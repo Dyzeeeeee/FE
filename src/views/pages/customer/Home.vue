@@ -1,11 +1,10 @@
 <template>
     <div class="h-full mb-12">
         <!-- Container with background image, overlay, and text -->
-        <div class="flex flex-col justify-center items-center bg-green-500 w-full relative"
+        <div class="flex flex-col justify-center items-center bg-black-100 w-full relative"
             :style="{ height: 'calc(100vh - 100px)' }">
             <!-- Image -->
-            <img src="https://cdn.shopify.com/s/files/1/0070/7032/files/food-photgraphy-tips.png?v=1657891849"
-                class="object-cover xl:h-[20vh] h-full w-full" />
+            <img src="@/assets/pics/BG.webp" class="object-cover xl:h-[20vh] h-full w-full" />
             <!-- Black overlay -->
             <div class="absolute top-0 left-0 w-full h-full bg-black opacity-60"></div>
             <!-- Text over the image and overlay -->

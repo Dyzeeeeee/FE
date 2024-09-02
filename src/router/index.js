@@ -1,17 +1,18 @@
 import AppLayout from '@/layout/AppLayout.vue';
-import StaffLayout from '@/layout/Staff/StaffLayout.vue';
 import CustomerLayout from '@/layout/Customer/CustomerLayout.vue';
+import StaffLayout from '@/layout/Staff/StaffLayout.vue';
 
-import { createRouter, createWebHistory } from 'vue-router';
+import {
+    createRouter,
+    createWebHistory
+} from 'vue-router';
 
 const router = createRouter({
     history: createWebHistory(),
-    routes: [
-        {
+    routes: [{
             path: '/',
             component: AppLayout,
-            children: [
-                {
+            children: [{
                     path: '/',
                     name: 'dashboard',
                     component: () => import('@/views/Dashboard.vue')
@@ -112,8 +113,7 @@ const router = createRouter({
         {
             path: '/staff',
             component: StaffLayout,
-            children: [
-                {
+            children: [{
                     path: '/staff',
                     name: 'staff-home',
                     component: () => import('@/views/pages/staff/Home.vue')
@@ -138,26 +138,25 @@ const router = createRouter({
         {
             path: '/customer',
             component: CustomerLayout,
-            children: [
-                {
+            children: [{
                     path: '/customer',
                     name: 'customer-home',
                     component: () => import('@/views/pages/customer/Home.vue')
                 },
                 {
                     path: '/customer/Profile',
-                    name: 'staff-POS',
+                    name: 'customer-profile',
                     component: () => import('@/views/pages/staff/Profile.vue')
                 },
                 {
-                    path: '/staff/Sales',
-                    name: 'staff-Sales',
-                    component: () => import('@/views/pages/staff/Sales.vue')
+                    path: '/customer/Menu',
+                    name: 'customer-menu',
+                    component: () => import('@/views/pages/customer/Menu.vue')
                 },
                 {
-                    path: '/staff/Profile',
-                    name: 'staff-Profile',
-                    component: () => import('@/views/pages/staff/Profile.vue')
+                    path: '/customer/Rooms',
+                    name: 'customer-rooms',
+                    component: () => import('@/views/pages/customer/Rooms.vue')
                 }
             ]
         },

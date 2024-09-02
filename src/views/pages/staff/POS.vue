@@ -49,7 +49,7 @@ const visible = ref(false);
                     </div>
                 </div>
                 <div class="flex gap-2 pb-3 text-sm xl:text-9xl font-bold"
-                    style="overflow-x: auto; white-space: no-wrap">
+                    style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
                     <Button rounded class="min-w-[5rem] xl:min-w-[5rem]"> All</Button>
                     <Button outlined rounded class="min-w-[5rem] xl:min-w-[7rem]" size="small"> Drinks</Button>
                     <Button outlined rounded class="min-w-[5rem] xl:min-w-[7rem]" size="small"> Drinks</Button>
