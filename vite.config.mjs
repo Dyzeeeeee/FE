@@ -31,7 +31,7 @@ export default defineConfig({
                 name: 'Anahaw',
                 short_name: 'Anahaw',
                 description: 'Anahaw app',
-                theme_color: '#ffffff',
+                theme_color: '#289c3c',
                 icons: [{
                         src: 'pwa-192x192.png',
                         sizes: '192x192',
