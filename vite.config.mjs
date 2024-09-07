@@ -28,22 +28,22 @@ export default defineConfig({
             filename: 'sw.js',
             includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
             manifest: {
-                name: 'Your App Name',
-                short_name: 'AppName',
-                description: 'Your app description',
+                name: 'Anahaw',
+                short_name: 'Anahaw',
+                description: 'Anahaw app',
                 theme_color: '#ffffff',
                 icons: [{
-                        src: 'pwa-nobg-192x192.png',
+                        src: 'pwa-192x192.png',
                         sizes: '192x192',
                         type: 'image/png'
                     },
                     {
-                        src: 'pwa-nobg-512x512.png',
+                        src: 'pwa-512x512.png',
                         sizes: '512x512',
                         type: 'image/png'
                     },
                     {
-                        src: 'pwa-nobg-512x512.png',
+                        src: 'pwa-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
                         purpose: 'any maskable'
