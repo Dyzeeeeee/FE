@@ -32,7 +32,6 @@ export default defineConfig({
                 short_name: 'Anahaw',
                 description: 'Anahaw app',
       start_url: "/auth/welcome",
-
       background_color: "#289c3c",
       theme_color: '#289c3c',
                 icons: [{
