@@ -1,15 +1,29 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
-import { ref } from 'vue';
-const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
+import { ref, watch } from 'vue';
+const { toggleDarkMode, isDarkTheme } = useLayout();
 
+const isFavorited = ref(false);
+
+function toggleFavorite() {
+    isFavorited.value = !isFavorited.value;
+}
 const visible = ref(false);
+
+watch(visible, (newValue) => {
+    if (newValue) {
+        document.body.classList.add('overflow-hidden');
+    } else {
+        document.body.classList.remove('overflow-hidden');
+    }
+});
+
 </script>
 
 <template>
-    <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
+    <!-- <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
         <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
-    </button>
+    </button> -->
     <div class="flex text-xl font-bold pt-4 pb-5 pl-4">
         MENU
     </div>
@@ -24,16 +38,23 @@ const visible = ref(false);
 
     <div class="grid grid-cols-12 xl:gap-4 gap-4 mt-5 pb-12 mb-12">
         <div class="col-span-12 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 gap-2">
-            <div class="card p-0 h-auto pb-5 mx-2 mb-4 ">
-                <div class="flex relative ">
+            <div class="card p-0 h-auto pb-5 mx-2 mb-4 relative">
+                <div class="flex relative">
                     <div
-                        class="text-3xl p-2 absolute bg-red-500 dark:bg-red-500 rounded-r-lg text-white dark:text-white  font-bold bottom-3">
+                        class="text-3xl p-2 absolute bg-red-500 dark:bg-red-500 rounded-r-lg text-white dark:text-white font-bold bottom-3">
                         ₱100
                     </div>
                     <img src="@/assets/pics/SisigRice.jpg"
                         class="object-cover xl:h-[20vh] h-[15vh] w-full rounded-t-lg" />
+                    <!-- Heart icon at the top right corner -->
+                    <div class="absolute top-2 right-2">
+                        <button @click="toggleFavorite">
+                            <Icon :icon="isFavorited ? 'teenyicons:heart-solid' : 'teenyicons:heart-outline'"
+                                :width="25" :height="25" :class="isFavorited ? 'text-red-500' : 'text-gray-500'" />
+                        </button>
+                    </div>
                 </div>
-                <div class="flex  pt-2 ml-4 xl:ml-0 xl:pt-0 xl:mt-4">
+                <div class="flex pt-2 ml-4 xl:ml-0 xl:pt-0 xl:mt-4">
                     <div class="xl:w-2/12"></div>
                     <div class="xl:w-70 flex-1 flex-wrap">
                         <div class="flex justify-between w-full">
@@ -47,10 +68,10 @@ const visible = ref(false);
                                 </Button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
+
         </div>
         <div class="col-span-12 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 gap-2">
             <div class="card p-0 h-auto pb-5 mx-2 mb-4">

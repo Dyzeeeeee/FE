@@ -124,6 +124,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/staff/POS.vue')
                 },
                 {
+                    path: '/staff/POS/Sell',
+                    name: 'staff-POSSell',
+                    component: () => import('@/views/pages/staff/POSSell.vue')
+                },
+                {
                     path: '/staff/Sales',
                     name: 'staff-Sales',
                     component: () => import('@/views/pages/staff/Sales.vue')
@@ -175,6 +180,16 @@ const router = createRouter({
             path: '/auth/login',
             name: 'login',
             component: () => import('@/views/pages/auth/Login.vue')
+        },
+        {
+            path: '/auth/signup',
+            name: 'signup',
+            component: () => import('@/views/pages/auth/Signup.vue')
+        },
+        {
+            path: '/auth/welcome',
+            name: 'welcome',
+            component: () => import('@/views/pages/auth/Welcome.vue')
         },
         {
             path: '/auth/access',

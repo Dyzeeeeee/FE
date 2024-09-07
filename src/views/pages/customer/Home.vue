@@ -13,6 +13,7 @@
                     <img src="@/assets/pics/logo.png" alt="" style="width: 300px;">
                     <span class="font-bold">Welcome to the resort and restaurant</span>
                 </div>
+
             </div>
         </div>
 

@@ -15,9 +15,14 @@ const model = ref([
     },
     {
         items: [
-            { label: 'Home', icon: 'pi pi-fw pi-home', to: '/staff' },
-            { label: 'Sales', icon: 'pi pi-fw pi-list-check', to: '/staff/Sales' },
-            { label: 'POS', icon: 'pi pi-fw pi-money-bill', to: '/staff/POS' }
+            { label: 'Home', icon: 'mdi:home', to: '/staff' },
+            // { label: 'Sales', icon: 'mdi:currency-usd-circle', to: '/staff/sales' },
+            { label: 'POS', icon: 'mdi:cash-register', to: '/staff/pos' },
+            { label: 'Tasks', icon: 'mdi:clipboard-text', to: '/staff/tasks' },
+            { label: 'Reservations', icon: 'fluent-mdl2:reservation-orders', to: '/staff/reservations' },
+            { label: 'Kitchen', icon: 'hugeicons:chef', to: '/staff/kitchen' },
+            { label: 'Customers', icon: 'gravity-ui:persons', to: '/staff/customers' },
+            { label: 'Inventory', icon: 'ic:baseline-inventory', to: '/staff/inventory' },
         ]
     }
 ]);

@@ -83,7 +83,7 @@ function isOutsideClicked(event) {
 <template>
     <div class="layout-wrapper" :class="containerClass">
         <app-topbar></app-topbar>
-        <staff-sidebar ></staff-sidebar>
+        <staff-sidebar></staff-sidebar>
         <div class="layout-main-container ">
             <div class="layout-main">
                 <router-view></router-view>
@@ -92,8 +92,9 @@ function isOutsideClicked(event) {
         </div>
         <div class="layout-mask animate-fadein"></div>
     </div>
-    <div class="flex fixed bottom-0 right-0 m-2 text-center rounded-t-lg">
-        <div class="flex-1 font-bold p-1 rounded-tl-lg -mb-2 pt-2 px-2 bg-blue-400 text-black" style="text-transform: lowercase">
+    <div class="hidden xl:flex fixed bottom-0 right-0 m-2 text-center rounded-t-lg">
+        <div class="flex-1 font-bold p-1 rounded-tl-lg -mb-2 pt-2 px-2 bg-blue-400 text-black"
+            style="text-transform: lowercase">
             {{ currentTime }}
         </div>
         <div class="-mb-2 pt-2 px-2 font-bold rounded-tr-lg bg-green-100 text-black">
