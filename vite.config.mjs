@@ -38,7 +38,7 @@ export default defineConfig({
                         type: 'image/png'
                     },
                     {
-                        src: 'pwa-512x512.png',
+                        src: 'Sharkcuet.png',
                         sizes: '512x512',
                         type: 'image/png'
                     },
