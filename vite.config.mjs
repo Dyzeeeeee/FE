@@ -17,7 +17,7 @@ export default defineConfig({
             registerType: 'autoUpdate',
             srcDir: 'src',
             filename: 'sw.js',
-            includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+            includeAssets: ['favicon.svg', 'logo-big.ico', 'robots.txt', 'apple-touch-icon.png'],
             manifest: {
                 name: 'Anahaw',
                 short_name: 'Anahaw',

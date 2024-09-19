@@ -26,25 +26,32 @@ function goToSignup() {
         </div>
     </div> -->
 
-    <div class="grid grid-cols-12 h-screen">
-        <div class="col-span-12  bg-black p-5">
-            <div class="relative flex flex-col justify-center items-center h-1/3 p-0">
+    <div class="grid grid-cols-12 h-screen bg-slate-800	">
+        <div class="hidden xl:block xl:col-span-7 self-center justify-center">
+            <!-- <img src="@/assets/pics/Welcome.png" alt="Welcome" class="h-auto w-full mb-7 object-cover"> -->
+
+        </div>
+        <div class="col-span-12 bg-slate-900 p-5 xl:col-span-5 xl:p-10 xl:rounded-3xl xl:m-10">
+            <div class="relative flex flex-col justify-center items-center h-1/3 p-0 ">
                 <!-- Welcome Image as Background -->
-                <img src="@/assets/pics/Welcome.png" alt="Welcome" class="h-auto w-screen mb-7 object-cover">
+                <img src="@/assets/pics/Welcome.png" alt="Welcome" class="h-auto w-screen mb-7 object-cover xl:hidden">
 
                 <!-- Logo Image at the center with an outline -->
-                <img src="@/assets/pics/logo-outline.png" alt="Logo" class="absolute h-[8rem] w-auto my-4 mt-7">
+                <img src="@/assets/pics/logo-outline.png" alt="Logo"
+                    class="absolute h-[8rem] w-auto my-4 mt-7 xl:h-[6rem]">
             </div>
 
-
-            <div class="text-center font-bold text-5xl">
-                Mabuhay!
+            <div>
+                <div class="text-center font-bold text-5xl xl:text-4xl ">
+                    Mabuhay!
+                </div>
+                <div class="text-center text-base px-4">
+                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam maiores cumque natus impedit
+                    laboriosam,
+                    sapiente
+                </div>
             </div>
-            <div class="text-center text-base px-4">
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam maiores cumque natus impedit laboriosam,
-                sapiente
-            </div>
-            <div class="text-center text-base mt-8 font-bold">
+            <div class="text-center text-base mt-8 font-bold xl:px-10">
                 <Button rounded class="w-full mb-4" @click="gotoLogin">
                     <div class="p-2">Login</div>
                 </Button>
@@ -52,7 +59,7 @@ function goToSignup() {
                     <div class="p-2">Sign Up</div>
                 </Button>
             </div>
-            <div class="text-center text-sm font-light px-4 mt-7">
+            <div class="text-center text-sm font-light px-4 mt-7 xl:px-10">
                 <Divider align="center">
                     <b>or</b>
                 </Divider>

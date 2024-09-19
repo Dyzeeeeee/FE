@@ -1,18 +1,16 @@
 import AppLayout from '@/layout/AppLayout.vue';
 import CustomerLayout from '@/layout/Customer/CustomerLayout.vue';
 import StaffLayout from '@/layout/Staff/StaffLayout.vue';
-
-import {
-    createRouter,
-    createWebHistory
-} from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
     history: createWebHistory(),
-    routes: [{
+    routes: [
+        {
             path: '/',
             component: AppLayout,
-            children: [{
+            children: [
+                {
                     path: '/',
                     name: 'dashboard',
                     component: () => import('@/views/Dashboard.vue')
@@ -113,7 +111,10 @@ const router = createRouter({
         {
             path: '/staff',
             component: StaffLayout,
-            children: [{
+            meta: { role: 'staff' }, // Protect this route for staff only
+
+            children: [
+                {
                     path: '/staff',
                     name: 'staff-home',
                     component: () => import('@/views/pages/staff/Home.vue')
@@ -124,7 +125,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/staff/POS.vue')
                 },
                 {
-                    path: '/staff/POS/Sell',
+                    path: '/staff/POS/Sell/:id',
                     name: 'staff-POSSell',
                     component: () => import('@/views/pages/staff/POSSell.vue')
                 },
@@ -141,9 +142,17 @@ const router = createRouter({
             ]
         },
         {
+            path: '/:pathMatch(.*)*', // or simply use '*' in Vue Router 3
+            name: 'notfound',
+            component: () => import('@/views/pages/NotFound.vue')
+        },
+
+        {
             path: '/customer',
             component: CustomerLayout,
-            children: [{
+            meta: { role: 'customer' }, // Protect this route for customers only
+            children: [
+                {
                     path: '/customer',
                     name: 'customer-home',
                     component: () => import('@/views/pages/customer/Home.vue')
@@ -151,7 +160,7 @@ const router = createRouter({
                 {
                     path: '/customer/Profile',
                     name: 'customer-profile',
-                    component: () => import('@/views/pages/staff/Profile.vue')
+                    component: () => import('@/views/pages/customer/Profile.vue')
                 },
                 {
                     path: '/customer/Menu',
@@ -170,11 +179,11 @@ const router = createRouter({
             name: 'landing',
             component: () => import('@/views/pages/Landing.vue')
         },
-        {
-            path: '/pages/notfound',
-            name: 'notfound',
-            component: () => import('@/views/pages/NotFound.vue')
-        },
+        // {
+        //     path: '/pages/notfound',
+        //     name: 'notfound',
+        //     component: () => import('@/views/pages/NotFound.vue')
+        // },
 
         {
             path: '/auth/login',
@@ -202,6 +211,35 @@ const router = createRouter({
             component: () => import('@/views/pages/auth/Error.vue')
         }
     ]
+});
+router.beforeEach((to, from, next) => {
+    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome']; // Public routes that don't require authentication
+    const authRequired = !publicPages.includes(to.path);
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const role = sessionStorage.getItem('role') || localStorage.getItem('role');
+
+    // const loggedIn = localStorage.getItem('token');
+    // const role = sessionStorage.getItem('role');
+
+    // Redirect logged-in users away from login/signup pages
+    if (token && publicPages.includes(to.path)) {
+        // Redirect to a default secure page based on role or to the dashboard
+        const redirectTo = role === 'customer' ? '/customer' : role === 'staff' ? '/staff' : '/';
+        return next(redirectTo);
+    }
+
+    if (authRequired && !token) {
+        next('/auth/welcome');
+    } else if (authRequired && token) {
+        const routeRole = to.meta?.role;
+        if (routeRole && routeRole !== role) {
+            next({ name: 'accessDenied' });
+        } else {
+            next();
+        }
+    } else {
+        next(); // Proceed to the route
+    }
 });
 
 export default router;
