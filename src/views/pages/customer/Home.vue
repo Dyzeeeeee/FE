@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full mb-12">
+    <div class="h-full mb-12 pb-12">
         <div class="flex flex-col justify-center items-center bg-black-100 w-full relative"
             :style="{ height: 'calc(100vh - 100px)' }">
             <img src="@/assets/pics/BG.webp" class="object-cover xl:h-full h-full w-full" />

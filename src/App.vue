@@ -3,7 +3,7 @@ import Floater from '@/layout/Floater.vue';
 </script>
 
 <template>
-    <Floater />
+    <!-- <Floater /> -->
     <router-view />
 </template>
 

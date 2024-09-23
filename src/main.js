@@ -33,7 +33,11 @@ import router from './router';
 //     });
 // }
 
-axios.defaults.baseURL = 'http://192.168.1.18:80/be/public/index.php/';
+// Dynamically set the base URL using the current host
+const currentHost = window.location.hostname;
+const baseURL = `http://${currentHost}/be/public/index.php/`;
+
+axios.defaults.baseURL = baseURL;
 
 axios.interceptors.request.use(
     function (config) {

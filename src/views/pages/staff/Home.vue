@@ -1,5 +1,6 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import axios from "axios";
+import { onMounted, onUnmounted, ref } from "vue";
 
 onMounted(() => {
     chartData.value = setChartData();
@@ -8,6 +9,29 @@ onMounted(() => {
 
 const chartData = ref();
 const chartOptions = ref();
+
+
+const userData = ref([]);
+const getUserById = async () => {
+    const userId = sessionStorage.getItem('userId');
+    if (!userId) {
+        console.error('No user ID found in session storage');
+        return;
+    }
+
+    try {
+        const response = await axios.get(`/get-user/${userId}`);
+        if (response.data) {
+            userData.value = response.data;
+            console.log('User data fetched:', userData.value);
+        } else {
+            console.error('No data returned for user');
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+};
+
 
 const setChartData = () => {
     const documentStyle = getComputedStyle(document.documentElement);
@@ -77,7 +101,7 @@ const setChartOptions = () => {
         }
     };
 };
-const dayName = ref(new Date().toLocaleDateString('en-US', { weekday: 'short' })); // "Tue"
+const dayName = ref(new Date().toLocaleDateString('en-US', { weekday: 'long' })); // "Tue"
 const dayNumber = ref(new Date().getDate()); // 6
 const monthName = ref(new Date().toLocaleDateString('en-US', { month: 'long' })); // "August"
 
@@ -93,6 +117,7 @@ const updateDateComponents = () => {
 let dateInterval;
 onMounted(() => {
     dateInterval = setInterval(updateDateComponents, 60000); // Update every minute
+    getUserById();
 });
 
 onUnmounted(() => {
@@ -104,12 +129,14 @@ onUnmounted(() => {
     <div class="grid grid-cols-12 xl:gap-3 gap-2 -m-5 xl:-m-3 ">
         <div class="col-span-12 xl:col-span-12 flex items-center">
             <div class="xl:ml-4 mr-2">
-                <Avatar image="https://thumbs.dreamstime.com/b/vector-illustration-smiling-shark-cartoon-minimalist-flat-style-isolated-white-background-315602043.jpg" size="xlarge" shape="circle" class="custom-avatar-border" />
+                <Avatar
+                    image="https://thumbs.dreamstime.com/b/vector-illustration-smiling-shark-cartoon-minimalist-flat-style-isolated-white-background-315602043.jpg"
+                    size="xlarge" shape="circle" class="custom-avatar-border" />
             </div>
             <div class="xl:p-2 flex-1">
                 <div class="flex justify-between items-center xl:text-4xl text-2xl">
                     <div class="flex-wrap">
-                        <div class="flex-wrap">Good Day <span class="font-bold">Username</span></div>
+                        <div class="flex-wrap">Good Day <span class="font-bold">{{ userData.firstname }}!</span></div>
                         <div class="text-base xl:text-xl flex"><i>Cashier</i></div>
                     </div>
 
@@ -128,7 +155,8 @@ onUnmounted(() => {
                         <span class="block text-muted-color font-medium mb-4">Orders</span>
                         <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">28441</div>
                     </div>
-                    <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-users text-cyan-500 !text-xl"></i>
                     </div>
                 </div>
@@ -143,7 +171,8 @@ onUnmounted(() => {
                         <span class="block text-muted-color font-medium mb-4">Customers</span>
                         <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">28441</div>
                     </div>
-                    <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-users text-cyan-500 !text-xl"></i>
                     </div>
                 </div>
@@ -158,7 +187,8 @@ onUnmounted(() => {
                         <span class="block text-muted-color font-medium mb-4">Reservations</span>
                         <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">28441</div>
                     </div>
-                    <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-users text-cyan-500 !text-xl"></i>
                     </div>
                 </div>
@@ -173,7 +203,8 @@ onUnmounted(() => {
                         <span class="block text-muted-color font-medium mb-4">Customers</span>
                         <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">28441</div>
                     </div>
-                    <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-users text-cyan-500 !text-xl"></i>
                     </div>
                 </div>

@@ -1,7 +1,12 @@
 <template>
     <AppConfigurator />
     <div class="grid grid-cols-12 h-screen bg-slate-800">
-        <div class="hidden xl:block xl:col-span-7"></div>
+        <div class="hidden xl:block xl:col-span-7  flex justify-center items-center self-center">
+            <div class="flex justify-center">
+            <img src="@/assets/pics/download.gif" alt="Centered GIF" class="max-w-full max-h-full" />
+        </div>
+        </div>
+
         <div
             class="col-span-12 xl:col-span-5 bg-black p-5 flex flex-col justify-between xl:p-10 xl:rounded-3xl xl:m-20 bg-slate-900">
             <!-- Top content container -->
@@ -80,13 +85,14 @@
                 </div>
             </div>
         </div>
+
     </div>
 </template>
 
 <script setup>
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import axios from 'axios';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -133,6 +139,10 @@ async function handleLogin() {
         alert('Login failed: ' + (error.response?.data?.message || error.message));
     }
 }
+
+onMounted(() => {
+    console.log("hostname is: ", window.location.hostname);
+});
 
 </script>
 

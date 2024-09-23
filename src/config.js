@@ -1,1 +1,5 @@
-export const baseImageUrl = 'http://192.168.1.18:80/be/public/uploads/';
+// Determine the current host (IP address or domain)
+const currentHost = window.location.hostname;
+
+// Set baseImageUrl dynamically using the current host
+export const baseImageUrl = `http://${currentHost}/be/public/uploads/`;

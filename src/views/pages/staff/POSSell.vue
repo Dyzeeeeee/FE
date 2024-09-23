@@ -9,13 +9,14 @@ import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
 
+const endSessionVisible = ref(false);
 const visible = ref(false);
 const categories = ref([]); // Assuming you're using Vue.js with ref for reactivity
 const allMenuItems = ref([]);  // Holds all menu items unfiltered
 const menuItems = ref([]);  // Holds items currently being displayed
 const scrollContainer = ref(null);
 const selectedCategoryId = ref('All');  // Initially set to 'All'
-const orderId = ref(localStorage.getItem('orderId'));
+const orderId = ref(null);
 const selectedService = ref('Dine in');  // Initially set to 'All'  
 const route = useRoute();
 const sessionId = route.params.id;
@@ -33,18 +34,19 @@ const QRcode = ref('');
 const setPaymentMethod = (method) => {
     paymentMethod.value = method;
 };
+const opening_cash = localStorage.getItem('opening_cash')
 
 const goToOrder = async () => {
     // Ensure an order is selected and check if the order status is 'canceled'
-    if (selectedOrder.value && selectedOrder.value.status !== 'cancelled' && selectedOrder.value.status !== 'completed') {
+    if (selectedOrder.value && selectedOrder.value.status !== 'cancelled' && selectedOrder.value.status !== 'paid') {
         orderId.value = selectedOrder.value.id;  // Assume the order ID is stored in selectedOrder
         await getOrderDetails(orderId.value);
         allOrders.value = false;  // Close the orders dialog/modal
-    } else if (selectedOrder.value.status === 'completed') {
+    } else if (selectedOrder.value.status === 'paid') {
         toast.add({
             severity: 'error',
             summary: 'Action Forbidden',
-            detail: 'You cannot go to an order with the status "completed".',
+            detail: 'You cannot go to an order with the status "paid".',
             life: 3000
         });
     }
@@ -147,7 +149,7 @@ const processPayment = async () => {
         // Update the order in the database with payment details
         const response = await axios.put(`/update-order/${orderId.value}`, {
             total_price: totalPrice.value,
-            status: 'completed',
+            status: 'paid',
             tendered: amountTendered.value,
             change1: change >= 0 ? change : 0,
             payment_method: paymentMethod.value,
@@ -322,7 +324,7 @@ const setExactAmount = () => {
 };
 const statusSeverity = (order) => {
     switch (order.status) {
-        case 'completed':
+        case 'paid':
             return 'success';
 
         case 'pending':
@@ -512,8 +514,8 @@ const getMenu = async () => {
 
 const totalCash = computed(() => {
     return filteredOrders.value
-        .filter(order => order.status === 'completed') // Filter for completed orders
-        .reduce((acc, order) => acc + parseFloat(order.total_price), 0); // Sum total_price
+        .filter(order => order.status === 'paid') // Filter for completed orders
+        .reduce((acc, order) => acc + parseFloat(order.total_price), parseFloat(opening_cash)); // Sum total_price, starting from opening_cash.value
 });
 
 
@@ -735,7 +737,7 @@ onMounted(async () => {
                     <div class="col-span-8 xl:col-span-7 mb-2">
                         <div class="flex flex-1 justify-start gap-2 font-bold">
                             <div class="xl:block">
-                                <Button class="w-auto" size="small" severity="danger" @click="confirmEnd()">
+                                <Button class="w-auto" size="small" severity="danger" @click="endSessionVisible = true">
                                     <Icon icon="material-symbols:tab-close-outline" width="20" height="20" />
                                     <div>End</div>
                                 </Button>
@@ -792,7 +794,7 @@ onMounted(async () => {
                             All
                         </Button>
                         <Button v-for="category in categories" :key="category.id"
-                            :outlined="selectedCategoryId !== category.id" rounded class="min-w-[5rem] xl:min-w-[7rem]"
+                            :outlined="selectedCategoryId !== category.id" rounded class="min-w-[7rem] xl:min-w-[7rem]"
                             size="small" @click="filterCategory(category.id)">
                             {{ category.name }}
                         </Button>
@@ -1112,7 +1114,7 @@ onMounted(async () => {
         </DataTable>
     </Dialog>
 
-    <Dialog v-model:visible="QRcodeVisible" modal :style="{ width: '20vw', height: '30%' }" position="center"
+    <Dialog v-model:visible="QRcodeVisible" modal :style="{ width: '20vw', height: '35%' }" position="center"
         header="Order QR Code">
 
         <div class="flex w-full">
@@ -1130,6 +1132,27 @@ onMounted(async () => {
                 QR code. </span> <span class="text-red-500">&nbspSoon there will be a scanner for computers but for now,
                 use
                 phone's camera.</span>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+            <Button severity="secondary" outlined @click="QRcodeVisible = false"> Cancel</Button>
+            <Button severity="success">Get Order</Button>
+        </div>
+    </Dialog>
+
+    <Dialog v-model:visible="endSessionVisible" modal :style="{ width: '20vw', height: '30%' }" position="center"
+        header="End the current session?">
+
+        <div class="flex-wrap w-full pb-2 font-bold mt-2">
+            <div>
+                Total Money in the Register:
+            </div>
+            <div class="text-3xl flex">
+                P{{ totalCash }}
+            </div>
+        </div>
+        <div class="flex justify-end gap-2">
+            <Button severity="secondary" outlined @click="endSessionVisible = false"> Cancel</Button>
+            <Button severity="danger" @click="endSession()">Close Session</Button>
         </div>
     </Dialog>
 

@@ -1,10 +1,10 @@
 <script setup>
 import AppConfigurator from '@/layout/AppConfigurator.vue';
-import { useRouter } from 'vue-router';
 import axios from "axios";
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const firebaseConfig = {
     apiKey: "AIzaSyAGhkUdH-9tFFimGJ1p9dzz76YPmrnohX4",
@@ -70,6 +70,10 @@ const router = useRouter();
 
 function gotoLogin() {
     router.push('/auth/login');
+}
+
+function continueAsGuest() {
+    router.push('/customer');
 }
 
 function goToSignup() {
@@ -139,8 +143,8 @@ function goToSignup() {
                     <Icon icon="hugeicons:new-twitter" width="45" height="45" class="text-white" />
                 </Button>
             </div>
-            <div class="text-center text-base mt-8 font-bold underline">
-                <a href="/customer">Continue as guest</a>
+            <div class="text-center text-base mt-8 font-bold underline " @click="continueAsGuest">
+                <div>Continue as guest</div>
             </div>
         </div>
 

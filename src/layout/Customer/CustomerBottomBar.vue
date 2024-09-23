@@ -18,6 +18,14 @@
             </div>
         </div>
 
+        <div @click="$router.push('/customer/notifications')" class="flex-1 text-center p-2 cursor-pointer">
+            <div :class="{ 'text-yellow-500': $route.path === '/customer/notifications' }">Notifications</div>
+            <div class="flex justify-center">
+                <Icon icon="quill:notifications" width="20" height="20"
+                    :class="{ 'text-yellow-500': $route.path === '/customer/notifications' }" />
+            </div>
+        </div>
+
         <!-- Rooms -->
         <div @click="$router.push('/customer/rooms')" class="flex-1 text-center p-2 cursor-pointer">
             <div :class="{ 'text-yellow-500': $route.path === '/customer/rooms' }">Rooms</div>
@@ -28,11 +36,11 @@
         </div>
 
         <!-- Profile -->
-        <div @click="$router.push('/customer/profile')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500': $route.path === '/customer/profile' }">Profile</div>
+        <div @click="$router.push('/customer/more')" class="flex-1 text-center p-2 cursor-pointer">
+            <div :class="{ 'text-yellow-500': $route.path === '/customer/more' }">More</div>
             <div class="flex justify-center">
-                <Icon icon="iconamoon:profile-duotone" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/customer/profile' }" />
+                <Icon icon="icon-park-outline:more-app" width="20" height="20"
+                    :class="{ 'text-yellow-500': $route.path === '/customer/more' }" />
             </div>
         </div>
     </div>

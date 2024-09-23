@@ -135,6 +135,16 @@ const router = createRouter({
                     component: () => import('@/views/pages/staff/Sales.vue')
                 },
                 {
+                    path: '/staff/Tasks',
+                    name: 'staff-tasks',
+                    component: () => import('@/views/pages/staff/Tasks.vue')
+                },
+                {
+                    path: '/staff/Kitchen',
+                    name: 'staff-kitchen',
+                    component: () => import('@/views/pages/staff/Kitchen.vue')
+                },
+                {
                     path: '/staff/Profile',
                     name: 'staff-Profile',
                     component: () => import('@/views/pages/staff/Profile.vue')
@@ -171,6 +181,11 @@ const router = createRouter({
                     path: '/customer/Rooms',
                     name: 'customer-rooms',
                     component: () => import('@/views/pages/customer/Rooms.vue')
+                },
+                {
+                    path: '/customer/more',
+                    name: 'customer-more',
+                    component: () => import('@/views/pages/customer/More.vue')
                 }
             ]
         },
@@ -213,24 +228,28 @@ const router = createRouter({
     ]
 });
 router.beforeEach((to, from, next) => {
-    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome']; // Public routes that don't require authentication
+    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer'];
+
     const authRequired = !publicPages.includes(to.path);
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     const role = sessionStorage.getItem('role') || localStorage.getItem('role');
 
-    // const loggedIn = localStorage.getItem('token');
-    // const role = sessionStorage.getItem('role');
-
-    // Redirect logged-in users away from login/signup pages
     if (token && publicPages.includes(to.path)) {
-        // Redirect to a default secure page based on role or to the dashboard
-        const redirectTo = role === 'customer' ? '/customer' : role === 'staff' ? '/staff' : '/';
-        return next(redirectTo);
+        if (to.path === '/customer') {
+            // Allow public access to the customer home without redirection
+            return next();
+        } else {
+            // Redirect to a default secure page based on role or to the dashboard
+            const redirectTo = role === 'customer' ? '/customer' : role === 'staff' ? '/staff' : '/';
+            return next(redirectTo);
+        }
     }
 
     if (authRequired && !token) {
+        // Navigate to welcome page if not logged in and accessing a protected route
         next('/auth/welcome');
     } else if (authRequired && token) {
+        // Role-based access control for authenticated paths
         const routeRole = to.meta?.role;
         if (routeRole && routeRole !== role) {
             next({ name: 'accessDenied' });
@@ -238,7 +257,8 @@ router.beforeEach((to, from, next) => {
             next();
         }
     } else {
-        next(); // Proceed to the route
+        // Proceed to public routes
+        next();
     }
 });
 

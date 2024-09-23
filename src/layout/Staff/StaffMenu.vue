@@ -1,22 +1,48 @@
 <script setup>
-import { ref } from 'vue';
+import axios from 'axios';
+import { computed, onMounted, ref } from 'vue';
 import StaffMenuItem from './StaffMenuItem.vue';
+const userData = ref([]);
+const getUserById = async () => {
+    const userId = sessionStorage.getItem('userId');
+    if (!userId) {
+        console.error('No user ID found in session storage');
+        return;
+    }
 
-const model = ref([
+    try {
+        const response = await axios.get(`/get-user/${userId}`);
+        if (response.data) {
+            userData.value = response.data;
+            console.log('User data fetched:', userData.value);
+        } else {
+            console.error('No data returned for user');
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+};
+
+onMounted(() => {
+    getUserById();
+
+});
+
+const model = computed(() => [
     {
         items: [
             {
-                label: 'Username', // Consider changing 'label' to the actual user's name if dynamic
-                role: 'Staff', // User's role
+                label: userData.value ? `${userData.value.firstname || ''} ${userData.value.lastname || ''}`.trim() : 'Guest',
+                role: `${userData.value.role}`,
                 avatar: 'https://thumbs.dreamstime.com/b/vector-illustration-smiling-shark-cartoon-minimalist-flat-style-isolated-white-background-315602043.jpg',
                 to: '/staff/profile'
             }
         ]
     },
+    // Remainder of your menu items
     {
         items: [
             { label: 'Home', icon: 'mdi:home', to: '/staff' },
-            // { label: 'Sales', icon: 'mdi:currency-usd-circle', to: '/staff/sales' },
             { label: 'POS', icon: 'mdi:cash-register', to: '/staff/pos' },
             { label: 'Tasks', icon: 'mdi:clipboard-text', to: '/staff/tasks' },
             { label: 'Reservations', icon: 'fluent-mdl2:reservation-orders', to: '/staff/reservations' },
@@ -26,6 +52,8 @@ const model = ref([
         ]
     }
 ]);
+
+
 </script>
 
 <template>

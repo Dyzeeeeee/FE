@@ -41,45 +41,7 @@ const formatTime = (dateString) => {
     });
 };
 
-const endSession = async (sessionId) => {
-    // Safely access orders data with optional chaining
-    const sessionOrders = ordersBySession.value[sessionId];
 
-    // Ensure the orders are loaded and check if any are pending
-    if (sessionOrders && sessionOrders.some(order => order.status === 'pending')) {
-        alert('There are pending orders. You cannot end this session yet.');
-        return;
-    }
-
-    try {
-        const response = await axios.put(`/update-session/${sessionId}`, {
-            status: 'closed',
-        }, {
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-            }
-        });
-        if (response.status === 200) {
-            // toast.add({
-            //     severity: 'success',
-            //     summary: 'Session Ended',
-            //     detail: 'The session has been successfully ended!',
-            //     life: 3000
-            // });
-            // Refresh sessions to reflect changes
-            await getSessions();
-            window.location.reload();
-        }
-    } catch (error) {
-        console.error('Failed to end session:', error);
-        // toast.add({
-        //     severity: 'error',
-        //     summary: 'Ending Session Failed',
-        //     detail: 'There was an error trying to end the session.',
-        //     life: 3000
-        // });
-    }
-};
 
 
 
@@ -87,27 +49,39 @@ const endSession = async (sessionId) => {
 const getSessions = async () => {
     try {
         const response = await axios.get('/get-sessions');
+        const userId = sessionStorage.getItem('userId');  // Retrieve userId from sessionStorage
         if (response.data && Array.isArray(response.data)) {
-            // Sort sessions by id in descending order
-            sessions.value = response.data.sort((a, b) => b.id - a.id);
+            // Filter sessions to only include those that belong to the current userId
+            const filteredSessions = response.data.filter(session => session.cashier_id === userId);
+            // Sort these filtered sessions by id in descending order
+            sessions.value = filteredSessions.sort((a, b) => b.id - a.id);
         } else {
             sessions.value = []; // Ensures sessions is always an array, even on error or empty data
         }
-        console.log(response.data);  // Log the sorted sessions for debugging
+        console.log(sessions.value);  // Log the filtered and sorted sessions for debugging
     } catch (error) {
         console.error('Failed to fetch sessions:', error);
     }
 };
 
 
+
 // Example function to add a session
 // Example function to add a session
 const startSession = async () => {
+    // Check if there is any session that is still open
+    if (sessions.value.some(session => session.status === 'open')) {
+        alert('A session is still open. Please close it before starting a new one.');
+        return;  // Stop the function execution if an open session is found
+    }
+
     const userId = sessionStorage.getItem('userId'); // Retrieve the user ID
+    localStorage.setItem('opening_cash', openingCash.value); // Store the opening cash in localStorage
+    console.log(openingCash.value);
 
     try {
         const sessionData = {
-            cashier_id: userId, // Use retrieved user ID
+            cashier_id: userId,
             opening_cash: openingCash.value,
             status: 'open'
         };
@@ -115,16 +89,16 @@ const startSession = async () => {
         const response = await axios.post('/add-session', sessionData, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Ensure the request includes the JWT token
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Including the JWT token for authorization
             }
         });
 
         console.log('Session added:', response.data);
-        visible.value = false;
+        visible.value = false;  // Close the dialog
 
         if (response.data && response.data.id) {
-            sessionId.value = response.data.id;
-            router.push(`/Staff/POS/Sell/${sessionId.value}`);
+            sessionId.value = response.data.id;  // Store the new session ID
+            router.push(`/Staff/POS/Sell/${sessionId.value}`);  // Navigate to the selling page
         } else {
             console.error("Failed to retrieve session ID from response");
         }
@@ -132,6 +106,7 @@ const startSession = async () => {
         console.error('Failed to add session:', error);
     }
 };
+
 
 
 
@@ -283,7 +258,7 @@ onMounted(() => {
 }
 
 :root {
-    --p-accordion-content-background: #4CAF50;
+    /* --p-accordion-content-background: #4CAF50; */
     /* Change to your preferred color */
 }
 </style>

@@ -55,8 +55,9 @@ function sendNotification() {
   // Hard-coded message details for testing
   const notificationData = {
     token: token.value,
-    title: "Test Notification",
-    body: "This is a test notification from Vue.js"
+    title: "Nagsend ba",
+    body: "Try nga",
+    // image_url: "http://be.test/uploads/logo.ico"
   };
 
   axios.post('/send-notification', notificationData)
