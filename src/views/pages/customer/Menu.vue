@@ -657,7 +657,7 @@
                 <div class="text-2xl font-bold w-full">{{ text }}</div>
             </div>
             <div class="flex justify-center mt-4">
-                <qrcode-vue :value="text" size='270' level='L' margin="3" />
+                <qrcode-vue :value="text" size='270' level='L' margin="3" class="rounded-xl" />
             </div>
             <div class="italic mt-2 text-light text-sm">
                 <span class="italic mt-2 text-light text-sm">

@@ -1,47 +1,63 @@
 <template>
     <div class="qr-reader">
-        <qrcode-stream :formats="['qr_code']" @detect="onDetect" @camera-on="onCameraOn" @error="onError">
-            <template #default>
-                <div class="overlay">Scanning for QR Codes...</div>
-            </template>
-        </qrcode-stream>
+      <qrcode-stream
+        v-if="cameraActive"
+        :formats="['qr_code']"
+        @detect="onDetect"
+        @camera-on="onCameraOn"
+        @error="onError"
+      >
+        <template #default>
+          <div class="overlay">Scanning for QR Codes...</div>
+        </template>
+      </qrcode-stream>
+      <button @click="toggleCamera">
+        {{ cameraActive ? 'Turn Camera Off' : 'Turn Camera On' }}
+      </button>
+      <div v-if="scannedContent" class="scanned-content">
+        <h3>Scanned QR Code Content:</h3>
+        <p>{{ scannedContent }}</p>
+      </div>
     </div>
-</template>
-
-<script>
-import { QrcodeStream } from 'vue-qrcode-reader';
-
-export default {
-    components: {
-        QrcodeStream
-    },
-    methods: {
-        onDetect(detectedCodes) {
-            console.log('Detected QR Codes:', detectedCodes);
-            // Handle detected QR codes here (e.g., navigate to a URL or display data)
-        },
-        onCameraOn(capabilities) {
-            console.log('Camera is on, capabilities:', capabilities);
-            // This is where you can check if the torch is supported and possibly enable it
-        },
-        onError(error) {
-            console.error('Error with QR Code Stream:', error);
-            // Handle errors appropriately (e.g., display a user-friendly message)
-        }
+  </template>
+  
+  <script setup>
+  import { ref } from 'vue';
+  import { QrcodeStream } from 'vue-qrcode-reader';
+  
+  const cameraActive = ref(false);
+  const scannedContent = ref('');
+  
+  const onDetect = (detectedCodes) => {
+    console.log('Detected QR Codes:', detectedCodes);
+    scannedContent.value = detectedCodes.map(code => code.rawValue).join(', ');
+  };
+  
+  const onCameraOn = (capabilities) => {
+    console.log('Camera is on, capabilities:', capabilities);
+  };
+  
+  const onError = (error) => {
+    console.error('Error with QR Code Stream:', error);
+    scannedContent.value = ''; // Clear previous content on error
+  };
+  
+  const toggleCamera = () => {
+    cameraActive.value = !cameraActive.value;
+    if (!cameraActive.value) {
+      scannedContent.value = ''; // Optionally clear the scanned content when camera is turned off
     }
-}
-</script>
-
-<style scoped>
-.qr-reader {
+  };
+  </script>
+  
+  <style scoped>
+  .qr-reader {
     position: relative;
     width: 100%;
-    /* Adjust size as needed */
     height: 400px;
-    /* Adjust size as needed */
-}
-
-.overlay {
+  }
+  
+  .overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -53,5 +69,25 @@ export default {
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     font-size: 20px;
-}
-</style>
+  }
+  
+  .scanned-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    color: black;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  </style>
+  
