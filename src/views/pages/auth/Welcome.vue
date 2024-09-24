@@ -110,7 +110,7 @@ function goToSignup() {
 </script>
 
 <template>
-    <div class="flex w-full justify-between">
+    <!-- <div class="flex w-full justify-between">
         <div>
             <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 40px">
         </div>
@@ -120,7 +120,7 @@ function goToSignup() {
         <div>
             <Button v-if="!isInstallable" @click="handleInstallApp">Install</Button>
         </div>
-    </div>
+    </div> -->
     <AppConfigurator />
     <!-- <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm h-screen"></div> -->
 
