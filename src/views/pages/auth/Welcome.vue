@@ -3,7 +3,7 @@ import AppConfigurator from '@/layout/AppConfigurator.vue';
 import axios from "axios";
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const firebaseConfig = {
@@ -83,7 +83,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
 const handleInstallApp = async () => {
     if (installPromptEvent.value) {
         // Show the install prompt
-        installPromptEvent.value.prompt();
+        Install.value = false,
+            installPromptEvent.value.prompt();
         // Wait for the user to respond to the prompt
         const { outcome } = await installPromptEvent.value.userChoice;
         if (outcome === 'accepted') {
@@ -96,6 +97,15 @@ const handleInstallApp = async () => {
         isInstallable.value = false;
     }
 };
+
+function checkInstalledStatus() {
+    if (!isInstallable.value) {
+        Install.value = false; // If not installable, ensure dialog does not show
+    } else {
+        Install.value = true; // Show dialog if the app is installable
+    }
+}
+
 function gotoLogin() {
     router.push('/auth/login');
 }
@@ -107,6 +117,10 @@ function continueAsGuest() {
 function goToSignup() {
     router.push('/auth/signup');
 }
+
+onMounted(() => {
+    checkInstalledStatus();
+});
 </script>
 
 <template>
