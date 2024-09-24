@@ -146,7 +146,8 @@ function goToSignup() {
                 <div class="text-center text-base px-4">
                     Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam maiores cumque natus impedit
                     laboriosam,
-                    sapiente
+                    sapiente <br>
+                    {{ token     }}
                 </div>
             </div>
             <div class="text-center text-base mt-8 font-bold xl:px-10">
