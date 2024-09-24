@@ -148,13 +148,13 @@ const router = createRouter({
                     path: '/staff/Profile',
                     name: 'staff-Profile',
                     component: () => import('@/views/pages/staff/Profile.vue')
-                },
-                {
-                    path: '/staff/inventory',
-                    name: 'staff-inventory',
-                    component: () => import('@/views/pages/staff/Inventory.vue')
                 }
             ]
+        },
+        {
+            path: '/inventory',
+            name: 'staff-inventory',
+            component: () => import('@/views/pages/staff/Inventory.vue')
         },
         {
             path: '/:pathMatch(.*)*', // or simply use '*' in Vue Router 3
@@ -233,7 +233,7 @@ const router = createRouter({
     ]
 });
 router.beforeEach((to, from, next) => {
-    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer'];
+    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer', '/inventory'];
 
     const authRequired = !publicPages.includes(to.path);
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
