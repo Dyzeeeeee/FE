@@ -1,10 +1,65 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
+import router from '@/router';
 import axios from 'axios';
 import { onMounted, ref, watch } from 'vue';
 const { toggleDarkMode, isDarkTheme } = useLayout();
 const userData = ref([]);
+const installPromptEvent = ref(null);
+const isInstallable = ref(false);
 
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Save the event for later use
+    installPromptEvent.value = e;
+    // Update installable status
+    isInstallable.value = true;
+});
+
+const handleInstallApp = async () => {
+    if (installPromptEvent.value) {
+        // Show the install prompt
+        installPromptEvent.value.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await installPromptEvent.value.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        } else {
+            console.log('User dismissed the install prompt');
+        }
+        // We no longer need the prompt. Clear it up.
+        installPromptEvent.value = null;
+        isInstallable.value = false;
+    }
+};
+
+const handleLogout = async () => {
+    try {
+        // Call backend logout endpoint
+        await axios.post('/logout', {}, {
+            headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+        });
+
+        // Clear local storage or any state management holding user data
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('role');
+        sessionStorage.removeItem('userId');
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('orderId');
+
+        // Redirect to the login page
+        router.push('/auth/welcome').then(() => {
+            // Reload the page to ensure proper rerouting after logout
+            window.location.reload();
+        });
+    } catch (error) {
+        console.error('Logout failed:', error);
+    }
+};
 const getUserById = async () => {
     const userId = sessionStorage.getItem('userId');
     if (!userId) {
@@ -43,8 +98,9 @@ watch(visible, (newValue) => {
 </script>
 
 <template>
+    <button v-if="isInstallable" @click="handleInstallApp">Install our app</button>
     <div class="flex text-xl font-bold pt-4 pb-5 pl-4">
-        MENU
+        MORE
     </div>
     <div class="grid grid-cols-12 gap-3 px-3">
         <div class="col-span-12 lg:col-span-6 xl:col-span-8 ">
@@ -181,7 +237,7 @@ watch(visible, (newValue) => {
         </div>
         <div class="col-span-12 lg:col-span-6 xl:col-span-8 ">
 
-            <Button class="w-full " outlined>
+            <Button class="w-full " outlined @click="handleLogout">
                 <Icon icon="majesticons:logout-half-circle" height="30" width="30" />
                 <div class="font-bold">Log out</div>
             </Button>

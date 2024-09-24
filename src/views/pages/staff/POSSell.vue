@@ -62,6 +62,42 @@ const goToOrder = async () => {
 }
 
 
+
+const confirmOrder = async () => {
+    try {
+        // Retrieve session_id from route parameters
+        const session_id = route.params.id;
+
+        // Build the data payload to include session_id
+        const payload = {
+            qrcode: QRcode.value,
+            session_id  // Using shorthand for object properties when names match
+        };
+
+        // Sending the QR code and session_id to the server to confirm the order
+        const response = await axios.put(`/confirmOrder/AIVR${encodeURIComponent(QRcode.value)}`, payload, {
+            headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+        });
+
+        console.log("data from putting: ", response.data.newOrderId)
+
+        if (response.status === 200) {
+            toast.add({ severity: 'success', summary: 'Order Confirmed', detail: 'The order has been confirmed successfully!', life: 3000 });
+            QRcodeVisible.value = false; // Close the QR code dialog
+            getOrders();
+            orderId.value = response.data.newOrderId;
+            getOrderDetails();// Refresh the list of orders; // Set the latest order ID if provided by the backend
+        } else {
+            throw new Error('Order confirmation failed');
+        }
+    } catch (error) {
+        console.error('Error confirming order:', error);
+        toast.add({ severity: 'error', summary: 'Confirmation Failed', detail: 'Failed to confirm the order.', life: 3000 });
+    }
+};
+
+
+
 const confirmEnd = () => {
     confirm.require({
         message: 'Are you sure you want to end this session?',
@@ -1135,7 +1171,7 @@ onMounted(async () => {
         </div>
         <div class="flex justify-end gap-2 mt-4">
             <Button severity="secondary" outlined @click="QRcodeVisible = false"> Cancel</Button>
-            <Button severity="success">Get Order</Button>
+            <Button severity="success" @click="confirmOrder">Get Order</Button>
         </div>
     </Dialog>
 

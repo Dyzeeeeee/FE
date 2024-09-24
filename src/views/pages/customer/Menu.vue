@@ -14,6 +14,8 @@ const generateRandomQR = () => {
 }
 const { toggleDarkMode, isDarkTheme } = useLayout();
 
+
+
 const formattedTime = computed(() => {
     const minutes = Math.floor(countdown.value / 60);
     const seconds = countdown.value % 60;
@@ -110,6 +112,7 @@ const createOrder = async (userId) => {
             orderId.value = response.data.id;  // Set the newly created order ID in the reactive reference
             localStorage.setItem('orderId', orderId.value);  // Store the order ID in localStorage
             console.log('Order ID:', orderId.value); // Logging the order ID
+
             return orderId.value;
         }
     } catch (error) {
@@ -118,19 +121,32 @@ const createOrder = async (userId) => {
 };
 
 const totalOrderPrice = computed(() => {
+
     return orderDetails.value.reduce((total, detail) => total + parseFloat(detail.subtotal), 0);
+
 });
 
+const updateTotalPrice = async () => {
+    if (orderId.value) {
+        try {
+            await axios.put(`/update-online-order/${orderId.value}`, { total_price: totalOrderPrice.value });
+        } catch (error) {
+            console.error('Error updating total price:', error);
+        }
+    }
+};
 
 const increaseQuantity = async (detail) => {
     detail.quantity = parseInt(detail.quantity, 10) + 1;  // Convert to integer and increment
-    await updateOrderDetail(detail);  // Call to update the backend
+    await updateOrderDetail(detail);
+    // Call to update the backend
 };
 
 const decreaseQuantity = async (detail) => {
     if (parseInt(detail.quantity, 10) > 1) {  // Convert to integer and check
         detail.quantity = parseInt(detail.quantity, 10) - 1;  // Decrement the quantity
-        await updateOrderDetail(detail);  // Call to update the backend
+        await updateOrderDetail(detail);
+        // Call to update the backend
     }
 };
 
@@ -148,7 +164,8 @@ const updateOrderDetail = async (detail) => {
         const response = await axios.post('/add-or-update-online-order-detail', updateData);
         if (response.status === 200 || response.status === 201) {
             console.log('Order detail updated:', response.data);
-            await getOnlineOrderDetails();  // Refresh the list of order details
+            await getOnlineOrderDetails();
+            // Refresh the list of order details
         } else {
             console.error('Failed to update order detail:', response.data);
         }
@@ -296,6 +313,13 @@ const getCategories = async () => {
         console.error('Error fetching categories:', error);  // Error handling
     }
 };
+
+watch(totalOrderPrice, () => {
+    updateTotalPrice();
+}, {
+    deep: true  // This option isn't necessary here but could be useful if watching nested data
+});
+
 function toggleFavorite() {
     isFavorited.value = !isFavorited.value;
 }
@@ -405,9 +429,9 @@ onUnmounted(() => {
             class="cursor-pointer pb-2 hidden xl:block" />
     </div>
 
-        <div class="grid grid-cols-12 xl:gap-4 gap-4 mt-5 pb-12 mb-12">
-            <!---->
-            <div class="col-span-12 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 gap-2">
+    <div class="grid grid-cols-12 xl:gap-4 gap-4 mt-5 pb-12 mb-12">
+        <!---->
+        <div class="col-span-12 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 gap-2">
 
             <div class="card p-0 h-auto pb-5 mx-2 mb-4">
                 <div class="flex relative ">
