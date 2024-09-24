@@ -47,7 +47,7 @@ const handleInstallApp = async () => {
         </div>
         <div class="flex">
             <div class="self-center ">
-                <Button v-if="!isInstallable" @click="handleInstallApp" style="height: 30px">Install</Button>
+                <Button @click="handleInstallApp" style="height: 30px">Install</Button>
             </div>
             <div class="self-center ml-4 ">
                 <Icon icon="ri:close-fill" height="20" @click="isInstallable = false" />
