@@ -148,6 +148,11 @@ const router = createRouter({
                     path: '/staff/Profile',
                     name: 'staff-Profile',
                     component: () => import('@/views/pages/staff/Profile.vue')
+                },
+                {
+                    path: '/staff/inventory',
+                    name: 'staff-inventory',
+                    component: () => import('@/views/pages/staff/Inventory.vue')
                 }
             ]
         },

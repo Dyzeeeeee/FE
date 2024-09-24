@@ -49,7 +49,7 @@ const handleInstallApp = async () => {
             <div class="self-center ">
                 <Button @click="handleInstallApp" style="height: 30px">Install</Button>
             </div>
-            <div class="self-center ml-4 ">
+            <div class="self-center ml-4 cursor-pointer">
                 <Icon icon="ri:close-fill" height="20" @click="isInstallable = false" />
             </div>
         </div>

@@ -1077,9 +1077,9 @@ onMounted(async () => {
                                 {{ formatDate(slotProps.data.order_date) }}
                             </template>
                         </Column>
-                        <Column field="customer_id" header="Customer">
+                        <Column field="customer_name" header="Customer">
                             <template #body="slotProps">
-                                {{ slotProps.data.customer_id ? slotProps.data.customer_id : 'no data' }}
+                                {{ slotProps.data.customer_name ? slotProps.data.customer_name : 'no data' }}
                             </template>
                         </Column>
                         <Column field="service" header="Service"></Column>
