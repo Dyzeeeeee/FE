@@ -1,10 +1,11 @@
 <template>
+    
     <AppConfigurator />
     <div class="grid grid-cols-12 h-screen bg-slate-800">
         <div class="hidden xl:block xl:col-span-7  flex justify-center items-center self-center">
             <div class="flex justify-center">
-            <img src="@/assets/pics/download.gif" alt="Centered GIF" class="max-w-full max-h-full" />
-        </div>
+                <img src="@/assets/pics/download.gif" alt="Centered GIF" class="max-w-full max-h-full" />
+            </div>
         </div>
 
         <div
@@ -92,7 +93,7 @@
 <script setup>
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();

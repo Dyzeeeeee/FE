@@ -110,8 +110,17 @@ function goToSignup() {
 </script>
 
 <template>
-    <Button v-if="isInstallable" @click="handleInstallApp">Install</Button>
-
+    <div class="flex w-full justify-between">
+        <div>
+            <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 40px">
+        </div>
+        <div class="self-center">
+            Anahaw Island View Resort is out now!
+        </div>
+        <div>
+            <Button v-if="!isInstallable" @click="handleInstallApp">Install</Button>
+        </div>
+    </div>
     <AppConfigurator />
     <!-- <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm h-screen"></div> -->
 

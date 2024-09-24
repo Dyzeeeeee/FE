@@ -1,9 +1,52 @@
 <script setup>
-import Floater from '@/layout/Floater.vue';
+import { ref } from 'vue';
+const installPromptEvent = ref(null);
+const isInstallable = ref(false);
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Save the event for later use
+    installPromptEvent.value = e;
+    // Update installable status
+    isInstallable.value = true;
+});
+
+const handleInstallApp = async () => {
+    if (installPromptEvent.value) {
+        // Show the install prompt
+        installPromptEvent.value.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await installPromptEvent.value.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        } else {
+            console.log('User dismissed the install prompt');
+        }
+        // We no longer need the prompt. Clear it up.
+        installPromptEvent.value = null;
+        isInstallable.value = false;
+    }
+};
 </script>
 
 <template>
     <!-- <Floater /> -->
+
+    <div class="flex w-full  p-2" v-if="isInstallable">
+        <div class="self-center ">
+            <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 30px; min-width: 30px;">
+        </div>
+        <div class="self-center text-center ">
+            You can now install the &nbsp;<span class="text-yellow-400 font-bold">Anahaw Island View Resort App</span>
+        </div>
+        <div class="self-center ">
+            <Button v-if="!isInstallable" @click="handleInstallApp" style="height: 30px">Install</Button>
+        </div>
+        <div class="self-center ml-4 ">
+            <Icon icon="ri:close-fill" height="20" @click="isInstallable = false" />
+        </div>
+    </div>
     <router-view />
 </template>
 
