@@ -16,6 +16,7 @@ const firebaseConfig = {
     measurementId: "G-5MKB25CEGX"
 };
 
+const Install = ref(false)
 const token = ref('');
 
 // Initialize Firebase
@@ -71,13 +72,12 @@ const installPromptEvent = ref(null);
 const isInstallable = ref(false);
 
 window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Save the event for later use
+    e.preventDefault(); // Prevent Chrome 67 and earlier from automatically showing the prompt
     installPromptEvent.value = e;
-    // Update installable status
     isInstallable.value = true;
+    Install.value = true; // Automatically open the dialog when installable
 });
+
 
 const handleInstallApp = async () => {
     if (installPromptEvent.value) {
@@ -109,7 +109,6 @@ function goToSignup() {
 </script>
 
 <template>
-    <button v-if="isInstallable" @click="handleInstallApp">Install our app</button>
 
     <AppConfigurator />
     <!-- <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm h-screen"></div> -->
@@ -180,6 +179,19 @@ function goToSignup() {
 
     </div>
 
+    <Dialog v-model="Install" modal :style="{ width: '80vw', height: '35%' }" position="center"
+        header="Install Our App">
+        <div class="flex w-full gap-2">
+            <img src="@/assets/pics/AppLogo.png" style="height: 50px;" />
+            <div class="text-xl self-center">
+                Anahaw Island View Resort
+            </div>
+        </div>
+        <div class="flex justify-end gap-2 mt-4 w-full">
+            <Button severity="secondary" outlined @click="closeInstallPrompt" class="w-1/2">Maybe Later</Button>
+            <Button severity="success" @click="handleInstallApp" class="w-1/2">Install</Button>
+        </div>
+    </Dialog>
 </template>
 
 <style scoped></style>
