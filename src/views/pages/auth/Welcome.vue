@@ -67,7 +67,34 @@ function sendNotification() {
         });
 }
 const router = useRouter();
+const installPromptEvent = ref(null);
+const isInstallable = ref(false);
 
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Save the event for later use
+    installPromptEvent.value = e;
+    // Update installable status
+    isInstallable.value = true;
+});
+
+const handleInstallApp = async () => {
+    if (installPromptEvent.value) {
+        // Show the install prompt
+        installPromptEvent.value.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await installPromptEvent.value.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        } else {
+            console.log('User dismissed the install prompt');
+        }
+        // We no longer need the prompt. Clear it up.
+        installPromptEvent.value = null;
+        isInstallable.value = false;
+    }
+};
 function gotoLogin() {
     router.push('/auth/login');
 }
@@ -82,6 +109,8 @@ function goToSignup() {
 </script>
 
 <template>
+    <button v-if="isInstallable" @click="handleInstallApp">Install our app</button>
+
     <AppConfigurator />
     <!-- <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm h-screen"></div> -->
 
