@@ -3,7 +3,7 @@ import AppConfigurator from '@/layout/AppConfigurator.vue';
 import axios from "axios";
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const firebaseConfig = {
@@ -83,8 +83,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 const handleInstallApp = async () => {
     if (installPromptEvent.value) {
         // Show the install prompt
-        Install.value = false,
-            installPromptEvent.value.prompt();
+        installPromptEvent.value.prompt();
         // Wait for the user to respond to the prompt
         const { outcome } = await installPromptEvent.value.userChoice;
         if (outcome === 'accepted') {
@@ -97,15 +96,6 @@ const handleInstallApp = async () => {
         isInstallable.value = false;
     }
 };
-
-function checkInstalledStatus() {
-    if (!isInstallable.value) {
-        Install.value = false; // If not installable, ensure dialog does not show
-    } else {
-        Install.value = true; // Show dialog if the app is installable
-    }
-}
-
 function gotoLogin() {
     router.push('/auth/login');
 }
@@ -117,13 +107,10 @@ function continueAsGuest() {
 function goToSignup() {
     router.push('/auth/signup');
 }
-
-onMounted(() => {
-    checkInstalledStatus();
-});
 </script>
 
 <template>
+    <Button v-if="isInstallable" @click="handleInstallApp">Install</Button>
 
     <AppConfigurator />
     <!-- <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm h-screen"></div> -->
@@ -194,7 +181,7 @@ onMounted(() => {
 
     </div>
 
-    <Dialog v-model:visible="Install" modal :style="{ width: '80vw', height: '35%' }" position="center"
+    <!-- <Dialog v-model:visible="Install" modal :style="{ width: '80vw', height: '35%' }" position="center"
         header="Install Our App">
 
         <div class="flex w-full gap-2">
@@ -205,9 +192,9 @@ onMounted(() => {
         </div>
         <div class="flex justify-end gap-2 mt-4 w-full">
             <Button severity="secondary" outlined @click="Install = false" class="w-1/2">Maybe Later</Button>
-            <Button severity="success" @click="handleInstallApp" class="w-1/2">Install</Button>
+            <Button severity="success" @click="confirmOrder" class="w-1/2">Install</Button>
         </div>
-    </Dialog>
+    </Dialog> -->
 </template>
 
 <style scoped></style>
