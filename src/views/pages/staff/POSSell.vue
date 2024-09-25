@@ -9,7 +9,13 @@ import { QrcodeStream } from 'vue-qrcode-reader';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
-
+const printOrder = () => {
+    printVisible.value = true; // Ensure receipt is visible
+    setTimeout(() => {
+        window.print(); // Open the print dialog
+        printVisible.value = false; // Hide the receipt after printing to return to normal view
+    }, 100);
+};
 const endSessionVisible = ref(false);
 const visible = ref(false);
 const categories = ref([]); // Assuming you're using Vue.js with ref for reactivity
@@ -27,6 +33,7 @@ const orderDetails = ref([]);
 const orders = ref([]);
 const customers = ref([]);
 const paymentVisible = ref(false);
+const printVisible = ref(false);
 const paymentMethod = ref('cash'); // Holds the selected payment method
 const tempOrderId = ref(null);
 const selectedOrder = ref();
@@ -203,14 +210,16 @@ const processPayment = async () => {
         if (response.status === 200) {
             toast.add({ severity: 'success', summary: 'Payment Processed', detail: 'Payment has been successfully processed!', life: 3000 });
             // Optionally, reset fields or redirect user
-            paymentVisible.value = false; // Close payment drawer
+            paymentVisible.value = false;
+            printVisible.value = true;
+        }
+        if (printVisible.value === false) {
             orderDetails.value = [];
             orderId.value = null;
             localStorage.removeItem('orderId');
-            amountTendered.value = 0; // Holds the amount tendered by the customer
+            amountTendered.value = 0;
 
-        }
-
+        }// Holds the amount tendered by the customer
         getOrders();
         getOrderDetails();
     } catch (error) {
@@ -1248,6 +1257,60 @@ const toggleCamera = () => {
 
     </Dialog>
 
+    <Dialog v-model:visible="printVisible" modal :style="{ width: '20vw', height: 'auto' }" position="center"
+        :header="'Order #' + orderId">
+
+        <div class="gap-2 flex w-full font-bold">
+            <Button class="w-full" severity="info" outlined>
+                Download pdf
+            </Button>
+            <Button class="w-full" severity="success" @click="printOrder">
+                Print
+            </Button>
+        </div>
+
+    </Dialog>
+    <div class="receipt" v-if="printVisible">
+        <div class="receipt-content">
+            <!-- Center the logo using a flex container -->
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <img src="@/assets/pics/receiptlogo.png" alt="Barangay Balite Logo" style="max-width: 200px;">
+                <!-- Ensure the image size is appropriate -->
+            </div>
+            <h2 style="text-align: center;   font-size: 15px;">
+                Barangay Balite, Calapan City,<br> Oriental Mindoro, 5200
+            </h2>
+            <h3 style="text-align: center;   font-size: 20px;"><strong>Order #:</strong> {{ orderId }}</h3>
+
+            <!-- Fix and style the date and time layout -->
+            <div
+                style="display: flex; justify-content: space-between; padding: 0 10px;   font-size: 15px; font-style: italic">
+                <p> {{ new Date().toLocaleDateString() }}</p>
+                <p> {{ new Date().toLocaleTimeString() }}</p> <!-- Display current time -->
+            </div>
+
+            <div v-for="item in orderDetails" :key="item.id">
+                <div style="justify-content: space-between; display: flex; padding: 0 15px; ">
+                    <div>
+                        <div>
+                            {{ item.name }}
+                        </div>
+                        <div>
+                            {{ item.quantity }} X {{ item.price }}
+                        </div>
+                    </div>
+                    <div style="font-weight: bold; font-size: 16px">
+                        {{ item.subtotal }}
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; font-weight: bold; justify-content: space-between; font-size: 18px">
+                <h3 style=" text-align: center;">Total: </h3>
+                <div>P{{ totalPrice }}.00</div>
+            </div>
+        </div>
+    </div>
+
 </template>
 
 <style>
@@ -1271,5 +1334,48 @@ const toggleCamera = () => {
     position: relative;
     width: 100%;
     height: 400px;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+        margin: 0;
+        padding: 0;
+    }
+
+    .receipt,
+    .receipt * {
+        visibility: visible;
+        color: #000;
+        /* Pure black */
+        background-color: #fff;
+        /* Pure white */
+    }
+
+    .receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 55mm;
+        padding: 5mm;
+        font-size: 12px;
+        /* Larger font size for better readability */
+        line-height: 1.5;
+        /* Improved line spacing */
+    }
+
+    .receipt-content h1,
+    .receipt-content h2,
+    .receipt-content h3,
+    .receipt-content p,
+    .receipt-content ul {
+        margin: 1mm 0;
+    }
+
+    .receipt-content ul {
+        padding-left: 5mm;
+        list-style-type: none;
+        /* No bullets */
+    }
 }
 </style>

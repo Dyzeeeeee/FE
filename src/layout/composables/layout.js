@@ -1,8 +1,4 @@
-import {
-    computed,
-    reactive,
-    readonly
-} from 'vue';
+import { computed, reactive, readonly } from 'vue';
 
 const layoutConfig = reactive({
     preset: 'Lara',
