@@ -33,27 +33,29 @@ const handleInstallApp = async () => {
 <template>
     <!-- <Floater /> -->
 
-    <div class="flex w-full  p-2 justify-between" v-if="isInstallable">
-        <div class="self-center ">
-            <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 30px; min-width: 30px;">
-        </div>
-        <div class="self-center text-center hidden xl:block">
-            You can now install the &nbsp;<span class="text-yellow-400 font-bold">Anahaw Island View Resort
-                App</span>
-        </div>
-        <div class="self-center text-center xl:hidden block">
-            You can now install the &nbsp;<br><span class="text-yellow-400 font-bold">Anahaw Island View Resort
-                App</span>
-        </div>
-        <div class="flex">
+    <template v-if="isInstallable">
+        <div class="flex w-full  p-2 justify-between">
             <div class="self-center ">
-                <Button @click="handleInstallApp" style="height: 30px">Install</Button>
+                <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 30px; min-width: 30px;">
             </div>
-            <div class="self-center ml-4 cursor-pointer">
-                <Icon icon="ri:close-fill" height="20" @click="isInstallable = false" />
+            <div class="self-center text-center hidden xl:block">
+                You can now install the &nbsp;<span class="text-yellow-400 font-bold">Anahaw Island View Resort
+                    App</span>
+            </div>
+            <div class="self-center text-center xl:hidden block">
+                You can now install the &nbsp;<br><span class="text-yellow-400 font-bold">Anahaw Island View Resort
+                    App</span>
+            </div>
+            <div class="flex">
+                <div class="self-center ">
+                    <Button @click="handleInstallApp" style="height: 30px">Install</Button>
+                </div>
+                <div class="self-center ml-4 cursor-pointer">
+                    <Icon icon="ri:close-fill" height="20" @click="isInstallable = false" />
+                </div>
             </div>
         </div>
-    </div>
+    </template>
     <router-view />
 </template>
 

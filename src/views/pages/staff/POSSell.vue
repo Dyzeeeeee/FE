@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from "primevue/usetoast";
 import { computed, onMounted, ref, watch } from 'vue';
+import { QrcodeStream } from 'vue-qrcode-reader';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -79,6 +80,8 @@ const confirmOrder = async () => {
             headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
         });
 
+        cameraVisible.value = false;
+
         console.log("data from putting: ", response.data.newOrderId)
 
         if (response.status === 200) {
@@ -134,6 +137,9 @@ const filteredOrders = computed(() => {
         .filter(order => order.session_id === route.params.id)
         .sort((a, b) => b.id - a.id); // Sorting by ID in descending order
 });
+
+const cameraActive = ref(false);
+const scannedContent = ref('');
 
 
 const allOrders = ref(false);
@@ -653,6 +659,43 @@ onMounted(async () => {
     getOrders();
     getCustomers();
 });
+
+const onDetect = (detectedCodes) => {
+    console.log('Detected QR Codes:', detectedCodes);
+
+    // Remove 'AIVR' from the detected codes if present
+    scannedContent.value = detectedCodes.map(code => {
+        let rawValue = code.rawValue;
+        if (rawValue.startsWith('AIVR')) {
+            // Remove the 'AIVR' prefix
+            return rawValue.substring(4); // Removes the first 4 characters
+        }
+        return rawValue; // Return the raw value if 'AIVR' is not present
+    }).join(', ');
+
+    QRcode.value = scannedContent.value;
+    confirmOrder();
+};
+
+
+const onCameraOn = (capabilities) => {
+    console.log('Camera is on, capabilities:', capabilities);
+};
+
+const onError = (error) => {
+    console.error('Error with QR Code Stream:', error);
+    scannedContent.value = ''; // Clear previous content on error
+};
+
+const cameraVisible = ref(false);
+
+const toggleCamera = () => {
+    cameraVisible.value = true;
+    cameraActive.value = true;
+    if (!cameraActive.value) {
+        scannedContent.value = '';
+    }
+};
 </script>
 
 <template>
@@ -799,9 +842,9 @@ onMounted(async () => {
                     </div>
                     <div class="col-span-4 xl:col-span-5">
                         <div class="flex flex-1 justify-end gap-2">
-                            <Button severity="info" class="w-full xl:w-auto" size="small" disabled>
-                                <Icon icon="f7:envelope-fill" width="20" height="20" />
-                                <div class="font-bold hidden sm:block">Note</div>
+                            <Button severity="info" class="w-full xl:w-auto" size="small" @click="toggleCamera">
+                                <Icon icon="ph:camera-bold" width="20" height="20" />
+                                <div class="font-bold hidden sm:block">Scan</div>
                             </Button>
                             <Button severity="info" class="w-full xl:w-auto" size="small" @click="allCustomers = true">
                                 <Icon icon="ion:person-add-sharp" width="20" height="20" />
@@ -1192,6 +1235,19 @@ onMounted(async () => {
         </div>
     </Dialog>
 
+    <Dialog v-model:visible="cameraVisible" modal :style="{ width: '50vw', height: '55%' }" position="center"
+        header="Scan Order QR Code">
+
+        <div class="qr-reader">
+            <qrcode-stream v-if="cameraActive" :formats="['qr_code']" @detect="onDetect" @camera-on="onCameraOn"
+                @error="onError">
+            </qrcode-stream>
+        </div>
+
+
+
+    </Dialog>
+
 </template>
 
 <style>
@@ -1209,5 +1265,11 @@ onMounted(async () => {
     /* Circular images */
     border: 3px solid #00ff6e;
     /* Optional: adds a border around the image */
+}
+
+.qr-reader {
+    position: relative;
+    width: 100%;
+    height: 400px;
 }
 </style>

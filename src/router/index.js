@@ -115,17 +115,17 @@ const router = createRouter({
 
             children: [
                 {
-                    path: '/staff',
+                    path: '/staff/home',
                     name: 'staff-home',
                     component: () => import('@/views/pages/staff/Home.vue')
                 },
                 {
-                    path: '/staff/POS',
+                    path: '/staff/pos',
                     name: 'staff-POS',
                     component: () => import('@/views/pages/staff/POS.vue')
                 },
                 {
-                    path: '/staff/POS/Sell/:id',
+                    path: '/staff/pos/Sell/:id',
                     name: 'staff-POSSell',
                     component: () => import('@/views/pages/staff/POSSell.vue')
                 },
@@ -155,6 +155,11 @@ const router = createRouter({
             path: '/inventory',
             name: 'staff-inventory',
             component: () => import('@/views/pages/staff/Inventory.vue')
+        },
+        {
+            path: '/cust',
+            name: 'cust',
+            component: () => import('@/views/pages/staff/Customers.vue')
         },
         {
             path: '/:pathMatch(.*)*', // or simply use '*' in Vue Router 3
@@ -233,7 +238,7 @@ const router = createRouter({
     ]
 });
 router.beforeEach((to, from, next) => {
-    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer', '/inventory'];
+    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer', '/inventory', '/cust', '/'];
 
     const authRequired = !publicPages.includes(to.path);
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');

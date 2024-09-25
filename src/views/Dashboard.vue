@@ -1,74 +1,40 @@
 <template>
-  <button @click="sendNotification">Send Notification</button>
-
+  <div>
+    <button @click="printDiv">Print Content</button>
+    <div ref="printableArea" class="print-area">
+      <h1>Printable Content</h1>
+      <p>This is some dummy text to demonstrate printing functionality in Vue.js.</p>
+      <ul>
+        <li>List Item 1</li>
+        <li>List Item 2</li>
+        <li>List Item 3</li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import axios from "axios";
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { ref } from 'vue';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAGhkUdH-9tFFimGJ1p9dzz76YPmrnohX4",
-  authDomain: "pushnotif-3bd70.firebaseapp.com",
-  projectId: "pushnotif-3bd70",
-  storageBucket: "pushnotif-3bd70.appspot.com",
-  messagingSenderId: "1043875162981",
-  appId: "1:1043875162981:web:6e575e0d6a1015d3d10f8c",
-  measurementId: "G-5MKB25CEGX"
+const printableArea = ref(null);
+
+const printDiv = () => {
+  const printContent = printableArea.value.innerHTML;
+  const originalContents = document.body.innerHTML;
+  document.body.innerHTML = printContent;
+  window.print();
+  document.body.innerHTML = originalContents;
 };
+</script>
 
-const token = ref('');
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-
-// Get registration token. Initially this makes a network call, once retrieved
-// subsequent calls to getToken will return from cache.
-const messaging = getMessaging();
-onMessage(messaging, (payload) => {
-  console.log('Message received. ', payload);
-  alert(`Message received: ${payload.notification.title}`);
-});
-
-
-
-getToken(messaging, { vapidKey: 'BJdT2QzOC15wwG2VJSxhN1eLFU2JwoFPDNg7UsyWVcNzbOoL0E4IBELeTjPCR__E6itzzlG6v1Xj4jJPMTz2HJM' }).then((currentToken) => {
-  if (currentToken) {
-    console.log("Token is: ", currentToken);
-    token.value = currentToken; // Store token in a reactive variable
-    // Send the token to your server
-    axios.post('/save-token', { token: currentToken })
-      .then(response => console.log('Token saved:', response))
-      .catch(error => console.error('Error saving token:', error));
-  } else {
-    console.log('No registration token available. Request permission to generate one.');
-  }
-}).catch((err) => {
-  console.log('An error occurred while retrieving token. ', err);
-});
-
-
-function sendNotification() {
-  // Hard-coded message details for testing
-  const notificationData = {
-    token: token.value,
-    title: "Nagsend ba",
-    body: "Try nga",
-    // image_url: "http://be.test/uploads/logo.ico"
-  };
-
-  axios.post('/send-notification', notificationData)
-    .then(response => {
-      console.log('Notification sent:', response);
-      alert('Notification sent successfully!');
-    })
-    .catch(error => {
-      console.error('Error sending notification:', error);
-      alert('Failed to send notification.');
-    });
+<style scoped>
+.print-area {
+  border: 1px solid #000;
+  padding: 20px;
+  margin-top: 20px;
 }
 
-</script>
+button {
+  margin-bottom: 20px;
+}
+</style>

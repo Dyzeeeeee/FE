@@ -313,7 +313,7 @@
 
     </template>
 
-<style>
+<style scoped>
 .item-border {
     border: 2px solid #a7af4c;
     padding: 2px;
@@ -330,6 +330,15 @@
 /* .fade-leave-active in <2.1.8 */
     {
     opacity: 0;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .strikethrough {

@@ -1,5 +1,5 @@
 <template>
-    
+
     <AppConfigurator />
     <div class="grid grid-cols-12 h-screen bg-slate-800">
         <div class="hidden xl:block xl:col-span-7  flex justify-center items-center self-center">
