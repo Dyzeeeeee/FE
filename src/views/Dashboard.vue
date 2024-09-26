@@ -1,9 +1,12 @@
 <template>
-  <div class="receipt" ref="receiptDiv"></div>
-  <button @click="shareContent">Share</button>
+  <div class="receipt-container">
+    <div class="receipt" ref="receiptDiv"></div>
+    <button @click="shareImage">Share as Image</button>
+  </div>
 </template>
 
 <script setup>
+import html2canvas from 'html2canvas';
 import { onMounted, ref } from 'vue';
 
 const receiptDiv = ref(null);
@@ -44,16 +47,16 @@ const total = () => {
   return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 };
 
-const shareContent = async () => {
+const shareImage = async () => {
+  const canvas = await html2canvas(receiptDiv.value);
+  const image = canvas.toDataURL("image/png");
+  const blob = await (await fetch(image)).blob();
   if (navigator.share) {
     try {
-      const blob = new Blob([receiptDiv.value.innerHTML], { type: 'text/html' });
-      const file = new File([blob], 'receipt.html', { type: 'text/html' });
-
       await navigator.share({
-        title: 'Your Receipt',
-        text: 'Here’s your receipt for your recent purchase.',
-        files: [file],
+        files: [new File([blob], "receipt.png", { type: "image/png" })],
+        title: "Receipt",
+        text: "Here is a snapshot of your receipt.",
       });
       console.log('Receipt shared successfully');
     } catch (err) {
@@ -66,53 +69,29 @@ const shareContent = async () => {
 </script>
 
 <style scoped>
+.receipt-container {
+  text-align: center;
+}
+
 .receipt {
   border: 1px solid #ccc;
   padding: 20px;
   border-radius: 8px;
   max-width: 400px;
   margin: 20px auto;
-  background-color: #696969;
+  background-color: #000000;
   font-family: Arial, sans-serif;
 }
 
-.receipt-title {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.receipt-date {
-  text-align: center;
-  font-size: 14px;
-  color: #666;
-}
-
-.receipt-items {
-  margin-bottom: 20px;
-}
-
-.receipt-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-}
-
-.item-name {
-  flex: 1;
-}
-
-.item-quantity {
-  margin: 0 10px;
-}
-
-.item-price {
-  width: 60px;
-  text-align: right;
-}
-
+.receipt-title,
+.receipt-date,
 .receipt-total {
-  text-align: right;
-  font-weight: bold;
+  color: #333;
+}
+
+.receipt-items,
+.receipt-item {
+  color: #666;
 }
 
 button {
@@ -123,6 +102,7 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-top: 20px;
 }
 
 button:hover {
