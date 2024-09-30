@@ -140,12 +140,15 @@ function goToSignup() {
         </div>
         <div class="col-span-12 bg-slate-900 p-5 xl:col-span-5 xl:p-10 xl:rounded-3xl xl:m-10">
             <div class="relative flex flex-col justify-center items-center h-1/3 p-0 ">
+                <video src="@/assets/pics/Welcome.mp4" playsinline autoplay muted loop
+                    class="h-auto w-screen mb-7 object-cover xl:hidden">
+                    Your browser does not support the video tag.
+                </video>
                 <!-- Welcome Image as Background -->
-                <img src="@/assets/pics/Welcome.png" alt="Welcome" class="h-auto w-screen mb-7 object-cover xl:hidden">
+                <!-- <img src="@/assets/pics/Welcome.png" alt="Welcome" class="h-auto w-screen mb-7 object-cover xl:hidden">
 
-                <!-- Logo Image at the center with an outline -->
                 <img src="@/assets/pics/logo-outline.png" alt="Logo"
-                    class="absolute h-[8rem] w-auto my-4 mt-7 xl:h-[6rem]">
+                    class="absolute h-[8rem] w-auto my-4 mt-7 xl:h-[6rem]"> -->
             </div>
 
             <div>

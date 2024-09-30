@@ -99,10 +99,10 @@ const isRouteActive = (itemPath) => {
     /* Keeps all content inside the border-radius */
 }
 
-.card:hover {
+/* .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
+} */
 
 .active-card {
     border: 2px solid #ffcc44;

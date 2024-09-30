@@ -19,11 +19,16 @@
         </div>
 
         <div @click="$router.push('/customer/notifications')" class="flex-1 text-center p-2 cursor-pointer">
+
             <div :class="{ 'text-yellow-500': $route.path === '/customer/notifications' }">Notifications</div>
             <div class="flex justify-center">
-                <Icon icon="quill:notifications" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/customer/notifications' }" />
+                <OverlayBadge severity="danger">
+                    <Icon icon="quill:notifications" width="20" height="20"
+                        :class="{ 'text-yellow-500': $route.path === '/customer/notifications' }" />
+                </OverlayBadge>
+
             </div>
+
         </div>
 
         <!-- Rooms -->

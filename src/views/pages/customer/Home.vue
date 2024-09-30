@@ -2,7 +2,8 @@
     <div class="h-full mb-12 pb-12">
         <div class="flex flex-col justify-center items-center bg-black-100 w-full relative"
             :style="{ height: 'calc(100vh - 100px)' }">
-            <img src="@/assets/pics/BG.webp" class="object-cover xl:h-full h-full w-full" />
+            <img src="https://media.cnn.com/api/v1/images/stellar/prod/160726134426-us-beautiful-hotels-14-setai-miami.jpg?q=w_1900,h_1096,x_0,y_0,c_fill/h_447"
+                class="object-cover xl:h-full h-full w-full" />
             <div class="absolute top-0 left-0 w-full h-full bg-black opacity-60"></div>
             <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white text-xl">
                 <div class="flex items-center justify-center flex-col">

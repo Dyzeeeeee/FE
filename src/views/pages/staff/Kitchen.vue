@@ -1,8 +1,12 @@
     <script setup>
     import axios from 'axios';
-    import { computed, onMounted, ref } from 'vue';
+    import { useToast } from 'primevue/usetoast';
+    import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+
+    const toast = useToast();
     const visible = ref(false);
     const previousOrders = ref(false);
+    const initialLoadCompleted = ref(false); // State to track if initial load is done
 
     const orders = ref([]);  // Reactive property to store the orders
     const getOrders = async () => {
@@ -18,13 +22,32 @@
         }
     };
 
+
+
+    // Watch for changes in order statuses, specifically for 'cancelled' status
+    watch(
+        () => orders.value.map(order => order.details.map(detail => detail.status)),
+        (newStatuses, oldStatuses) => {
+            newStatuses.forEach((orderStatuses, orderIndex) => {
+                orderStatuses.forEach((status, detailIndex) => {
+                    if (status === 'cancelled' && oldStatuses[orderIndex][detailIndex] !== 'cancelled') {
+                        console.log(`Order ${orders.value[orderIndex].id}, Detail ${orders.value[orderIndex].details[detailIndex].detail_id} status changed to cancelled.`);
+                    }
+                });
+            });
+        },
+        { deep: true }  // Use deep to watch for changes in nested properties
+    );
+
     // Computed property to filter out orders with all details 'serving'
     const activeOrders = computed(() => {
         return orders.value.filter(order => {
-            // Check if any detail is not in 'serving' status
-            return order.details.some(detail => detail.status !== 'serving');
+            // Exclude orders with 'cancelled' status
+            return order.status !== 'cancelled' &&
+                order.details.some(detail => detail.status !== 'serving');
         });
     });
+
 
 
     const updateOrderStatus = async (order, detail) => {
@@ -79,28 +102,94 @@
     const ordersSummary = computed(() => {
         const summary = {};
         orders.value.forEach(order => {
-            order.details.forEach(detail => {
-                // Check if the status of the detail is 'preparing'
-                if (detail.status === 'preparing') {
-                    if (!summary[detail.category_name]) {
-                        summary[detail.category_name] = { totalQuantity: 0, items: {} };
+            if (order.status !== 'cancelled') {  // Exclude cancelled orders entirely
+                order.details.forEach(detail => {
+                    // Also check if the detail itself isn't cancelled
+                    if (detail.status !== 'cancelled' && detail.status === 'preparing') {
+                        const categoryName = detail.category_name;
+                        const menuName = detail.menu_name;
+                        const quantity = parseInt(detail.quantity);
+
+                        if (!summary[categoryName]) {
+                            summary[categoryName] = { totalQuantity: 0, items: {} };
+                        }
+
+                        summary[categoryName].totalQuantity += quantity;
+
+                        if (!summary[categoryName].items[menuName]) {
+                            summary[categoryName].items[menuName] = 0;
+                        }
+                        summary[categoryName].items[menuName] += quantity;
                     }
-                    summary[detail.category_name].totalQuantity += parseInt(detail.quantity);
-                    if (!summary[detail.category_name].items[detail.menu_name]) {
-                        summary[detail.category_name].items[detail.menu_name] = 0;
-                    }
-                    summary[detail.category_name].items[detail.menu_name] += parseInt(detail.quantity);
-                }
-            });
+                });
+            }
         });
         return summary;
     });
 
 
 
-    onMounted(() => {
-        getOrders();
+    onMounted(async () => {
+        await getOrders();  // Fetch orders on mount
+        initialLoadCompleted.value = false; // Reset the flag on each mount
+        const intervalId = setInterval(getOrders, 10000); // Polling interval
+        onUnmounted(() => clearInterval(intervalId));
     });
+
+
+    watch(
+        () => orders.value.map(order => ({
+            id: order.id,
+            status: order.status,
+            detailsCount: order.details.length
+        })),
+        (newOrders, oldOrders) => {
+            if (!initialLoadCompleted.value) {
+                initialLoadCompleted.value = true;
+                return;
+            }
+
+            // Detect if new orders have been added
+            const newOrdersCount = newOrders.length - oldOrders.length;
+            if (newOrdersCount > 0) {
+                const addedOrders = newOrders.slice(oldOrders.length);
+                addedOrders.forEach(order => {
+                    if (order.detailsCount > 1) { // More than one detail in the new order
+                        toast.add({
+                            severity: 'success',
+                            summary: 'New Order Added',
+                            detail: `Order #${order.id} with ${order.detailsCount} items has been added.`,
+                            life: 3000
+                        });
+                    } else { // Exactly one detail in the new order
+                        toast.add({
+                            severity: 'success',
+                            summary: 'New Order Added',
+                            detail: `Order #${order.id} with one item has been added.`,
+                            life: 3000
+                        });
+                    }
+                });
+            }
+
+            // Handle changes in existing orders
+            newOrders.forEach((newOrder, index) => {
+                const oldOrder = oldOrders[index];
+                if (oldOrder && newOrder.status === 'cancelled' && oldOrder.status !== 'cancelled') {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Order Cancelled',
+                        detail: `Order #${newOrder.id} has been cancelled.`,
+                        life: 3000
+                    });
+                }
+            });
+        },
+        { deep: true }
+    );
+
+
+
 
 
 
@@ -109,6 +198,7 @@
 
 
     <template>
+        <Toast />
         <div class="grid grid-cols-12 gap-3 -m-3">
             <div class="col-span-12 lg:col-span-6 xl:col-span-12 xl:m-0 h-[80vh] flex flex-col justify-between ">
                 <!-- Your Cards Section -->
@@ -321,7 +411,7 @@
 
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.2s;
+    transition: opacity 0.5s;
 }
 
 .fade-enter,

@@ -130,7 +130,7 @@ async function handleLogin() {
         if (response.data.user.role === 'customer') {
             router.push('/customer'); // Navigate to customer dashboard
         } else if (response.data.user.role === 'staff') {
-            router.push('/staff'); // Navigate to staff dashboard
+            router.push('/staff/home'); // Navigate to staff dashboard
         } else {
             throw new Error('Unknown role');
         }

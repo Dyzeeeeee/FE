@@ -55,11 +55,11 @@ const shareImage = async () => {
     try {
       await navigator.share({
         files: [new File([blob], "receipt.png", { type: "image/png" })],
-        title: "Receipt",
-        text: "Here is a snapshot of your receipt.",
+        // title: "Receipt",
+        // text: "Here is a snapshot of your receipt.",
       });
       console.log('Receipt shared successfully');
-    } catch (err) {
+    } catch (err) { 
       console.error('Error sharing:', err);
     }
   } else {
@@ -108,4 +108,6 @@ button {
 button:hover {
   background-color: #45a049;
 }
+
+
 </style>

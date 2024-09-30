@@ -8,6 +8,28 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { QrcodeStream } from 'vue-qrcode-reader';
 import { useRoute, useRouter } from 'vue-router';
 
+
+const shareReceiptAsImage = async () => {
+    const canvas = await html2canvas(receiptRef.value);
+    canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'receipt.png', { type: 'image/png' });
+        try {
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'Receipt',
+                    text: 'Here is your receipt.'
+                });
+                console.log('Receipt shared successfully!');
+            } else {
+                console.error('Sharing not supported');
+            }
+        } catch (err) {
+            console.error('Error sharing the receipt:', err);
+        }
+    });
+};
+
 const router = useRouter();
 const printOrder = () => {
     printVisible.value = true; // Ensure receipt is visible
@@ -90,7 +112,8 @@ const confirmOrder = async () => {
         cameraVisible.value = false;
 
         console.log("data from putting: ", response.data.newOrderId)
-
+        selectedService.value = response.data.service;
+        console.log("data received are: ", response.data.service)
         if (response.status === 200) {
             toast.add({ severity: 'success', summary: 'Order Confirmed', detail: 'The order has been confirmed successfully!', life: 3000 });
             QRcodeVisible.value = false; // Close the QR code dialog
@@ -168,7 +191,6 @@ const cancelOrder = async () => {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
         });
 
-
         // if (response.status === 200) {
         //     toast.add({ severity: 'success', summary: 'Payment Processed', detail: 'Payment has been successfully processed!', life: 3000 });
         //     // Optionally, reset fields or redirect user
@@ -180,14 +202,16 @@ const cancelOrder = async () => {
         // }
 
         getOrders();
-        getOrderDetails();
-        allOrders.value = false;
         orderId.value = null; // Close payment drawer
+        getOrderDetails();
+        // orderDetails.value = [];
+        // allOrders.value = false;
     } catch (error) {
         console.error('Failed to process payment:', error);
         toast.add({ severity: 'error', summary: 'Payment Failed', detail: 'Failed to process the payment.', life: 3000 });
     }
 }
+
 
 
 // Function to process payment
@@ -938,7 +962,7 @@ const toggleCamera = () => {
                                 </Button> <Button class="w-full xl:w-auto" severity="info" size="small"
                                     @click="QRcodeVisible = true" outlined>
                                     <Icon icon="ion:qr-code" width="20" height="20" />
-                                    <div class="font-bold hidden sm:block">QR</div>
+                                    <div class="font-bold hidden sm:block">Code</div>
                                 </Button>
                             </div>
                         </div>
@@ -1244,12 +1268,15 @@ const toggleCamera = () => {
         </div>
     </Dialog>
 
-    <Dialog v-model:visible="cameraVisible" modal :style="{ width: '50vw', height: '55%' }" position="center"
+    <Dialog v-model:visible="cameraVisible" modal class="xl:h-[80vh] xl:w-[40vw]" position="center"
         header="Scan Order QR Code">
 
         <div class="qr-reader">
             <qrcode-stream v-if="cameraActive" :formats="['qr_code']" @detect="onDetect" @camera-on="onCameraOn"
                 @error="onError">
+                <template #default>
+                    <div class="overlay">Scanning...</div>
+                </template>
             </qrcode-stream>
         </div>
 
@@ -1262,35 +1289,43 @@ const toggleCamera = () => {
 
         <div class="gap-2 flex w-full font-bold">
             <Button class="w-full" severity="info" outlined>
-                Download pdf
+                Download
             </Button>
-            <Button class="w-full" severity="success" @click="printOrder">
-                Print
-            </Button>
+            <div class="w-full xl:block hidden">
+                <Button severity="success" @click="printOrder" class="w-full">
+                    Print
+                </Button>
+            </div>
+            <div class="w-full block xl:hidden">
+                <Button severity="success" @click="shareReceiptAsImage" class="w-full">
+                    Print
+                </Button>
+            </div>
         </div>
 
     </Dialog>
-    <div class="receipt" v-if="printVisible">
+    <div class="receipt" v-if="printVisible" ref="receiptRef">
         <div class="receipt-content">
             <!-- Center the logo using a flex container -->
             <div style="display: flex; justify-content: center; width: 100%;">
                 <img src="@/assets/pics/receiptlogo.png" alt="Barangay Balite Logo" style="max-width: 200px;">
                 <!-- Ensure the image size is appropriate -->
             </div>
-            <h2 style="text-align: center;   font-size: 15px;">
+            <h2 style="text-align: center;   font-size: 12px;">
                 Barangay Balite, Calapan City,<br> Oriental Mindoro, 5200
             </h2>
-            <h3 style="text-align: center;   font-size: 20px;"><strong>Order #:</strong> {{ orderId }}</h3>
+            <h3 style="text-align: center;   font-size: 18px;"><strong>Order #:</strong> {{ orderId }}</h3>
 
             <!-- Fix and style the date and time layout -->
-            <div
-                style="display: flex; justify-content: space-between; padding: 0 10px;   font-size: 15px; font-style: italic">
+            <div style="display: flex; justify-content: space-between;    font-size: 10px; font-style: italic">
                 <p> {{ new Date().toLocaleDateString() }}</p>
-                <p> {{ new Date().toLocaleTimeString() }}</p> <!-- Display current time -->
+                <p> {{ new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) }}</p>
+                <!-- Display current time with hours and minutes -->
             </div>
 
+            <hr>
             <div v-for="item in orderDetails" :key="item.id">
-                <div style="justify-content: space-between; display: flex; padding: 0 15px; ">
+                <div style="justify-content: space-between; display: flex; ">
                     <div>
                         <div>
                             {{ item.name }}
@@ -1299,11 +1334,13 @@ const toggleCamera = () => {
                             {{ item.quantity }} X {{ item.price }}
                         </div>
                     </div>
-                    <div style="font-weight: bold; font-size: 16px">
+                    <div style="font-weight: bold; font-size: 15px">
                         {{ item.subtotal }}
                     </div>
                 </div>
             </div>
+            <hr>
+
             <div style="display: flex; font-weight: bold; justify-content: space-between; font-size: 18px">
                 <h3 style=" text-align: center;">Total: </h3>
                 <div>P{{ totalPrice }}.00</div>
@@ -1333,7 +1370,7 @@ const toggleCamera = () => {
 .qr-reader {
     position: relative;
     width: 100%;
-    height: 400px;
+    height: 100%;
 }
 
 @media print {
@@ -1377,5 +1414,19 @@ const toggleCamera = () => {
         list-style-type: none;
         /* No bullets */
     }
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 20px;
 }
 </style>

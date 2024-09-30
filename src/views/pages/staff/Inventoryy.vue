@@ -45,7 +45,7 @@ onMounted(async () => {
                         </Button>
                     </div>
                     <Button class="w-auto ml-4" severity="success" @click="visible = true">
-                        <Icon icon="fluent:people-add-32-regular" width="20" height="20" />
+                        <Icon icon="mingcute:inventory-line" width="20" height="20" />
                         <div class="font-bold sm:block">Add</div>
                     </Button>
                 </div>

@@ -98,7 +98,7 @@ const startSession = async () => {
 
         if (response.data && response.data.id) {
             sessionId.value = response.data.id;  // Store the new session ID
-            router.push(`//Sell/${sessionId.value}`);  // Navigate to the selling page
+            router.push(`/staff/pos/Sell/${sessionId.value}`);  // Navigate to the selling page
         } else {
             console.error("Failed to retrieve session ID from response");
         }

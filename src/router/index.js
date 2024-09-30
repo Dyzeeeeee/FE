@@ -148,12 +148,32 @@ const router = createRouter({
                     path: '/staff/Profile',
                     name: 'staff-Profile',
                     component: () => import('@/views/pages/staff/Profile.vue')
+                },
+                {
+                    path: '/staff/inventory',
+                    name: 'staff-inventory',
+                    component: () => import('@/views/pages/staff/Inventoryy.vue')
+                },
+                {
+                    path: '/staff/customers',
+                    name: 'staff-customers',
+                    component: () => import('@/views/pages/staff/Customers.vue')
+                },
+                {
+                    path: '/staff/settings',
+                    name: 'staff-settings',
+                    component: () => import('@/views/pages/staff/Settings.vue')
+                },
+                {
+                    path: '/staff/Reservations',
+                    name: 'staff-Reservations',
+                    component: () => import('@/views/pages/staff/Reservations.vue')
                 }
             ]
         },
         {
             path: '/inventory',
-            name: 'staff-inventory',
+            name: 'inventory',
             component: () => import('@/views/pages/staff/Inventory.vue')
         },
         {
@@ -196,6 +216,16 @@ const router = createRouter({
                     path: '/customer/more',
                     name: 'customer-more',
                     component: () => import('@/views/pages/customer/More.vue')
+                },
+                {
+                    path: '/customer/track-order/:id',
+                    name: 'customer-track-order',
+                    component: () => import('@/views/pages/customer/TrackOrder.vue')
+                },
+                {
+                    path: '/customer/notifications',
+                    name: 'customer-notifications',
+                    component: () => import('@/views/pages/customer/Notifications.vue')
                 }
             ]
         },

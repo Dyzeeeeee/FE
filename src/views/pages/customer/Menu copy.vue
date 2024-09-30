@@ -3,19 +3,8 @@
     import { useLayout } from '@/layout/composables/layout';
     import axios from 'axios';
     import QrcodeVue from 'qrcode.vue';
-    import { useRouter } from 'vue-router';
 
     import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
-    const router = useRouter();
-    const getItemQuantity = (itemId) => {
-        const detail = orderDetails.value.find(d => d.menu_item_id === itemId);
-        return detail ? detail.quantity : 0;  // Return the quantity if found, otherwise 0
-    };
-    function trackOrder() {
-        // Construct the path using the order value
-        const path = `/customer/track-order/${myOrder.value}`;
-        router.push(path);
-    }
     const text = ref(localStorage.getItem('qrCode') || 'AIVR12345');
     const timerRef = ref(null);
     const serviceTypes = ref([{ id: 'Dine in', name: 'Dine In' }, { id: 'Take Out', name: 'Take Out' }]);
@@ -539,7 +528,7 @@
                     <div class="flex relative ">
                         <div v-if="isItemAdded(item.id)"
                             class="absolute top-0 right-0 m-3 bg-indigo-500 text-white px-2 py-1 rounded-lg text-sm">
-                            Added {{ getItemQuantity(item.id) }} <!-- Display quantity of this specific item -->
+                            Added
                         </div>
                         <div class="text-xl p-2 absolute bg-red-500 rounded-r-lg  font-bold bottom-3">
                             ₱{{ item.price }}
@@ -743,7 +732,7 @@
                 Kindly wait for your order as it is being prepared
             </div>
             <div class="flex w-full italic justify-center mt-2">
-                <Button severity="info" class="w-full" @click="trackOrder">
+                <Button severity="info" class="w-full">
                     <div class="font-bold">
                         Track My Order
                     </div>
