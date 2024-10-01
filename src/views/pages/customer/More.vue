@@ -98,7 +98,7 @@ watch(visible, (newValue) => {
 </script>
 
 <template>
-    <div class="my-[5rem]">
+    <div class="mb-[5rem] mt-[2rem]">
 
         <button v-if="isInstallable" @click="handleInstallApp">Install our app</button>
         <div class="flex text-xl font-bold pt-4 pb-5 pl-4">

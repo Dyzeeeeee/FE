@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 
+
 const dayName = ref(new Date().toLocaleDateString('en-US', { weekday: 'short' })); // "Tue"
 const dayNumber = ref(new Date().getDate()); // 6
 const monthName = ref(new Date().toLocaleDateString('en-US', { month: 'long' })); // "August"
+
 
 // Function to update the date components
 const updateDateComponents = () => {
@@ -25,10 +27,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="">
+    <div class="mt-[5rem]">
         <div class="flex items-center">
             <div class="mr-2 ml-4">
-                <Avatar image="https://thumbs.dreamstime.com/b/vector-illustration-smiling-shark-cartoon-minimalist-flat-style-isolated-white-background-315602043.jpg" size="xlarge" shape="circle" class="custom-avatar-border" />
+                <Avatar
+                    image="https://thumbs.dreamstime.com/b/vector-illustration-smiling-shark-cartoon-minimalist-flat-style-isolated-white-background-315602043.jpg"
+                    size="xlarge" shape="circle" class="custom-avatar-border" />
             </div>
             <div class="p-2 flex-1">
                 <div class="flex justify-between items-center text-4xl">

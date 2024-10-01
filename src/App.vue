@@ -1,8 +1,13 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
 const installPromptEvent = ref(null);
 const isInstallable = ref(false);
-
+const route = useRoute();
+const showComponent = computed(() => {
+    return route.path !== '/customer';
+});
+const advertisment = ref(true)
 window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault();
@@ -34,7 +39,7 @@ const handleInstallApp = async () => {
     <!-- <Floater /> -->
 
     <template v-if="isInstallable">
-        <div class="flex w-full  p-2 justify-between">
+        <div v-if="showComponent" class="flex w-full  p-2 justify-between">
             <div class="self-center ">
                 <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 30px; min-width: 30px;">
             </div>
@@ -55,8 +60,17 @@ const handleInstallApp = async () => {
                 </div>
             </div>
         </div>
+
     </template>
     <router-view />
+
+
+    <Dialog v-model:visible="advertisment" v-if="!showComponent && isInstallable"
+        :style="{ width: '80vw', height: '50%' }">
+        <div>
+            Installable na ang Anahaw App Man!
+        </div>
+    </Dialog>
 </template>
 
 <style>

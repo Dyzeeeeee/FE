@@ -21,7 +21,7 @@ watch(visible, (newValue) => {
     </button> -->
     <div class="mt-[5rem]">
     <div class="flex text-xl font-bold pt-4 pb-5 pl-4">
-        ROOMS
+        <!-- ROOMS   -->
     </div>
     <div class="flex gap-2 pb-3 text-sm xl:text-9xl font-bold"
         style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">

@@ -495,24 +495,29 @@
             <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
         </button> -->
         <div class="mt-[5rem]">
-            <div class="flex text-xl font-bold pt-4 pb-5 pl-4 justify-between px-2">
-                <div> <Button severity="success" class="h-[2rem]" @click="simpleMenu = true">
+            <div class="flex text-xl font-bold py-2 mt-[6rem] pl-4 justify-between px-2 bg-gray-800 mb-3">
+                <div class="flex-1">
+                    <Button severity="success" class="h-[2rem]" @click="simpleMenu = true">
                         <Icon icon="ic:sharp-menu-book" height="15" />
-                        <div> Simplified Menu</div>
-                    </Button></div>
-                <div class="flex gap-2">
-                    <Button severity="primary" class="h-[2rem]" text @click="search = true">
-                        <Icon icon="mingcute:search-line" height="15" />
+                        <div> Simple</div>
                     </Button>
+                </div>
+                <div class="flex-1 flex gap-2">
+                    <InputGroup>
+                        <InputText class="h-[2rem] w-[70%]" />
+                        <Button severity="primary" class="h-[2rem]" @click="search = true">
+                            <Icon icon="mingcute:search-line" height="15" />
+                        </Button>
+                    </InputGroup>
 
                 </div>
             </div>
-            <div class="flex gap-2 pb-3 text-sm xl:text-9xl font-bold"
+            <div class="flex gap-2 pb-0 text-sm xl:text-9xl font-bold "
                 style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
                 <Icon icon="fe:arrow-left" width="50" height="50" @click="scrollToLeft"
                     class="cursor-pointer pb-2  hidden xl:block" />
                 <div ref="scrollContainer"
-                    class="flex gap-2 pb-3 text-sm xl:text-9xl font-bold relative overflow-x-auto whitespace-nowrap"
+                    class="flex gap-2 pb-0 text-sm xl:text-9xl font-bold relative overflow-x-auto whitespace-nowrap "
                     style="scrollbar-width: none; -ms-overflow-style: none;">
 
                     <Button rounded :outlined="selectedCategoryId !== 'All'" @click="filterCategory('All')" size="small"
@@ -529,7 +534,7 @@
                     class="cursor-pointer pb-2 hidden xl:block" />
             </div>
 
-            <div class="grid grid-cols-12 xl:gap-4 gap- mt-5 pb-12 mb-12">
+            <div class="grid grid-cols-12 xl:gap-4 gap-2 mt-5 pb-12 mb-12">
                 <!---->
                 <!-- <div class="col-span-6 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 gap-2">
 
