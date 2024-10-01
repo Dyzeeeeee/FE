@@ -1,6 +1,7 @@
 <script setup>
 import AppTopbar from '../AppTopbar.vue';
 import CustomerBottomBar from './CustomerBottomBar.vue';
+import CustomerTopBar from './CustomerTopBar.vue';
 
 </script>
 
@@ -9,6 +10,8 @@ import CustomerBottomBar from './CustomerBottomBar.vue';
         <div class="hidden">
             <app-topbar></app-topbar>
         </div>
+        <CustomerTopBar />
+
         <!-- bottom-bar that has 5 menu that is by default home then when an different button is selected it will be the
         active one -->
         <div class="layout-main-container -mt-12 ">
@@ -33,3 +36,6 @@ import CustomerBottomBar from './CustomerBottomBar.vue';
     </div> -->
     <Toast />
 </template>
+
+
+<style scoped></style>

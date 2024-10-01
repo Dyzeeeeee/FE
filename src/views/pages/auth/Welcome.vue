@@ -140,15 +140,13 @@ function goToSignup() {
         </div>
         <div class="col-span-12 bg-slate-900 p-5 xl:col-span-5 xl:p-10 xl:rounded-3xl xl:m-10">
             <div class="relative flex flex-col justify-center items-center h-1/3 p-0 ">
-                <video src="@/assets/pics/Welcome.mp4" playsinline autoplay muted loop
-                    class="h-auto w-screen mb-7 object-cover xl:hidden">
-                    Your browser does not support the video tag.
-                </video>
+                <img src="@/assets/pics/Welx.gif" class="h-auto w-[80%] mb-7 object-cover xl:hidden bg-whiste">
                 <!-- Welcome Image as Background -->
                 <!-- <img src="@/assets/pics/Welcome.png" alt="Welcome" class="h-auto w-screen mb-7 object-cover xl:hidden">
-
                 <img src="@/assets/pics/logo-outline.png" alt="Logo"
                     class="absolute h-[8rem] w-auto my-4 mt-7 xl:h-[6rem]"> -->
+                <img src="@/assets/pics/logo.png" alt="Logo"
+                    class="absolute h-[8rem] w-auto my-4 mt-7 xl:h-[6rem] hidden xl:block">
             </div>
 
             <div>
@@ -159,7 +157,7 @@ function goToSignup() {
                     Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam maiores cumque natus impedit
                     laboriosam,
                     sapiente <br>
-                    {{ token }}
+                    <!-- {{ token }} -->
                 </div>
             </div>
             <div class="text-center text-base mt-8 font-bold xl:px-10">

@@ -19,6 +19,7 @@ watch(visible, (newValue) => {
     <!-- <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
         <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
     </button> -->
+    <div class="mt-[5rem]">
     <div class="flex text-xl font-bold pt-4 pb-5 pl-4">
         ROOMS
     </div>
@@ -176,7 +177,7 @@ watch(visible, (newValue) => {
 
     </div>
 
-
+</div>
 
 
 
