@@ -2,4 +2,4 @@
 const currentHost = window.location.hostname;
 
 // Set baseImageUrl dynamically using the current host
-export const baseImageUrl = `https://app.anahaw.shop/uploads/`;
+export const baseImageUrl = `https://anahaw.shop/uploads/`;
