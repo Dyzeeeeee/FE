@@ -33,7 +33,7 @@
                         <InputGroupAddon>
                             <i class="pi pi-user"></i>
                         </InputGroupAddon>
-                        <InputText placeholder="Email" v-model="email" />
+                        <InputText placeholder="Email" v-model="email" @keyup.enter="handleLogin" />
                     </InputGroup>
                     <InputGroup>
                         <InputGroupAddon>
