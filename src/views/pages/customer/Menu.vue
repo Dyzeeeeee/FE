@@ -73,23 +73,22 @@
 
     const removeItem = async (detail) => {
         // Optional: Confirm from the user before removal
-        if (confirm('Are you sure you want to remove this item?')) {
-            try {
-                const response = await axios.delete(`/remove-order-detail/${detail.id}`); // Assuming the endpoint takes an ID in the URL
 
-                // Check if the deletion was successful, considering a 200 OK or 204 No Content response as successful
-                if (response.status === 200 || response.status === 204) {
-                    console.log('Item removed successfully');
-                    // Update the state by filtering out the deleted item
-                    orderDetails.value = orderDetails.value.filter(d => d.id !== detail.id);
-                } else {
-                    console.error('Failed to remove the item:', response.data);
-                }
-            } catch (error) {
-                // This will catch any network errors or cases where the response status code was not in the 2xx range
-                console.error('Error removing item:', error);
-                alert('Failed to remove the item.'); // Optionally, provide user feedback
+        try {
+            const response = await axios.delete(`/remove-order-detail/${detail.id}`); // Assuming the endpoint takes an ID in the URL
+
+            // Check if the deletion was successful, considering a 200 OK or 204 No Content response as successful
+            if (response.status === 200 || response.status === 204) {
+                console.log('Item removed successfully');
+                // Update the state by filtering out the deleted item
+                orderDetails.value = orderDetails.value.filter(d => d.id !== detail.id);
+            } else {
+                console.error('Failed to remove the item:', response.data);
             }
+        } catch (error) {
+            // This will catch any network errors or cases where the response status code was not in the 2xx range
+            console.error('Error removing item:', error);
+            alert('Failed to remove the item.'); // Optionally, provide user feedback
         }
     };
 
@@ -283,12 +282,14 @@
                     orderDetail.quantity = parseInt(existingItem.quantity, 10) + 1; // Base 10
                     orderDetail.subtotal = parseFloat(menuItem.price) * orderDetail.quantity;
                 }
+                toast.add({ severity: 'success', summary: 'Success', detail: `Item ${menuItem.name} added to the order successfully!`, life: 2000 });
 
 
                 // Make the API call to add or update the order detail
                 const response = await axios.post('/add-or-update-online-order-detail', orderDetail);
                 console.log('Item added/updated in order:', response.data);
                 getOnlineOrderDetails();
+
                 // Optionally, update UI or state based on successful addition/update
             } catch (error) {
                 console.error('Error adding/updating item in order:', error);
@@ -299,8 +300,10 @@
     };
 
 
+    import { useToast } from 'primevue/usetoast';
 
 
+    const toast = useToast();
 
 
 
@@ -494,6 +497,7 @@
         <!-- <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
             <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
         </button> -->
+        <Toast />
         <div class="mt-[5rem]">
             <div class="flex text-xl font-bold py-2 mt-[6rem] pl-4 justify-between px-2 bg-gray-800 mb-3">
                 <div class="flex-1">
@@ -571,12 +575,13 @@
                     <div class="card p-0 h-auto pb-5 mx-2 mb-4 min-h-[35vh] max-h-[35vh] relative ">
                         <div class="flex relative ">
                             <div v-if="isItemAdded(item.id)"
-                                class="absolute top-0 right-0 m-3 bg-indigo-500 text-white px-2 py-1 rounded-lg text-sm">
-                                Added {{ getItemQuantity(item.id) }} <!-- Display quantity of this specific item -->
+                                class="absolute inset-0 bg-black opacity-60 rounded-t-lg font-bold text-4xl justify-center flex flex-col items-center  text-green-500">
+                                <Icon icon="line-md:confirm-circle-filled" height="50" />
+                                <Badge :value="getItemQuantity(item.id)" severity="info"
+                                    class="absolute top-2 right-2" />
                             </div>
-                            <div class="text-xl p-2 absolute bg-red-500 rounded-r-lg  font-bold bottom-3">
-                                ₱{{ item.price }}
-                            </div>
+                            <!-- <div class="text-xl p-2 absolute bg-red-500 rounded-r-lg  font-bold bottom-3 ">
+                            </div> -->
                             <img :src="item.imageUrl" class="object-cover xl:h-[20vh] h-[20vh] w-full rounded-t-lg" />
 
                         </div>
@@ -587,6 +592,10 @@
                                     <div class="flex flex-col gap-0">
                                         <div class="text-xl font-bold xl:text-4xl">
                                             {{ item.name }}
+                                        </div>
+                                        <div>
+                                            ₱{{ item.price }}
+
                                         </div>
                                         <!-- <div class="text-sm italic">
                                         10-20 minutes

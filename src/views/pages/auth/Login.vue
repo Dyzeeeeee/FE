@@ -135,9 +135,9 @@ async function handleLogin() {
             throw new Error('Unknown role');
         }
 
-        alert('Login successful!');
+        // alert('Login successful!');
     } catch (error) {
-        alert('Login failed: ' + (error.response?.data?.message || error.message));
+        // alert('Login failed: ' + (error.response?.data?.message || error.message));
     }
 }
 

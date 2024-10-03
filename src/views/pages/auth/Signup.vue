@@ -20,7 +20,7 @@ const confirmPassword = ref('');
 const signUp = async () => {
     // Perform basic validation
     if (password.value !== confirmPassword.value) {
-        alert("Passwords do not match!");
+        // alert("Passwords do not match!");
         return;
     }
 
@@ -38,15 +38,15 @@ const signUp = async () => {
         // Handle successful response (you can redirect or show a message)
         console.log(response.data);
 
-        alert('Registration successful!');
+        // alert('Registration successful!');
         router.push('/auth/login'); // Redirect to login page after sign up
 
     } catch (error) {
         // Handle error
         if (error.response && error.response.data) {
-            alert(`Error: ${error.response.data.message}`);
+            // alert(`Error: ${error.response.data.message}`);
         } else {
-            alert('An error occurred during registration.');
+            // alert('An error occurred during registration.');
         }
         console.error(error);
     }
