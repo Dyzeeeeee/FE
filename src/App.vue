@@ -63,9 +63,7 @@ const handleInstallApp = async () => {
 
     </template>
     <router-view />
-
-
-    <Dialog v-model:visible="advertisment" v-if="!showComponent && isInstallable"
+    <Dialog v-model:visible="advertisment" modal v-if="!showComponent && isInstallable"
         :style="{ width: '80vw', height: '50%' }">
         <div>
             Installable na ang Anahaw App Man!

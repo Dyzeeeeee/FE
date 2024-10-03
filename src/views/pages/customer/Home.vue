@@ -1,5 +1,10 @@
 <template>
-    <div class="h-full mb-[3em] pb-[0rem] ">
+    <div class="hidden xl:block h-full w-full justify-center flex flex-col items-center ">
+        <div class=" flex justify-center w-full ">
+            <img src="@/assets/pics/sorry.png" alt="" class="h-[50%] w-[50%]">
+        </div>
+    </div>
+    <div class="xl:hidden block h-full mb-[3em] pb-[0rem] ">
         <div class="flex flex-col w-full relative items-center overflow-hidden" :style="{ height: 'calc(55vh)' }">
             <div style="border-bottom-left-radius: 100%; border-bottom-right-radius: 100%; width: 120vw;"
                 class="bg-emerald-600 h-[95%] border-b-[2rem] border-emerald-800 overflow-hidden relative">

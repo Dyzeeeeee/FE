@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showComponent"
+    <div v-if="showComponent" class=" xl:hidden block"
         :class="['fixed top-0 left-0 right-0 z-50', isRounded ? 'mt-5 rounded-3xl mx-5 bg-emerald-800 p-2 shadow-md transition-all duration-300 ease-in-out' : ' bg-gray-800  p-2 transition-all duration-300 ease-in-out']">
         <div class="flex justify-between px-2 self-center">
             <div class="flex gap-2 flex-1">

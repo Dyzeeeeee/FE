@@ -35,7 +35,7 @@ import router from './router';
 
 // Dynamically set the base URL using the current host
 const currentHost = window.location.hostname;
-const baseURL = `http://${currentHost}/be/public/index.php/`;
+const baseURL = `http://anahaw.shop/`;
 
 axios.defaults.baseURL = baseURL;
 
