@@ -40,7 +40,7 @@
                             <i class="pi pi-lock"></i>
                         </InputGroupAddon>
                         <Password v-model="password" inputId="password" placeholder="Password" toggleMask
-                            :feedback="false" />
+                            :feedback="false" @keyup.enter="handleLogin" />
                     </InputGroup>
                 </div>
                 <div class="flex justify-between mt-2 text-sm">
