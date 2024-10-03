@@ -64,9 +64,17 @@ const handleInstallApp = async () => {
     </template>
     <router-view />
     <Dialog v-model:visible="advertisment" modal v-if="!showComponent && isInstallable"
-        :style="{ width: '80vw', height: '50%' }">
-        <div>
-            Installable na ang Anahaw App Man!
+        :style="{ width: '80vw', height: 'auto' }">
+        <div class="flex justify-center text-2xl font-bold mb-2">
+            <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 50px; min-width: 50px;">
+
+        </div>
+        <div class="flex justify-center text-2xl font-bold mb-2">You can now install the <span
+                class="text-yellow-400 font-bold">&nbsp;Anahaw Island View Resort
+                Application</span> &nbsp;in your device</div>
+        <div class="w-full">
+            <Button @click="handleInstallApp" class="w-full">Install Now</Button>
+
         </div>
     </Dialog>
 </template>
