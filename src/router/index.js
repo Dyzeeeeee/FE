@@ -268,7 +268,7 @@ const router = createRouter({
     ]
 });
 router.beforeEach((to, from, next) => {
-    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer', '/inventory', '/cust', '/'];
+    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer'];
 
     const authRequired = !publicPages.includes(to.path);
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
