@@ -64,7 +64,12 @@ const handleInstallApp = async () => {
     </template>
     <router-view />
     <Dialog v-model:visible="advertisment" modal v-if="!showComponent && isInstallable"
-        :style="{ width: '80vw', height: 'auto' }">
+        :style="{ width: '80vw', height: 'auto' }" :pt="{
+            root: 'border-none',
+            mask: {
+                style: 'backdrop-filter: blur(10px)',
+            },
+        }">
         <div class="flex justify-center text-2xl font-bold mb-2">
             <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 50px; min-width: 50px;">
 
