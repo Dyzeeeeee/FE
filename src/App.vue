@@ -5,7 +5,7 @@ const installPromptEvent = ref(null);
 const isInstallable = ref(false);
 const route = useRoute();
 const showComponent = computed(() => {
-    return route.path !== '/customer' || route.path !== '/customer/menu' || route.path !== '/customer/rooms';
+    return route.path !== '/customer' && route.path !== '/customer/menu' && route.path !== '/customer/rooms';
 });
 const advertisment = ref(true)
 window.addEventListener('beforeinstallprompt', (e) => {
