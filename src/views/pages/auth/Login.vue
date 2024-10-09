@@ -131,6 +131,8 @@ async function handleLogin() {
             router.push('/customer'); // Navigate to customer dashboard
         } else if (response.data.user.role === 'staff') {
             router.push('/staff/home'); // Navigate to staff dashboard
+        } else if (response.data.user.role === 'waiter') {
+            router.push('/waiter/home'); // Navigate to staff dashboard
         } else {
             throw new Error('Unknown role');
         }

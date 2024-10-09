@@ -2,11 +2,43 @@
 import { useLayout } from '@/layout/composables/layout';
 import router from '@/router';
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 import AppConfigurator from './AppConfigurator.vue';
 
+const installPromptEvent = ref(null);
+const isInstallable = ref(false);
+const route = useRoute();
+const showComponent = computed(() => {
+    return route.path !== '/customer' && route.path !== '/customer/menu' && route.path !== '/customer/rooms';
+});
+const advertisment = ref(true)
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Save the event for later use
+    installPromptEvent.value = e;
+    // Update installable status
+    isInstallable.value = true;
+});
 
+const handleInstallApp = async () => {
+    if (installPromptEvent.value) {
+        // Show the install prompt
+        installPromptEvent.value.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await installPromptEvent.value.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        } else {
+            console.log('User dismissed the install prompt');
+        }
+        // We no longer need the prompt. Clear it up.
+        installPromptEvent.value = null;
+        isInstallable.value = false;
+    }
+};
 
 const menuStates = ref({
     calendarMenu: false,
@@ -128,6 +160,26 @@ onMounted(() => {
 </script>
 
 <template>
+    <Dialog v-model:visible="advertisment" modal v-if="showComponent && isInstallable"
+        :style="{ width: '80vw', height: 'auto' }" :pt="{
+            root: 'border-none',
+            mask: {
+                style: 'backdrop-filter: blur(10px)',
+            },
+        }">
+        <div class="flex justify-center text-2xl font-bold mb-2">
+            <img src="@/assets/pics/AppLogo.png" class="self-center" alt="" style="height: 50px; min-width: 50px;">
+        </div>
+        <div class="text-center justify-center text-2xl font-bold mb-2">
+            You can now install the
+            <span class="text-yellow-400
+                font-bold">&nbsp;Anahaw Island View Resort Application</span>&nbsp;in your
+            device
+        </div>
+        <div class="w-full">
+            <Button @click="handleInstallApp" class="w-full">Install Now</Button>
+        </div>
+    </Dialog>
     <div class="layout-topbar fixed top-0 left-0 w-full z-40">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" @click="onMenuToggle">

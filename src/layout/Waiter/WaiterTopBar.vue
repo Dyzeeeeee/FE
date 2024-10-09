@@ -1,11 +1,11 @@
 <template>
-    
-    <div v-if="showComponent" class=" xl:hidden block"
-        :class="['fixed top-0 left-0 right-0 z-50', isRounded ? 'mt-5 rounded-3xl mx-5 bg-emerald-800 p-2 shadow-md transition-all duration-300 ease-in-out' : ' bg-gray-800  p-2 transition-all duration-300 ease-in-out']">
+
+    <div v-if="showComponent" class=" xl:hidden block "
+        :class="['fixed top-0 left-0 right-0 z-50', isRounded ? 'text-surface-800 border-[2px] border-surface-800 mt-3 rounded-3xl mx-2 bg-emerald-500 p-2 shadow-md transition-all duration-300 ease-in-out' : ' bg-gray-800  p-2 transition-all duration-300 ease-in-out']">
         <div class="flex justify-between px-2 self-center">
             <div class="flex gap-2 flex-1">
                 <div class=" flex-wrap  ">
-                    <div class="text-white">
+                    <div class="">
                         <img src="@/assets/pics/logo-plain.png" alt="" style="height: 2rem;">
                     </div>
                     <div class="text-xs font-bold">Anahaw</div>
@@ -14,15 +14,18 @@
                     <!-- <Icon icon="lets-icons:search-fill" height="25" width="25" /> -->
                 </div>
             </div>
-            <div v-if="userId" class="flex gap-2 justify-center text-center flex-1 text-white">
+            <div v-if="userId" class="flex gap-2 justify-center text-center flex-1">
                 <div class="self-center font-bold text-lg">
                     {{ routeName }}
                 </div>
             </div>
 
-            <div v-if="userId" class="self-center flex gap-3 flex-1 justify-end">
-                <Icon icon="ic:sharp-notifications" height="25" width="25" />
-                <Icon icon="pajamas:profile" height="25" width="25" />
+            <div v-if="userId" class="self-center flex gap-2 flex-1 justify-end ">
+                <Icon icon="ic:sharp-notifications" class="w-9 h-9 rounded-full p-0.5 self-center" />
+                <!-- <Icon icon="pajamas:profile" height="25" width="25" /> -->
+                <img src="https://res.cloudinary.com/teepublic/image/private/s--70s5l004--/c_crop,x_10,y_10/c_fit,w_1109/c_crop,g_north_west,h_1008,w_1260,x_-76,y_-64/co_rgb:c8e0ec,e_colorize,u_Misc:One%20Pixel%20Gray/c_scale,g_north_west,h_1008,w_1260/fl_layer_apply,g_north_west,x_-76,y_-64/bo_157px_solid_white/e_overlay,fl_layer_apply,h_1008,l_Misc:Art%20Print%20Bumpmap,w_1260/e_shadow,x_6,y_6/c_limit,h_1254,w_1254/c_lpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_auto,h_630,q_auto:good:420,w_630/v1661243507/production/designs/34363529_0.jpg"
+                    alt="Profile Avatar"
+                    class="w-11 h-11 rounded-full mr-2 border-2 border-surface-800 bg-white p-0.5" />
             </div>
             <Button v-else class="self-center flex w-[50%] font-bold py-2 px-4" @click="goToLogin">
                 Log in
@@ -64,14 +67,16 @@ onUnmounted(() => {
 
 const routeName = computed(() => {
     // Check the path to decide the text dynamically
-    if (route.path === '/customer') {
+    if (route.path === '/waiter/home') {
         return 'HOME';
-    } else if (route.path === '/customer/menu') {
+    } else if (route.path === '/waiter/orders') {
+        return 'ORDERS';
+    }
+    else if (route.path === '/waiter/menu') {
         return 'MENU';
-    } else if (route.path === '/customer/rooms') {
-        return 'ROOMS';
-    } else if (route.path === '/customer/more') {
-        return 'MORE';
+    }
+    else if (route.path === '/waiter/takeorder') {
+        return 'TAKE ORDER';
     }
 
     return '';

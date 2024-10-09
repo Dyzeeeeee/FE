@@ -813,6 +813,7 @@ const toggleCamera = () => {
 
                 <div class="flex gap-2  border-gray-700 border-t pt-4">
                     <InputGroup>
+                        
                         <InputGroupAddon>
                             <Icon icon="clarity:peso-solid" width="20" height="20" />
                         </InputGroupAddon>
