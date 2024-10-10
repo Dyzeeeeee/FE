@@ -101,7 +101,7 @@ const setChartOptions = () => {
         }
     };
 };
-const dayName = ref(new Date().toLocaleDateString('en-US', { weekday: 'long' })); // "Tue"
+const dayName = ref(new Date().toLocaleDateString('en-US', { weekday: 'short' })); // "Tue"
 const dayNumber = ref(new Date().getDate()); // 6
 const monthName = ref(new Date().toLocaleDateString('en-US', { month: 'long' })); // "August"
 

@@ -145,8 +145,8 @@ onUnmounted(() => {
 
 <template>
     <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10">
-        <div class="col-span-12 xl:col-span-12 items-center bg-gray-900 mt-2 "
-            :class="['fixed top-20 left-0 right-0 z-50', isRounded ? 'mt-2 p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-14 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
+        <div class="col-span-12 xl:col-span-12 items-center bg-gray-900  "
+            :class="['fixed top-0 left-0 right-0 z-[1]', isRounded ? ' p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-0 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
             <div class="flex gap-2 overflow-x-auto transition-all duration-300 ease-in-out transform"
                 :class="showCustomers ? 'flex gap-2 overflow-x-auto' : 'hidden'"
                 style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">

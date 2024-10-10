@@ -1,6 +1,6 @@
 <template>
-    <div v-if="minimized === true && showComponent"
-        :class="['z-50 xl:hidden block top-0 left-0 bg-emerald-500 fixed p-3 mt-10 rounded-tr-xl rounded-br-xl ', isHidden ? 'opacity-0' : 'opacity-90']"
+    <div v-if="minimized === true"
+        :class="['xl:hidden block top-0 left-0 bg-emerald-500 fixed p-3 mt-3 rounded-tr-xl rounded-br-xl z-50', isHidden ? 'opacity-0' : 'opacity-90 fixed ']"
         @click="toggleTopBar" @mouseenter="resetInactivityTimer" @mouseleave="resetInactivityTimer"
         :style="{ transition: 'opacity 1s ease' }">
         <div>
@@ -129,6 +129,6 @@ const minimized = ref(true);
 
 
 const showComponent = computed(() => {
-    return route.path !== '/waiter/orders';
+    return route.path !== '/customer/more';
 });
 </script>

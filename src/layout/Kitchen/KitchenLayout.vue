@@ -2,8 +2,8 @@
 import { useLayout } from '@/layout/composables/layout';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import AppTopbar from './../AppTopbar.vue';
-import WaiterBottomBar from './WaiterBottomBar.vue';
-import WaiterTopBar from './WaiterTopBar.vue';
+import KitchenBottomBar from './KitchenBottomBar.vue';
+import KitchenTopBar from './KitchenTopBar.vue';
 const currentTime = ref(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 const currentDate = ref(formatDate(new Date()));
 
@@ -82,7 +82,7 @@ function isOutsideClicked(event) {
 
 <template>
     <div class="layout-wrapper" :class="containerClass">
-        <WaiterTopBar></WaiterTopBar>
+        <KitchenTopBar></KitchenTopBar>
         <div class="hidden">
             <app-topbar></app-topbar>
         </div>
@@ -103,6 +103,6 @@ function isOutsideClicked(event) {
             {{ currentDate }}
         </div>
     </div>
-    <WaiterBottomBar></WaiterBottomBar>
+    <KitchenBottomBar></KitchenBottomBar>
     <Toast />
 </template>

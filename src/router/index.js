@@ -1,5 +1,6 @@
 import AppLayout from '@/layout/AppLayout.vue';
 import CustomerLayout from '@/layout/Customer/CustomerLayout.vue';
+import KitchenLayout from '@/layout/Kitchen/KitchenLayout.vue';
 import StaffLayout from '@/layout/Staff/StaffLayout.vue';
 import WaiterLayout from '@/layout/Waiter/WaiterLayout.vue';
 import { createRouter, createWebHistory } from 'vue-router';
@@ -206,6 +207,19 @@ const router = createRouter({
             ]
         },
         {
+            path: '/kitchen',
+            component: KitchenLayout,
+            meta: { role: 'kitchen' },
+
+            children: [
+                {
+                    path: '/kitchen/home',
+                    name: 'kitchen-home',
+                    component: () => import('@/views/pages/kitchen/Home.vue')
+                }
+            ]
+        },
+        {
             path: '/inventory',
             name: 'inventory',
             component: () => import('@/views/pages/staff/Inventory.vue')
@@ -314,7 +328,7 @@ router.beforeEach((to, from, next) => {
             return next();
         } else {
             // Redirect to a default secure page based on role or to the dashboard
-            const redirectTo = role === 'customer' ? '/customer' : role === 'staff' ? '/staff' : role === 'waiter' ? '/waiter' : '/';
+            const redirectTo = role === 'customer' ? '/customer' : role === 'staff' ? '/staff' : role === 'waiter' ? '/waiter' : role === 'kitchen' ? '/kitchen' : '/';
             return next(redirectTo);
         }
     }
