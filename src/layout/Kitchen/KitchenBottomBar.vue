@@ -1,11 +1,11 @@
 <template>
     <div class="fixed bottom-0 left-0 right-0 bg-gray-800 text-white flex justify-evenly text-xs z-10 h-[4rem]">
         <!-- Home -->
-        <div @click="$router.push('/waiter/home')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/waiter/home' }">Home</div>
+        <div @click="$router.push('/kitchen/home')" class="flex-1 text-center p-2 cursor-pointer">
+            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/kitchen/home' }">Home</div>
             <div class="flex justify-center">
                 <Icon icon="ion:home" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/waiter/home' }" />
+                    :class="{ 'text-yellow-500': $route.path === '/kitchen/home' }" />
             </div>
         </div>
         <!-- <div @click="$router.push('/waiter/menu')" class="flex-1 text-center p-2 cursor-pointer">
@@ -16,11 +16,11 @@
             </div>
         </div> -->
         <!-- Menu -->
-        <div @click="$router.push('/waiter/orders')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/waiter/orders' }">Orders</div>
+        <div @click="$router.push('/kitchen/orders')" class="flex-1 text-center p-2 cursor-pointer">
+            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/kitchen/orders' }">Orders</div>
             <div class="flex justify-center">
                 <Icon icon="fluent-mdl2:activate-orders" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/waiter/orders' }" />
+                    :class="{ 'text-yellow-500': $route.path === '/kitchen/orders' }" />
             </div>
         </div>
 
@@ -42,18 +42,18 @@
         </div> -->
 
         <!-- Profile -->
-        <div @click="$router.push('/waiter/notes')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/waiter/notes' }">History</div>
+        <div @click="$router.push('/kitchen/history')" class="flex-1 text-center p-2 cursor-pointer">
+            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/kitchen/history' }">History</div>
             <div class="flex justify-center">
                 <Icon icon="nimbus:history" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/waiter/notes' }" />
+                    :class="{ 'text-yellow-500': $route.path === '/kitchen/history' }" />
             </div>
         </div>
-        <div @click="$router.push('/waiter/menu')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/waiter/menu' }">More</div>
+        <div @click="$router.push('/kitchen/more')" class="flex-1 text-center p-2 cursor-pointer">
+            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/kitchen/more' }">More</div>
             <div class="flex justify-center">
                 <Icon icon="icon-park-outline:more-app" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/waiter/menu' }" />
+                    :class="{ 'text-yellow-500': $route.path === '/kitchen/more' }" />
             </div>
         </div>
     </div>

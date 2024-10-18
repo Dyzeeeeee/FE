@@ -143,9 +143,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10 mt-20">
+    <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10 mt-24">
         <div class="col-span-12 xl:col-span-12 items-center bg-surface-800"
-            :class="['fixed top-20 left-0 right-0 z-50', isRounded ? 'mt-2 p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-16 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
+            :class="['fixed top-0 left-0 right-0 z-50', isRounded ? 'mt-2 p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-0 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
             <div class="flex gap-2 font-bold">
                 <div class="flex gap-2 w-[30%]">
                     <Button severity="success">

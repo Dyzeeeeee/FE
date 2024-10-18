@@ -92,6 +92,7 @@
 
 <script setup>
 import AppConfigurator from '@/layout/AppConfigurator.vue';
+import { simulateAxiosProcess } from '@/useLoading'; // Import the shared function
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -107,10 +108,13 @@ function handleWelcome() {
 
 async function handleLogin() {
     try {
-        const response = await axios.post('/login', {
-            email: email.value,
-            password: password.value
-        });
+        const response = await simulateAxiosProcess(
+            axios.post('/login', {
+                email: email.value,
+                password: password.value
+            })
+        );
+
 
         if (rememberMe.value == true) {
             localStorage.setItem('token', response.data.token);

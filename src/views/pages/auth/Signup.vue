@@ -1,5 +1,6 @@
 <script setup>
 import AppConfigurator from '@/layout/AppConfigurator.vue';
+import { simulateAxiosProcess } from '@/useLoading'; // Import the shared function
 import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -25,7 +26,7 @@ const signUp = async () => {
     }
 
     try {
-        const response = await axios.post('/signup', {
+        const response = await simulateAxiosProcess(axios.post('/signup', {
             firstname: firstname.value,
             lastname: lastname.value,
             birthday: birthday.value,
@@ -33,7 +34,7 @@ const signUp = async () => {
             phone: phone.value,
             password: password.value,
             address: address.value,
-        });
+        }));
 
         // Handle successful response (you can redirect or show a message)
         console.log(response.data);

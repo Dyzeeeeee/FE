@@ -147,150 +147,75 @@ onUnmounted(() => {
     <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10">
         <div class="col-span-12 xl:col-span-12 items-center bg-gray-900  "
             :class="['fixed top-0 left-0 right-0 z-[1]', isRounded ? ' p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-0 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
-            <div class="flex gap-2 overflow-x-auto transition-all duration-300 ease-in-out transform"
+            <div class="flex flex-wrap gap-2 overflow-x-auto transition-all duration-300 ease-in-out transform"
                 :class="showCustomers ? 'flex gap-2 overflow-x-auto' : 'hidden'"
                 style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
-                <div class="relative">
+                <div class="relative max-w-[14%] overflow-x-auto">
                     <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col bg-white text-yellow-500 border-yellow-500">
-                        AB
+                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col bg-white border-yellow-500">
+                        <Icon icon="fluent:mail-inbox-all-24-filled" height="20" class="self-center text-yellow-500" />
                     </div>
                     <!-- Overlay Badge -->
                     <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
+                        class="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full flex justify-center items-center border-[1px] text-sm">
+                        45
+                    </div>
+                    <div class="text-center truncate text-yellow-500">
+                        All
                     </div>
                 </div>
-                <div class="relative">
+                <div class="relative max-w-[14%] overflow-x-auto">
                     <div
                         class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
+                        <Icon icon="healthicons:hot-meal" height="20" class="self-center" />
                     </div>
                     <!-- Overlay Badge -->
                     <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
+                        class="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full flex justify-center items-center border-[1px] text-sm">
+                        10
+                    </div>
+                    <div class="text-center truncate">
+                        Sizzling Plates
                     </div>
                 </div>
-                <div class="relative">
+                <div class="relative max-w-[14%] overflow-x-auto">
                     <div
                         class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
+                        <Icon icon="healthicons:hot-meal" height="20" class="self-center" />
                     </div>
                     <!-- Overlay Badge -->
                     <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
+                        class="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full flex justify-center items-center border-[1px] text-sm">
+                        10
                     </div>
-                </div>
-                <div class="relative">
-                    <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
-                    </div>
-                    <!-- Overlay Badge -->
-                    <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
-                    </div>
-                </div>
-                <div class="relative">
-                    <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
-                    </div>
-                    <!-- Overlay Badge -->
-                    <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
-                    </div>
-                </div>
-                <div class="relative">
-                    <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
-                    </div>
-                    <!-- Overlay Badge -->
-                    <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
-                    </div>
-                </div>
-                <div class="relative">
-                    <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
-                    </div>
-                    <!-- Overlay Badge -->
-                    <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
-                    </div>
-                </div>
-                <div class="relative">
-                    <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
-                    </div>
-                    <!-- Overlay Badge -->
-                    <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
-                    </div>
-                </div>
-                <div class="relative">
-                    <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
-                    </div>
-                    <!-- Overlay Badge -->
-                    <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
-                    </div>
-                </div>
-
-                <div class="relative">
-                    <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
-                    </div>
-                    <!-- Overlay Badge -->
-                    <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
-                    </div>
-                </div>
-                <div class="relative">
-                    <div
-                        class="rounded-full border-[3px] text-xl font-bold h-[3rem] w-[3rem] flex justify-center items-center flex-col">
-                        AB
-                    </div>
-                    <!-- Overlay Badge -->
-                    <div
-                        class="absolute top-0 right-0 h-4 w-4 bg-yellow-500 rounded-full flex justify-center items-center border-[1px]">
-                        <Icon icon="fluent:alert-16-filled" width="10" height="10" class="text-white" />
+                    <div class="text-center truncate">
+                        Sizzling Plates
                     </div>
                 </div>
             </div>
             <div class="flex justify-between bg-surface-700 mt-2 p-2 font-bold rounded-full">
-                <div class="self-center flex gap-2 justify-end">
-                    <div class="self-center w-1/4 justify-start flex gap-2 ">
-                        <Icon icon="iconamoon:arrow-left-2-duotone" height="30" class="self-center" />
-                    </div>
-                    <div class="self-center">
-                        Total: 3000
-                    </div>
-                </div>
-                <div class="self-center">
-                    Customer AB
-                </div>
-                <div class="flex gap-2 justify-end">
+                <!-- <div class="self-center flex-1">
                     <Button class="h-[2rem]" rounded severity="danger">Close</Button>
-                    <div class="self-center w-1/4 justify-start flex gap-2 ">
-                        <Icon icon="iconamoon:arrow-right-2-duotone" height="30" class="self-center" />
+                </div> -->
+                <div class="self-center w-1/4 justify-start flex gap-2 ">
+                    <Icon icon="iconamoon:arrow-left-2-duotone" height="30" class="self-center" />
+                </div>
+                <div class="self-center flex-1 justify-center flex gap-2 ">
+                    <Icon icon="healthicons:hot-meal" height="30" class="self-center" />
+                    <div class="self-center">
+                        Sizzling Plates
+                    </div>
+                    <div
+                        class="h-6 w-6 bg-red-500 rounded-full flex justify-center items-center border-[1px] text-sm self-center">
+                        10
                     </div>
                 </div>
+                <div class="self-center w-1/4 justify-end flex gap-2 ">
+                    <Icon icon="iconamoon:arrow-right-2-duotone" height="30" class="self-center" />
+                </div>
+                <!-- <div class="flex-1 self-center justify-end flex">
+                    3
+                </div> -->
             </div>
             <div @click="showCustomers = !showCustomers"
                 class="absolute left-1/2 bottom-[-20px] w-16 h-16 bg-gray-900 rounded-full z-[-1] transform -translate-x-1/2 shadow-lg flex flex-col justify-end items-center">
@@ -301,7 +226,7 @@ onUnmounted(() => {
 
         </div>
 
-        <div class="col-span-12 flex flex-col gap-3 " :class="showCustomers ? 'mt-32' : 'mt-20'">
+        <div class="col-span-12 flex flex-col gap-3 " :class="showCustomers ? 'mt-36' : 'mt-20'">
             <div class="card p-0 m-0 ">
                 <div class>
                     <div class="flex w-full">

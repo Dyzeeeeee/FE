@@ -43,11 +43,11 @@
                     :class="{ 'text-yellow-500': $route.path === '/waiter/notes' }" />
             </div>
         </div>
-        <div @click="$router.push('/waiter/menu')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/waiter/menu' }">Menu</div>
+        <div @click="$router.push('/waiter/more')" class="flex-1 text-center p-2 cursor-pointer">
+            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/waiter/more' }">More</div>
             <div class="flex justify-center">
-                <Icon icon="ic:sharp-menu-book" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/waiter/menu' }" />
+                <Icon icon="icon-park-outline:more-app" width="20" height="20"
+                    :class="{ 'text-yellow-500': $route.path === '/waiter/more' }" />
             </div>
         </div>
     </div>

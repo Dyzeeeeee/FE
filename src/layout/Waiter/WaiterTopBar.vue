@@ -12,7 +12,7 @@
         <div class="flex justify-between px-2 self-center">
             <div class="flex gap-2 flex-1">
                 <div class="self-center" @click="toggleTopBar">
-                    <Icon icon="tabler:arrow-up-left-circle" height="25" width="25" />
+                    <Icon icon="majesticons:pin" height="25" width="25" />
                 </div>
 
                 <div class=" flex-wrap  ">
@@ -129,6 +129,6 @@ const minimized = ref(true);
 
 
 const showComponent = computed(() => {
-    return route.path !== '/waiter/orders';
+    return route.path !== '/waiter/orders' && route.path !== '/waiter/notes' && route.path !== '/waiter/takeorder';
 });
 </script>

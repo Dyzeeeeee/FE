@@ -1,8 +1,8 @@
-<script setup>
-</script>
-
 <template>
     <!-- <Floater /> -->
+    <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <img src="@/assets/pics/laoding-unscreen.gif" class="h-[10rem] w-[10rem]" />
+    </div>
 
     <router-view />
 
@@ -33,3 +33,9 @@
     /* Optional: Adds a border around the scrollbar handle */
 }
 </style>
+
+
+<script setup>
+import { loading } from './useLoading'; // Ensure this path is correct
+
+</script>

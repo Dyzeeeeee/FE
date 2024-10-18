@@ -310,7 +310,7 @@ onUnmounted(() => {
                 </div>
             </div>
         </div>
-        <div class="col-span-12 h-[30vh]">
+        <div class="col-span-12 min-h-[30vh] h-auto">
             <div class="card border-[1px] h-full p-3">
                 <div class="flex text-2xl font-bold mb-2 gap-2">
                     <div>
@@ -321,7 +321,7 @@ onUnmounted(() => {
                         45
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-3 overflow-auto max-h-[20vh]">
+                <div class="flex flex-wrap gap-3 overflow-auto ">
 
                     <div class="relative max-w-[18%] overflow-x-auto">
                         <div
@@ -368,6 +368,62 @@ onUnmounted(() => {
                     <div class="relative max-w-[18%] overflow-x-auto">
                         <div
                             class="rounded-full border-[3px] text-xl font-bold h-[4rem] w-[4rem] flex justify-center items-center flex-col">
+                            <Icon icon="healthicons:hot-meal" height="20" class="self-center" />
+                        </div>
+                        <!-- Overlay Badge -->
+                        <div
+                            class="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full flex justify-center items-center border-[1px] text-sm">
+                            10
+                        </div>
+                        <div class="text-center truncate">
+                            Sizzling Plates
+                        </div>
+                    </div>
+                    <div class="relative max-w-[18%] overflow-x-auto">
+                        <div
+                            class="rounded-full border-[3px] text-xl font-bold h-[4rem] w-[4rem] flex justify-center items-center flex-col">
+                            <Icon icon="healthicons:hot-meal" height="20" class="self-center" />
+                        </div>
+                        <!-- Overlay Badge -->
+                        <div
+                            class="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full flex justify-center items-center border-[1px] text-sm">
+                            10
+                        </div>
+                        <div class="text-center truncate">
+                            Sizzling Plates
+                        </div>
+                    </div>
+                    <div class="relative max-w-[18%] overflow-x-auto">
+                        <div
+                            class="rounded-full border-[3px] text-xl font-bold h-[4rem] w-[4rem] flex justify-center items-center flex-col">
+                            <Icon icon="healthicons:hot-meal" height="20" class="self-center" />
+                        </div>
+                        <!-- Overlay Badge -->
+                        <div
+                            class="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full flex justify-center items-center border-[1px] text-sm">
+                            10
+                        </div>
+                        <div class="text-center truncate">
+                            Sizzling Plates
+                        </div>
+                    </div>
+                    <div class="relative max-w-[18%] overflow-x-auto">
+                        <div
+                            class="rounded-full border-[3px] text-xl font-bold h-[4rem] w-[4rem] flex justify-center items-center flex-col">
+                            <Icon icon="healthicons:hot-meal" height="20" class="self-center" />
+                        </div>
+                        <!-- Overlay Badge -->
+                        <div
+                            class="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full flex justify-center items-center border-[1px] text-sm">
+                            10
+                        </div>
+                        <div class="text-center truncate">
+                            Sizzling Plates
+                        </div>
+                    </div>
+                    <div class="relative max-w-[18%] overflow-x-auto">
+                        <div
+                            class="rounded-full border-[3px] text-xl font-bold h-[4rem] w-[4rem] flex justify-center items-center flex-col">
                             <Icon icon="mdi:chips" height="20" class="self-center" />
                         </div>
                         <!-- Overlay Badge -->
@@ -384,83 +440,9 @@ onUnmounted(() => {
                 </div>
             </div>
         </div>
-        <div class="col-span-12">
-            <div class="card p-0 m-0 ">
-                <div class>
-                    <div class="flex w-full">
-                        <div class="rounded-tl-lg rounded-bl-lg bg-green-200 min-w-[4%]">
 
-                        </div>
-                        <div class="w-[96%] p-3">
-                            <div class="flex-wrap text-2xl font-bold mb-2">
-                                <div class="flex justify-between">
-                                    <div>
-                                        Order #123
-                                    </div>
-                                    <div
-                                        class="text-green-200 rounded-full border-[1px] px-2 self-center text-base w-auto flex">
-                                        <Icon icon="material-symbols:payments-outline-rounded" height="20"
-                                            class="mr-1" />
-                                        Paid
-                                    </div>
-                                </div>
-                                <div class="italic flex text-xs font-normal">
-                                    3mins ago
-                                </div>
-                            </div>
-
-
-                            <div class="border-[1px] border-dashed w-full p-2">
-
-                                <div class="flex justify-between">
-                                    <div class="flex gap-1">
-                                        <div>
-                                            1x
-                                        </div>
-                                        <div class="underline" @click="itemStatus = true">
-                                            Sinigang na Bangus
-                                        </div>
-                                        <div class="flex self-center text-blue-300">
-                                            <Icon icon="fluent:note-24-filled" height="20" class="" />
-                                        </div>
-                                    </div>
-                                    <div class="flex self-center text-sm">
-
-                                        <Icon icon="ic:round-mode-standby" height="20"
-                                            class="opacity-50 text-secondary" />
-                                        <Icon icon="    " height="20" class="opacity-50 text-orange-500" />
-                                        <Icon icon="game-icons:hot-meal" height="20"
-                                            class="opacity-50 text-yellow-500" />
-                                        <Icon icon="line-md:check-all" height="20" class="opacity-50 text-green-500" />
-                                    </div>
-                                </div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
     </div>
-    <Dialog v-model:visible="itemStatus" modal :style="{ width: '70vw', minHeight: '25%', padding: '0px' }"
-        position="center" header="Sinigang na Bangus">
-        <div class="bg-blue-100 border-[1px] border-dashed p-2 text-sm text-black overflow-auto">
-            <span class="font-bold">Note:&nbsp;</span>Masarap dapat ang luto hehehehe kasi kung hindi ewan
-        </div>
-        <div class="mt-2 flex">
-            Take this item to start<div class="flex text-center  text-orange-500"> &nbsp;preparing
-                <Icon icon="eos-icons:loading" height="20" class="" />
-            </div>
-        </div>
-        <div class="flex justify-end gap-2 p-0 w-full mt-2">
-            <!-- <Button severity="secondary" outlined @click="itemStatus = false" class="w-[30%]"> Close</Button> -->
-            <Button severity="success" @click="itemStatus = false" class="w-full">Start Cooking</Button>
-        </div>
-    </Dialog>
+
 </template>
 
 <style scoped>

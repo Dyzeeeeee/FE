@@ -6,6 +6,7 @@ import { onMounted, ref, watch } from 'vue';
 const { toggleDarkMode, isDarkTheme } = useLayout();
 const userData = ref([]);
 const installPromptEvent = ref(null);
+import { simulateAxiosProcess } from '@/useLoading'; // Import the shared function
 
 
 const handleInstallApp = async () => {
@@ -28,9 +29,9 @@ const handleInstallApp = async () => {
 const handleLogout = async () => {
     try {
         // Call backend logout endpoint
-        await axios.post('/logout', {}, {
+        await simulateAxiosProcess(axios.post('/logout', {}, {
             headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
-        });
+        }));
 
         // Clear local storage or any state management holding user data
         sessionStorage.removeItem('token');
@@ -95,7 +96,7 @@ watch(visible, (newValue) => {
         <div class="flex text-xl font-bold pt-4 pb-5 pl-4">
             <!-- MORE -->
         </div>
-        <div class="grid grid-cols-12 gap-3 ">
+        <div class="grid grid-cols-12 gap-3">
             <div class="col-span-12 lg:col-span-6 xl:col-span-8 ">
                 <div class="card w-full p-3 pointer-cursor" style="position: relative;">
                     <div class="flex justify-center" style="margin-top: -50px;">

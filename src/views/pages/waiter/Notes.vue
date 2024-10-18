@@ -260,8 +260,8 @@ onUnmounted(() => {
 
 <template>
     <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10 mt-16">
-        <div class="col-span-12 xl:col-span-12 items-center bg-surface-800 "
-            :class="['fixed top-20 left-0 right-0 z-50', isRounded ? 'mt-2 p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-16 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
+        <div class="col-span-12 xl:col-span-12 items-center bg-surface-800]"
+            :class="['fixed top-0 left-0 right-0 z-50', isRounded ? 'mt-2 p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-16 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
             <div class="flex gap-2 font-bold">
 
                 <!-- <div class="flex-1">
@@ -284,9 +284,9 @@ onUnmounted(() => {
         </div>
 
         <div class="col-span-12 flex gap-3 relative">
-            <div class="card-container relative w-full h-[7rem] overflow-hidden">
+            <div class="card-container relative w-full h-[7rem] overflow-hidden  border-[1px] rounded-lg">
                 <!-- Background Card -->
-                <div class="absolute inset-0 transition-transform duration-300 transform bg-surface-900 rounded-lg">
+                <div class="absolute inset-0 transition-transform duration-300 transform bg-surface-900 rounded-lg ">
                     <div class="flex w-full h-full justify-between">
                         <div
                             class="p-3 h-full w-[15%] flex flex-col justify-center items-center bg-red-500 rounded-tl-lg rounded-bl-lg">

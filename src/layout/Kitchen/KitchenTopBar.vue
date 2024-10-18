@@ -1,6 +1,6 @@
 <template>
-    <div v-if="minimized === true"
-        :class="['xl:hidden block top-0 left-0 bg-emerald-500 fixed p-3 mt-3 rounded-tr-xl rounded-br-xl z-50', isHidden ? 'opacity-0' : 'opacity-90 fixed ']"
+    <div v-if="minimized === true && showComponent"
+        :class="['z-50 xl:hidden block top-0 left-0 bg-emerald-500 fixed p-3 mt-10 rounded-tr-xl rounded-br-xl ', isHidden ? 'opacity-0' : 'opacity-90']"
         @click="toggleTopBar" @mouseenter="resetInactivityTimer" @mouseleave="resetInactivityTimer"
         :style="{ transition: 'opacity 1s ease' }">
         <div>
@@ -12,7 +12,7 @@
         <div class="flex justify-between px-2 self-center">
             <div class="flex gap-2 flex-1">
                 <div class="self-center" @click="toggleTopBar">
-                    <Icon icon="tabler:arrow-up-left-circle" height="25" width="25" />
+                    <Icon icon="majesticons:pin" height="25" width="25" />
                 </div>
 
                 <div class=" flex-wrap  ">
@@ -129,6 +129,6 @@ const minimized = ref(true);
 
 
 const showComponent = computed(() => {
-    return route.path !== '/customer/more';
+    return route.path !== '/kitchen/orders' && route.path !== '/kitchen/history';
 });
 </script>

@@ -190,9 +190,9 @@ const router = createRouter({
                     component: () => import('@/views/pages/waiter/Orders.vue')
                 },
                 {
-                    path: '/waiter/menu',
-                    name: 'waiter-menu',
-                    component: () => import('@/views/pages/waiter/Menu.vue')
+                    path: '/waiter/More',
+                    name: 'waiter-More',
+                    component: () => import('@/views/pages/waiter/More.vue')
                 },
                 {
                     path: '/waiter/notes',
@@ -216,6 +216,21 @@ const router = createRouter({
                     path: '/kitchen/home',
                     name: 'kitchen-home',
                     component: () => import('@/views/pages/kitchen/Home.vue')
+                },
+                {
+                    path: '/kitchen/orders',
+                    name: 'kitchen-orders',
+                    component: () => import('@/views/pages/kitchen/Orders.vue')
+                },
+                {
+                    path: '/kitchen/history',
+                    name: 'kitchen-history',
+                    component: () => import('@/views/pages/kitchen/History.vue')
+                },
+                {
+                    path: '/kitchen/more',
+                    name: 'kitchen-more',
+                    component: () => import('@/views/pages/kitchen/More.vue')
                 }
             ]
         },
