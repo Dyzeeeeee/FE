@@ -259,102 +259,87 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10 mt-16">
-        <div class="col-span-12 xl:col-span-12 items-center bg-surface-800]"
-            :class="['fixed top-0 left-0 right-0 z-50', isRounded ? 'mt-2 p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-16 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
-            <div class="flex gap-2 font-bold">
-
-                <!-- <div class="flex-1">
-
-                </div> -->
-                <div class="flex justify-end w-[85%]">
-                    <InputGroup>
-                        <InputText placeholder="Search your notes" />
-                        <Button>
-                            <Icon icon="mingcute:search-line" />
+    <div class="relative">
+        <!-- Main Content -->
+        <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10 mt-16">
+            <div class="col-span-12 xl:col-span-12 items-center bg-surface-800 hidden"
+                :class="['fixed top-0 left-0 right-0 z-50', isRounded ? 'mt-2 p-2 shadow-md transition-all duration-300 ease-in-out' : 'top-16 bg-gray-800 p-2 transition-all duration-300 ease-in-out shadow-lg ']">
+                <div class="flex gap-2 font-bold">
+                    <div class="flex justify-end w-[85%]">
+                        <InputGroup>
+                            <InputText placeholder="Search your notes" />
+                            <Button>
+                                <Icon icon="mingcute:search-line" />
+                            </Button>
+                        </InputGroup>
+                    </div>
+                    <div class="flex gap-2 w-[15%] justify-end">
+                        <Button severity="info" @click="noteVisible = true">
+                            <Icon icon="material-symbols:note-stack-add-sharp" height="20" />
                         </Button>
-                    </InputGroup>
-                </div>
-                <div class="flex gap-2 w-[15%] justify-end">
-                    <Button severity="info" @click="noteVisible = true">
-                        <Icon icon="material-symbols:note-stack-add-sharp" height="20" />
-                    </Button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-span-12 flex gap-3 relative">
-            <div class="card-container relative w-full h-[7rem] overflow-hidden  border-[1px] rounded-lg">
-                <!-- Background Card -->
-                <div class="absolute inset-0 transition-transform duration-300 transform bg-surface-900 rounded-lg ">
-                    <div class="flex w-full h-full justify-between">
-                        <div
-                            class="p-3 h-full w-[15%] flex flex-col justify-center items-center bg-red-500 rounded-tl-lg rounded-bl-lg">
-                            <Icon icon="material-symbols:delete-sharp" height="40" />
-                        </div>
-                        <div
-                            class="p-3 h-full w-[15%] flex flex-col justify-center items-center bg-green-500 rounded-tr-lg rounded-br-lg">
-                            <Icon icon="mingcute:send-fill" height="40" />
+            <div class="col-span-12 flex gap-3 relative">
+                <div class="card-container relative w-full h-[7rem] overflow-hidden border-[1px] rounded-lg">
+                    <!-- Background Card -->
+                    <div class="absolute inset-0 transition-transform duration-300 transform bg-surface-900 rounded-lg">
+                        <div class="flex w-full h-full justify-between">
+                            <div
+                                class="p-3 h-full w-[15%] flex flex-col justify-center items-center bg-red-500 rounded-tl-lg rounded-bl-lg">
+                                <Icon icon="material-symbols:delete-sharp" height="40" />
+                            </div>
+                            <div
+                                class="p-3 h-full w-[15%] flex flex-col justify-center items-center bg-green-500 rounded-tr-lg rounded-br-lg">
+                                <Icon icon="mingcute:send-fill" height="40" />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Slideable Card -->
-                <div ref="cardRef" class="card h-full p-3 w-full transition-transform ease-out"
-                    :style="{ transform: `translateX(${translateX}px)` }" @touchstart="startTouch"
-                    @touchmove="moveTouch" @touchend="endTouch" @click="resetCardPosition" :class="{
-                        'rounded-tr-none rounded-br-none pl-[18%]': isSlidLeft, 'rounded-tl-none rounded-bl-none pr-[18%]':
-                            isSlidRight
-                    }">
-                    <!-- Card Content -->
-                    <div class="font-bold text-2xl">Untitled Note</div>
-                    <div class="truncate overflow-auto text-sm italic opacity-70">
-                        09/27/2024 (3:30pm)
-                    </div>
-                    <div class="overflow-auto"
-                        :class="{ 'rounded-tr-none rounded-br-none text-end': isSlidLeft, 'rounded-tl-none rounded-bl-none': isSlidRight }">
-                        <div class="flex flex-wrap gap-2 mt-2">
-                            <span
-                                v-for="(order, index) in (isSlidLeft || isSlidRight ? selectedOrders.slice(0, 1) : selectedOrders.slice(0, 2))"
-                                :key="index"
-                                class="inline-flex items-center px-2 py-1 bg-yellow-200 text-black rounded-full">
-                                {{ order }}
-                            </span>
-
-                            <!-- Check if there are more than the displayed orders to show "+X more" -->
-                            <span v-if="(isSlidLeft || isSlidRight) && selectedOrders.length > 1"
-                                class="inline-flex items-center px-2 py-1 bg-gray-300 text-black rounded-full">
-                                +{{ selectedOrders.length - 1 }} more
-                            </span>
-
-                            <span v-if="!isSlidLeft && !isSlidRight && selectedOrders.length > 2"
-                                class="inline-flex items-center px-2 py-1 bg-gray-300 text-black rounded-full">
-                                +{{ selectedOrders.length - 2 }} more
-                            </span>
+                    <!-- Slideable Card -->
+                    <div ref="cardRef" class="card h-full p-3 w-full transition-transform ease-out"
+                        :style="{ transform: `translateX(${translateX}px)` }" @touchstart="startTouch"
+                        @touchmove="moveTouch" @touchend="endTouch" @click="resetCardPosition" :class="{
+                            'rounded-tr-none rounded-br-none pl-[18%]': isSlidLeft,
+                            'rounded-tl-none rounded-bl-none pr-[18%]': isSlidRight
+                        }">
+                        <div class="font-bold text-2xl">Untitled Note</div>
+                        <div class="truncate overflow-auto text-sm italic opacity-70">
+                            09/27/2024 (3:30pm)
+                        </div>
+                        <div class="overflow-auto">
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span v-for="(order, index) in selectedOrders.slice(0, 2)" :key="index"
+                                    class="inline-flex items-center px-2 py-1 bg-yellow-200 text-black rounded-full">
+                                    {{ order }}
+                                </span>
+                                <span v-if="selectedOrders.length > 2"
+                                    class="inline-flex items-center px-2 py-1 bg-gray-300 text-black rounded-full">
+                                    +{{ selectedOrders.length - 2 }} more
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Overlay -->
 
     </div>
+
     <Dialog v-model:visible="noteVisible" modal
         :style="{ width: '90vw', minHeight: '70%', padding: '0px', backgroundColor: '' }" position="center" header="">
-        <!-- Notepad Container -->
         <div class="flex flex-col h-full p-6">
-            <!-- Notepad Header (Title) -->
             <div class="pb-4 h-[20%]">
                 <input v-model="customerID" type="text" placeholder="Enter Title..."
                     class="w-full text-2xl font-bold bg-transparent border-b-2 border-gray-300 outline-none py-2" />
             </div>
-
-            <!-- Notepad Body (Text Area) -->
             <div class="flex-1 relative min-h-[40vh]">
                 <input type="text" v-model="inputValue" @input="filterOrders"
                     placeholder="Start typing customer's order..."
                     class="w-full h-12 bg-transparent outline-none text-lg leading-relaxed border-b border-gray-400" />
-
-                <!-- Autocomplete suggestions dropdown -->
                 <ul v-if="filteredOrders.length > 0"
                     class="absolute z-10 bg-surface-900 border border-gray-400 rounded-md w-full mt-1">
                     <li v-for="(order, index) in filteredOrders" :key="index" @click="addOrder(order)"
@@ -362,8 +347,6 @@ onUnmounted(() => {
                         {{ order }}
                     </li>
                 </ul>
-
-                <!-- Chips for displaying selected orders -->
                 <div class="flex flex-wrap gap-2 mt-4">
                     <span v-for="(order, index) in selectedOrders" :key="index"
                         class="inline-flex items-center px-2 py-1 bg-yellow-200 text-black rounded-full">
@@ -372,14 +355,16 @@ onUnmounted(() => {
                     </span>
                 </div>
             </div>
-
-            <!-- Footer (Save Button) -->
             <div class="flex justify-end w-full mt-4 h-[10%]">
                 <Button class="w-1/3" @click="saveNote">Save</Button>
             </div>
         </div>
     </Dialog>
-
+    <div class="absolute inset-0 bg-white bg-opacity-100 flex items-center justify-center">
+        <div class="text-center text-white text-xl font-semibold">
+            <img src="@/assets/pics/underconstruction-unscreen.gif" />
+        </div>
+    </div>
 </template>
 
 <style scoped>
