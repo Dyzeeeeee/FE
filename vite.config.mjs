@@ -19,7 +19,7 @@ export default defineConfig({
             filename: 'sw.js',
             includeAssets: ['favicon.svg', 'logo-big.ico', 'robots.txt', 'apple-touch-icon.png'],
             manifest: {
-                name: 'Anahaw',
+                name: 'Anahawaryu',
                 short_name: 'Anahaw',
                 description: 'Anahaw app',
                 start_url: '/auth/welcome',
