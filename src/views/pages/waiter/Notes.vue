@@ -281,7 +281,7 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <div class="col-span-12 flex gap-3 relative">
+            <div class="col-span-12 flex gap-3 relative hidden">
                 <div class="card-container relative w-full h-[7rem] overflow-hidden border-[1px] rounded-lg">
                     <!-- Background Card -->
                     <div class="absolute inset-0 transition-transform duration-300 transform bg-surface-900 rounded-lg">
@@ -360,9 +360,9 @@ onUnmounted(() => {
             </div>
         </div>
     </Dialog>
-    <div class="absolute inset-0 bg-white bg-opacity-100 flex items-center justify-center">
+    <div class="absolute inset-0 bg-opacity-100 flex items-center justify-center">
         <div class="text-center text-white text-xl font-semibold">
-            <img src="@/assets/pics/underconstruction-unscreen.gif" />
+            <img src="@/assets/pics/CSoon.png" class="h-80"/>
         </div>
     </div>
 </template>
