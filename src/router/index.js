@@ -1,4 +1,5 @@
 import AppLayout from '@/layout/AppLayout.vue';
+import CashierLayout from '@/layout/Cashier/CashierLayout.vue';
 import CustomerLayout from '@/layout/Customer/CustomerLayout.vue';
 import KitchenLayout from '@/layout/Kitchen/KitchenLayout.vue';
 import StaffLayout from '@/layout/Staff/StaffLayout.vue';
@@ -207,6 +208,39 @@ const router = createRouter({
             ]
         },
         {
+            path: '/cashier',
+            component: CashierLayout,
+            meta: { role: 'cashier' },
+
+            children: [
+                {
+                    path: '/cashier/home',
+                    name: 'cashier-home',
+                    component: () => import('@/views/pages/cashier/Home.vue')
+                },
+                {
+                    path: '/cashier/orders',
+                    name: 'cashier-orders',
+                    component: () => import('@/views/pages/cashier/Orders.vue')
+                },
+                {
+                    path: '/cashier/More',
+                    name: 'cashier-More',
+                    component: () => import('@/views/pages/cashier/More.vue')
+                },
+                {
+                    path: '/cashier/requests',
+                    name: 'cashier-requests',
+                    component: () => import('@/views/pages/cashier/Requests.vue')
+                },
+                {
+                    path: '/cashier/takeorder',
+                    name: 'cashier-takeorder',
+                    component: () => import('@/views/pages/cashier/TakeOrder.vue')
+                }
+            ]
+        },
+        {
             path: '/kitchen',
             component: KitchenLayout,
             meta: { role: 'kitchen' },
@@ -343,7 +377,7 @@ router.beforeEach((to, from, next) => {
             return next();
         } else {
             // Redirect to a default secure page based on role or to the dashboard
-            const redirectTo = role === 'customer' ? '/customer' : role === 'staff' ? '/staff' : role === 'waiter' ? '/waiter' : role === 'kitchen' ? '/kitchen' : '/';
+            const redirectTo = role === 'customer' ? '/customer' : role === 'staff' ? '/staff' : role === 'waiter' ? '/waiter' : role === 'kitchen' ? '/kitchen' : role === 'cashier' ? '/cashier' : '/';
             return next(redirectTo);
         }
     }

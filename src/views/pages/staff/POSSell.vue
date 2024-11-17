@@ -813,7 +813,7 @@ const toggleCamera = () => {
 
                 <div class="flex gap-2  border-gray-700 border-t pt-4">
                     <InputGroup>
-                        
+
                         <InputGroupAddon>
                             <Icon icon="clarity:peso-solid" width="20" height="20" />
                         </InputGroupAddon>
@@ -1149,9 +1149,9 @@ const toggleCamera = () => {
                         <!-- <Column expander style="width: 3rem"></Column> -->
                         <Column field="id" header="ID">
                         </Column>
-                        <Column field="order_date" header="Order Date">
+                        <Column field="created_at" header="Order Date">
                             <template #body="slotProps">
-                                {{ formatDate(slotProps.data.order_date) }}
+                                {{ formatDate(slotProps.data.created_at) }}
                             </template>
                         </Column>
                         <Column field="customer_name" header="Customer">

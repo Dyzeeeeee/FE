@@ -209,9 +209,9 @@ onMounted(() => {
                                             v-if="ordersBySession[session.id] && ordersBySession[session.id].length">
                                             <Column field="id" header="Order ID"></Column>
                                             <!-- <Column field="customer_id" header="Customer"></Column> -->
-                                            <Column field="order_date" header="Date">
+                                            <Column field="created_at" header="Date">
                                                 <template #body="slotProps">
-                                                    {{ formatTime(slotProps.data.order_date) }}
+                                                    {{ formatTime(slotProps.data.created_at) }}
                                                 </template>
                                             </Column>
                                             <Column field="total_price" header="Total"></Column>

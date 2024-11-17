@@ -109,15 +109,15 @@ onUnmounted(() => {
 
 const routeName = computed(() => {
     // Check the path to decide the text dynamically
-    if (route.path === '/waiter/home') {
+    if (route.path === '/cashier/home') {
         return 'HOME';
-    } else if (route.path === '/waiter/orders') {
+    } else if (route.path === '/cashier/orders') {
         return 'ORDERS';
     }
-    else if (route.path === '/waiter/menu') {
+    else if (route.path === '/cashier/menu') {
         return 'MENU';
     }
-    else if (route.path === '/waiter/takeorder') {
+    else if (route.path === '/cashier/takeorder') {
         return 'TAKE ORDER';
     }
 
@@ -129,6 +129,6 @@ const minimized = ref(true);
 
 
 const showComponent = computed(() => {
-    return route.path !== '/waiter/orders' && route.path !== '/waiter/notes' && route.path !== '/waiter/takeorder';
+    return route.path !== '/cashier/orders' && route.path !== '/cashier/requests' && route.path !== '/cashier/takeorder';
 });
 </script>

@@ -10,6 +10,23 @@ onMounted(() => {
 const chartData = ref();
 const chartOptions = ref();
 
+const scrollContainer = ref(null);
+
+const scrollLeft = () => {
+    scrollContainer.value.scrollBy({
+        top: 0,
+        left: -325, // Adjust scroll amount
+        behavior: 'smooth',
+    });
+};
+
+const scrollRight = () => {
+    scrollContainer.value.scrollBy({
+        top: 0,
+        left: 325, // Adjust scroll amount
+        behavior: 'smooth',
+    });
+};
 
 const userData = ref([]);
 const getUserById = async () => {
@@ -167,10 +184,19 @@ onUnmounted(() => {
 
 
 
-        <div class="col-span-12 min-h-[25vh] max-h-[40vh] mb-2 px-4">
-            <div class="flex gap-4 pb-0 text-sm xl:text-9xl font-bold p-0 overflow-x-auto whitespace-nowrap "
-                style="scrollbar-width: none; -ms-overflow-style: none;">
-                <div class="card border-[2px] rounded-xl h-full  min-w-[80vw] m-0  border-yellow-500  p-0 ">
+        <div class="col-span-12 min-h-[25vh] max-h-[40vh] mb-2 px-8 relative">
+            <button class="absolute -right-2 top-1/2 transform -translate-y-1/2 text-white" @click="scrollRight">
+                <Icon icon="fe:arrow-right" width="40" height="40" class="cursor-pointer pb-2" />
+            </button>
+            <button class="absolute -left-2 top-1/2 transform -translate-y-1/2 text-white" @click="scrollLeft">
+                <Icon icon="fe:arrow-left" width="40" height="40" class="cursor-pointer pb-2" />
+            </button>
+            <div class="flex justify-center">
+                1/5
+            </div>
+            <div class="flex gap-4 pb-0 mt-1 text-sm xl:text-9xl font-bold p-0 overflow-x-auto whitespace-nowrap "
+                ref="scrollContainer" style="scrollbar-width: none; -ms-overflow-style: none;">
+                <div class="card border-[2px] rounded-xl h-auto  min-w-[80vw] m-0  border-yellow-500  p-0 ">
                     <div class=" w-full">
                         <div
                             class="border-b-[0px] text-yellow-600 border-[2px] font-bold text-xl flex justify-between bg-yellow-200 rounded-t-lg p-2 border-yellow-500">
@@ -234,10 +260,10 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </div>
-                <div class="card border-[2px] rounded-xl h-full  min-w-[80vw] m-0  border-white p-0 ">
+                <div class="card border-[2px] rounded-xl h-auto  min-w-[80vw] m-0  border-yellow-500  p-0 ">
                     <div class=" w-full">
                         <div
-                            class="border-b-[0px] text-yellow-600 border-[2px] font-bold text-xl flex justify-between bg-yellow-200 rounded-t-lg p-2 border-white">
+                            class="border-b-[0px] text-yellow-600 border-[2px] font-bold text-xl flex justify-between bg-yellow-200 rounded-t-lg p-2 border-yellow-500">
                             <div class="flex">
                                 <div class="self-center">
                                     <Icon icon="game-icons:hot-meal" height="20" />
@@ -298,10 +324,10 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </div>
-                <div class="card border-[0px] rounded-xl h-full  min-w-[80vw] m-0  border-yellow-500  p-0">
+                <div class="card border-[2px] rounded-xl h-auto  min-w-[80vw] m-0  border-yellow-500  p-0 ">
                     <div class=" w-full">
                         <div
-                            class="text-yellow-600 border-[0px] font-bold text-xl flex justify-between bg-yellow-200 rounded-t-lg p-2 border-yellow-500">
+                            class="border-b-[0px] text-yellow-600 border-[2px] font-bold text-xl flex justify-between bg-yellow-200 rounded-t-lg p-2 border-yellow-500">
                             <div class="flex">
                                 <div class="self-center">
                                     <Icon icon="game-icons:hot-meal" height="20" />
@@ -359,109 +385,17 @@ onUnmounted(() => {
 
 
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card border-[1px] rounded-xl h-full bg-yellow-200 min-w-[80vw] m-0 text-black p-4">
-                    <div class=" w-full">
-                        <div class="text-yellow-600 font-bold text-xl flex justify-between">
-                            <div class="flex">
-                                <div class="self-center">
-                                    <Icon icon="game-icons:hot-meal" height="20" />
-                                </div>
-                                <div class="self-end">
-                                    Ready to be Served
-                                </div>
-                            </div>
-                            <div>
-                                <button
-                                    class="flex justify-center gap-2 h-[2rem] w-[2rem] rounded-full border-[1px] border-gray-500 text-gray-500 hover:border-green-500 hover:text-green-500 hover:bg-green-200">
-                                    <div class="self-center">
-                                        <Icon icon="entypo:check" height="20" class="" />
-
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-                        <Divider class="text-white" />
-                        <div class="font-bold text-xl flex ">
-                            Customer AB
-                        </div>
-                        <div class="overflow-auto max-h-[10vh] min-h-[10vh]">
-                            <div class="flex justify-between">
-                                <div>
-                                    Iced Coffee Latte
-                                </div>
-                                <div>
-                                    X1
-                                </div>
-                            </div>
-                            <div class="flex justify-between">
-                                <div>
-                                    Iced Coffee Latte
-                                </div>
-                                <div>
-                                    X1
-                                </div>
-                            </div>
-                            <div class="flex justify-between">
-                                <div>
-                                    Iced Coffee Latte
-                                </div>
-                                <div>
-                                    X1
-                                </div>
-                            </div>
-                            <div class="flex justify-between">
-                                <div>
-                                    Iced Coffee Latte
-                                </div>
-                                <div>
-                                    X1
-                                </div>
-                            </div>
-                            <div class="flex justify-between">
-                                <div>
-                                    Iced Coffee Latte
-                                </div>
-                                <div>
-                                    X1
-                                </div>
-                            </div>
-                            <div class="flex justify-between">
-                                <div>
-                                    Iced Coffee Latte
-                                </div>
-                                <div>
-                                    X1
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="flex bg-orange-300 rounded-full mt-4 p-2 border-dashed border-[1px] border-black  overflow-auto  ">
-                            <div class="font-bold">Note:&nbsp; </div>
-                            <div class="font-normal truncate">
-                                No ice for the Iced Coffee Latte
-                                No ice for the Iced Coffee Latte
-                                No ice for the Iced Coffee Latte
-                                No ice for the Iced Coffee Latte
-                                No ice for the Iced Coffee Latte
-                                No ice for the Iced Coffee Latte
-                                No ice for the Iced Coffee Latte
-                                No ice for the Iced Coffee Latte
-                            </div>
-
-
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="col-span-12 h-auto mb-2">
             <div class="flex gap-3 justify-center ">
                 <button
-                    class="flex flex-col justify-center items-center border-white border-[2px] text-white h-[5rem] w-[30%] rounded-xl font-bold hover:bg-white hover:text-yellow-500 hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="fluent-mdl2:activate-orders" height="20" class="" />
                     </div>
@@ -470,7 +404,7 @@ onUnmounted(() => {
                     </div>
                 </button>
                 <button
-                    class="flex flex-col justify-center items-center border-white border-[2px] text-white h-[5rem] w-[30%] rounded-xl font-bold  hover:bg-white hover:text-yellow-500 hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="hugeicons:menu-restaurant" height="20" class="" />
                     </div>
@@ -479,7 +413,7 @@ onUnmounted(() => {
                     </div>
                 </button>
                 <button
-                    class="flex flex-col justify-center items-center border-white border-[2px] text-white h-[5rem] w-[30%] rounded-xl font-bold  hover:bg-white hover:text-yellow-500 hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="gg:qr" height="30" class="" />
                     </div>

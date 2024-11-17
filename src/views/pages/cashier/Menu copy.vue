@@ -3,33 +3,8 @@
     import { useLayout } from '@/layout/composables/layout';
     import axios from 'axios';
     import QrcodeVue from 'qrcode.vue';
-    import { useRouter } from 'vue-router';
 
     import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
-    const router = useRouter();
-    const getItemQuantity = (itemId) => {
-        const detail = orderDetails.value.find(d => d.menu_item_id === itemId);
-        return detail ? detail.quantity : 0;  // Return the quantity if found, otherwise 0
-    };
-    const filteredMenuItems = (categoryId) => {
-        return allMenuItems.value.filter(item => item.category_id === categoryId);
-    };
-
-    const searchedMenuItems = computed(() => {
-        if (!searchTerm.value.trim()) return allMenuItems.value;
-        return allMenuItems.value.filter(item =>
-            item.name.toLowerCase().includes(searchTerm.value.toLowerCase())
-        );
-    });
-
-    const simpleMenu = ref(false);
-    const search = ref(false);
-
-    function trackOrder() {
-        // Construct the path using the order value
-        const path = `/customer/track-order/${myOrder.value}`;
-        router.push(path);
-    }
     const text = ref(localStorage.getItem('qrCode') || 'AIVR12345');
     const timerRef = ref(null);
     const serviceTypes = ref([{ id: 'Dine in', name: 'Dine In' }, { id: 'Take Out', name: 'Take Out' }]);
@@ -46,9 +21,6 @@
         }
         console.log("Selected service type:", selectedServiceType.value);
     };
-
-    const searchTerm = ref('');
-
     const generateRandomQR = () => {
         const randomNumber = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
         text.value = `AIVR${randomNumber}`;
@@ -73,22 +45,23 @@
 
     const removeItem = async (detail) => {
         // Optional: Confirm from the user before removal
+        if (confirm('Are you sure you want to remove this item?')) {
+            try {
+                const response = await axios.delete(`/remove-order-detail/${detail.id}`); // Assuming the endpoint takes an ID in the URL
 
-        try {
-            const response = await axios.delete(`/remove-order-detail/${detail.id}`); // Assuming the endpoint takes an ID in the URL
-
-            // Check if the deletion was successful, considering a 200 OK or 204 No Content response as successful
-            if (response.status === 200 || response.status === 204) {
-                console.log('Item removed successfully');
-                // Update the state by filtering out the deleted item
-                orderDetails.value = orderDetails.value.filter(d => d.id !== detail.id);
-            } else {
-                console.error('Failed to remove the item:', response.data);
+                // Check if the deletion was successful, considering a 200 OK or 204 No Content response as successful
+                if (response.status === 200 || response.status === 204) {
+                    console.log('Item removed successfully');
+                    // Update the state by filtering out the deleted item
+                    orderDetails.value = orderDetails.value.filter(d => d.id !== detail.id);
+                } else {
+                    console.error('Failed to remove the item:', response.data);
+                }
+            } catch (error) {
+                // This will catch any network errors or cases where the response status code was not in the 2xx range
+                console.error('Error removing item:', error);
+                alert('Failed to remove the item.'); // Optionally, provide user feedback
             }
-        } catch (error) {
-            // This will catch any network errors or cases where the response status code was not in the 2xx range
-            console.error('Error removing item:', error);
-            alert('Failed to remove the item.'); // Optionally, provide user feedback
         }
     };
 
@@ -259,7 +232,7 @@
             orderId.value = await createOrder(userId);
         }
 
-        // Proceed only if an order ID is simpli
+        // Proceed only if an order ID is available
         if (orderId.value) {
             try {
                 // Make the API call to fetch current order details to check if item exists
@@ -282,14 +255,12 @@
                     orderDetail.quantity = parseInt(existingItem.quantity, 10) + 1; // Base 10
                     orderDetail.subtotal = parseFloat(menuItem.price) * orderDetail.quantity;
                 }
-                toast.add({ severity: 'success', summary: 'Success', detail: `Item ${menuItem.name} added to the order successfully!`, life: 2000 });
 
 
                 // Make the API call to add or update the order detail
                 const response = await axios.post('/add-or-update-online-order-detail', orderDetail);
                 console.log('Item added/updated in order:', response.data);
                 getOnlineOrderDetails();
-
                 // Optionally, update UI or state based on successful addition/update
             } catch (error) {
                 console.error('Error adding/updating item in order:', error);
@@ -300,10 +271,8 @@
     };
 
 
-    import { useToast } from 'primevue/usetoast';
 
 
-    const toast = useToast();
 
 
 
@@ -436,7 +405,7 @@
     async function checkOrderConfirmation() {
         try {
             const response = await axios.get(`/get-online-order/${orderId.value}`);
-            if (response.data && response.data.confirmed == "confirmed") {
+            if (response.data && response.data.confirmed == 1) {
                 isConfirmed.value = 1; // Update the confirmed status
                 clearInterval(intervalId); // Stop the countdown
                 QRcodeVisible.value = false; // Close the QR dialog
@@ -497,50 +466,33 @@
         <!-- <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
             <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
         </button> -->
-        <Toast />
-        <div class="mt-[5rem]">
-            <div class="flex text-xl font-bold py-2 mt-[6rem] pl-4 justify-between px-2 bg-gray-800 mb-3">
-                <div class="flex-1">
-                    <Button severity="success" class="h-[2rem]" @click="simpleMenu = true">
-                        <Icon icon="ic:sharp-menu-book" height="15" />
-                        <div> Simple</div>
-                    </Button>
-                </div>
-                <div class="flex-1 flex gap-2">
-                    <InputGroup>
-                        <InputText class="h-[2rem] w-[70%]" />
-                        <Button severity="primary" class="h-[2rem]" @click="search = true">
-                            <Icon icon="mingcute:search-line" height="15" />
-                        </Button>
-                    </InputGroup>
+        <div class="flex text-xl font-bold pt-4 pb-5 pl-4">
+            MENU
+        </div>
+        <div class="flex gap-2 pb-3 text-sm xl:text-9xl font-bold"
+            style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
+            <Icon icon="fe:arrow-left" width="50" height="50" @click="scrollToLeft"
+                class="cursor-pointer pb-2  hidden xl:block" />
+            <div ref="scrollContainer"
+                class="flex gap-2 pb-3 text-sm xl:text-9xl font-bold relative overflow-x-auto whitespace-nowrap"
+                style="scrollbar-width: none; -ms-overflow-style: none;">
 
-                </div>
+                <Button rounded :outlined="selectedCategoryId !== 'All'" @click="filterCategory('All')" size="small"
+                    class="min-w-[5rem] xl:min-w-[7rem]">
+                    All
+                </Button>
+                <Button v-for="category in categories" :key="category.id" :outlined="selectedCategoryId !== category.id"
+                    rounded class="min-w-[7rem] xl:min-w-[7rem]" size="small" @click="filterCategory(category.id)">
+                    {{ category.name }}
+                </Button>
             </div>
-            <div class="flex gap-2 pb-0 text-sm xl:text-9xl font-bold "
-                style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
-                <Icon icon="fe:arrow-left" width="50" height="50" @click="scrollToLeft"
-                    class="cursor-pointer pb-2  hidden xl:block" />
-                <div ref="scrollContainer"
-                    class="flex gap-2 pb-0 text-sm xl:text-9xl font-bold relative overflow-x-auto whitespace-nowrap "
-                    style="scrollbar-width: none; -ms-overflow-style: none;">
+            <Icon icon="fe:arrow-right" width="50" height="50" @click="scrollToRight"
+                class="cursor-pointer pb-2 hidden xl:block" />
+        </div>
 
-                    <Button rounded :outlined="selectedCategoryId !== 'All'" @click="filterCategory('All')" size="small"
-                        class="min-w-[5rem] xl:min-w-[7rem]">
-                        All
-                    </Button>
-                    <Button v-for="category in categories" :key="category.id"
-                        :outlined="selectedCategoryId !== category.id" rounded class="min-w-[7rem] xl:min-w-[7rem]"
-                        size="small" @click="filterCategory(category.id)">
-                        {{ category.name }}
-                    </Button>
-                </div>
-                <Icon icon="fe:arrow-right" width="50" height="50" @click="scrollToRight"
-                    class="cursor-pointer pb-2 hidden xl:block" />
-            </div>
-
-            <div class="grid grid-cols-12 xl:gap-4 gap-2 mt-5 pb-12 mb-12">
-                <!---->
-                <!-- <div class="col-span-6 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 gap-2">
+        <div class="grid grid-cols-12 xl:gap-4 gap- mt-5 pb-12 mb-12">
+            <!---->
+            <!-- <div class="col-span-6 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 gap-2">
 
                 <div class="card p-0 h-auto pb-5 mx-2 mb-4">
                     <div class="flex relative ">
@@ -569,56 +521,50 @@
                     </div>
                 </div>
             </div> -->
-                <!---->
-                <div class="col-span-6 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 mb-3" v-for="item in menuItems"
-                    :key="item.id">
-                    <div class="card p-0 h-auto pb-5 mx-2 mb-4 min-h-[35vh] max-h-[35vh] relative ">
-                        <div class="flex relative ">
-                            <div v-if="isItemAdded(item.id)"
-                                class="absolute inset-0 bg-black opacity-60 rounded-t-lg font-bold text-4xl justify-center flex flex-col items-center  text-green-500">
-                                <Icon icon="line-md:confirm-circle-filled" height="50" />
-                                <Badge :value="getItemQuantity(item.id)" severity="info"
-                                    class="absolute top-2 right-2" />
-                            </div>
-                            <!-- <div class="text-xl p-2 absolute bg-red-500 rounded-r-lg  font-bold bottom-3 ">
-                            </div> -->
-                            <img :src="item.imageUrl" class="object-cover xl:h-[20vh] h-[20vh] w-full rounded-t-lg" />
-
+            <!---->
+            <div class="col-span-6 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 mb-3" v-for="item in menuItems"
+                :key="item.id">
+                <div class="card p-0 h-auto pb-5 mx-2 mb-4 min-h-[35vh] max-h-[35vh] relative ">
+                    <div class="flex relative ">
+                        <div v-if="isItemAdded(item.id)"
+                            class="absolute top-0 right-0 m-3 bg-indigo-500 text-white px-2 py-1 rounded-lg text-sm">
+                            Added
                         </div>
-                        <div class="flex  pt-2 ml-4 xl:ml-0 xl:pt-0 xl:mt-4">
-                            <div class="xl:w-2/12"></div>
-                            <div class="xl:w-70 flex-1 flex-wrap">
-                                <div class="flex justify-between w-full">
-                                    <div class="flex flex-col gap-0">
-                                        <div class="text-xl font-bold xl:text-4xl">
-                                            {{ item.name }}
-                                        </div>
-                                        <div>
-                                            ₱{{ item.price }}
+                        <div class="text-xl p-2 absolute bg-red-500 rounded-r-lg  font-bold bottom-3">
+                            ₱{{ item.price }}
+                        </div>
+                        <img :src="item.imageUrl" class="object-cover xl:h-[20vh] h-[20vh] w-full rounded-t-lg" />
 
-                                        </div>
-                                        <!-- <div class="text-sm italic">
+                    </div>
+                    <div class="flex  pt-2 ml-4 xl:ml-0 xl:pt-0 xl:mt-4">
+                        <div class="xl:w-2/12"></div>
+                        <div class="xl:w-70 flex-1 flex-wrap">
+                            <div class="flex justify-between w-full">
+                                <div class="flex flex-col gap-0">
+                                    <div class="text-xl font-bold xl:text-4xl">
+                                        {{ item.name }}
+                                    </div>
+                                    <!-- <div class="text-sm italic">
                                         10-20 minutes
                                     </div> -->
-                                    </div>
-                                    <div class="self-center px-4 absolute bottom-2 right-0 w-full flex gap-2">
-                                        <Button size="small" @click="showDetails(item)" outlined style="" class="w-full"
-                                            severity="info">
-                                            Details
-                                        </Button>
-                                        <Button size="small" @click="addToOrder(item)" outlineld style=""
-                                            class="w-full">
-                                            <Icon icon="mingcute:plus-fill" height="15" />
-                                        </Button>
-                                    </div>
                                 </div>
-
+                                <div class="self-center px-4 absolute bottom-2 right-0 w-full flex gap-2">
+                                    <Button size="small" @click="showDetails(item)" outlined style="" class="w-full"
+                                        severity="info">
+                                        Details
+                                    </Button>
+                                    <Button size="small" @click="addToOrder(item)" outlineld style="" class="w-full">
+                                        <Icon icon="mingcute:plus-fill" height="15" />
+                                    </Button>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-3">
+        </div>
+        <!-- <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-3">
             <Badge v-if="orderItemCount > 0" :value="orderItemCount" severity="danger"
                 style="position: absolute; top: 0; right: 0; z-index: 99;">
             </Badge>
@@ -632,251 +578,210 @@
                 </div>
             </Button>
         </div> -->
-            <div class="fixed-bottom-overlay p-5" v-if="orderItemCount > 0">
-                <Button @click="visible = true" severity="info" class="w-full h-[3.4rem] p-0">
-                    <div class="flex justify-between w-full">
-                        <div class="flex-1 flex gap-2 self-center">
-                            <div>
-                                <Icon icon="dashicons:food" width="20" height="20" />
-                            </div>
-                            <div class="font-bold">
-                                {{ orderItemCount }}
-                            </div>
+        <div class="fixed-bottom-overlay p-5" v-if="orderItemCount > 0">
+            <Button @click="visible = true" severity="info" class="w-full h-[3.4rem] p-0">
+                <div class="flex justify-between w-full">
+                    <div class="flex-1 flex gap-2 self-center">
+                        <div>
+                            <Icon icon="dashicons:food" width="20" height="20" />
                         </div>
-                        <div class="flex flex-1 justify-center">
-                            <span class=" font-bold">View my order</span>
-                        </div>
-                        <div class="flex-1 flex justify-end">
-                            <span class="ml-1 font-bold">P {{ totalOrderPrice }}</span>
+                        <div class="font-bold">
+                            {{ orderItemCount }}
                         </div>
                     </div>
+                    <div class="flex flex-1 justify-center">
+                        <span class=" font-bold">View my order</span>
+                    </div>
+                    <div class="flex-1 flex justify-end">
+                        <span class="ml-1 font-bold">P {{ totalOrderPrice }}</span>
+                    </div>
+                </div>
+            </Button>
+        </div>
+
+
+        <Drawer v-model:visible="visible" header="My Order" position="bottom" class="opacity-90"
+            :style="{ width: '100%', height: '85vh' }">
+            <div class="flex flex-col h-full ">
+                <div class="flex-grow overflow-auto">
+                    <div class="grid grid-cols-12 mb-4">
+                        <div class="col-span-12 mb-2">
+                            <div class="flex gap-2 pb-3 text-sm xl:text-9xl font-bold"
+                                style="overflow-x: auto; white-space: no-wrap;">
+                                <div class="flex gap-2">
+                                    <Button v-for="service in serviceTypes" :key="service.id"
+                                        :outlined="selectedServiceType !== service.id"
+                                        @click="selectServiceType(service.id)">
+                                        {{ service.name }}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-12 mb-2 bg-">
+                            <Divider />
+                            <div v-for="detail in orderDetails" :key="detail.id">
+                                <div class="flex mb-3 gap-2">
+                                    <div class="font-bold text-xl self-end flex-grow">
+                                        {{ detail.name }}
+                                    </div>
+                                    <div class="self-center flex-wrap text-lg  text-end px-4">
+                                        <div class="text-sm italic">
+                                            Subtotal
+                                        </div>
+                                        <div class="font-bold">P {{ detail.subtotal }}</div>
+                                        <!-- Price, assuming a currency filter -->
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 pt-2 justify-between mr-3">
+                                    <div class="flex items-center w-1/3 h-full ml-3">
+                                        <div class="flex-wrap">
+                                            <div class="text-sm mr-1 font-bold">
+                                                Price:
+                                            </div>
+                                            <div class="text-base italic">
+                                                P {{ detail.price }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="width: 55%;">
+                                        <InputGroup class="w-full" style="height: 30px">
+                                            <Button :severity="detail.quantity > 1 ? 'primary' : 'danger'" size="small"
+                                                class="w-4/12 h-full"
+                                                @click="detail.quantity > 1 ? decreaseQuantity(detail) : removeItem(detail)">
+                                                <Icon :icon="detail.quantity > 1 ? 'ic:sharp-minus' : 'mi:delete'"
+                                                    width="15" height="15" />
+                                            </Button>
+                                            <InputText v-model="detail.quantity" @change="updateQuantity(detail)"
+                                                placeholder="0" class="h-full" />
+                                            <Button severity="primary" size="small" class="w-4/12 h-full"
+                                                @click="increaseQuantity(detail)">
+                                                <Icon icon="ic:sharp-plus" width="15" height="15" />
+                                            </Button>
+                                        </InputGroup>
+
+
+
+                                    </div>
+                                </div>
+
+                                <Divider />
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full">
+                    <div class="flex-wrap mb-3 gap-2">
+                        <div class="flex mb-3">
+                            <div class="flex justify-start px-4 ">
+                                <span class="font-bold text-xl self-center">Total Price</span>
+                            </div>
+                            <div class="flex-1 text-end gap-2 align-self-end ">
+                                <span class="font-bold text-2xl pr-4">P {{ totalOrderPrice }}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-center">
+                            <div class="flex-1 text-end gap-2 justify-center flex ">
+                                <Button :disabled="!orderDetails.length" severity="success" class="w-full xl:w-auto"
+                                    @click="setQRVisibility(true)">
+                                    <Icon icon="ic:baseline-payments" width="20" height="20" />
+                                    <div class="font-bold">Confirm Order</div>
+                                </Button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Drawer>
+
+
+        <Dialog v-model:visible="QRcodeVisible" modal :style="{ width: '90vw', height: '80%' }" position="center"
+            header="Order QR Code" @update:visible="setQRVisibility">
+            <div class="flex w-full text-center">
+                <div class="text-2xl font-bold w-full">{{ text }}</div>
+            </div>
+            <div class="flex justify-center mt-4">
+                <qrcode-vue :value="text" size='270' level='L' margin="3" class="rounded-xl" />
+            </div>
+            <div class="italic mt-2 text-light text-sm">
+                <span class="italic mt-2 text-light text-sm">
+                    Let any staff from <span class="font-bold">Anahaw Island View Resort</span>
+                    scan your QR code or let them know about the code above the QR.
+                </span>
+            </div>
+            <div v-if="QRcodeVisible" class="flex">
+                <span class="font-bold">Time Remaining: </span>
+                <p>&nbsp;{{ formattedTime }}</p>
+            </div>
+        </Dialog>
+
+
+        <Dialog v-model:visible="confirmedVisible" modal :style="{ width: '90vw', height: '40%' }" position="center"
+            class="p-0" style="margin: -50px;">
+            <div class="flex w-full text-green-400 justify-center">
+                <Icon icon="line-md:confirm-circle-twotone" height="70" />
+            </div>
+            <div class="flex w-full text-green-400 justify-center text-xl font-bold">
+                Order Confirmed Order #{{ myOrder }}
+            </div>
+            <div class="flex w-full italic justify-center">
+                Kindly wait for your order as it is being prepared
+            </div>
+            <div class="flex w-full italic justify-center mt-2">
+                <Button severity="info" class="w-full">
+                    <div class="font-bold">
+                        Track My Order
+                    </div>
+
+                    <Icon icon="arcticons:whereyougo" width="20" height="20" />
                 </Button>
             </div>
+        </Dialog>
 
-
-            <Drawer v-model:visible="visible" header="My Order" position="bottom" class="opacity-90"
-                :style="{ width: '100%', height: '85vh' }">
-                <div class="flex flex-col h-full ">
-                    <div class="flex-grow overflow-auto">
-                        <div class="grid grid-cols-12 mb-4">
-                            <div class="col-span-12 mb-2">
-                                <div class="flex gap-2 pb-3 text-sm xl:text-9xl font-bold"
-                                    style="overflow-x: auto; white-space: no-wrap;">
-                                    <div class="flex gap-2">
-                                        <Button v-for="service in serviceTypes" :key="service.id"
-                                            :outlined="selectedServiceType !== service.id"
-                                            @click="selectServiceType(service.id)">
-                                            {{ service.name }}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-span-12 mb-2 bg-">
-                                <Divider />
-                                <div v-for="detail in orderDetails" :key="detail.id">
-                                    <div class="flex mb-3 gap-2">
-                                        <div class="font-bold text-xl self-end flex-grow">
-                                            {{ detail.name }}
-                                        </div>
-                                        <div class="self-center flex-wrap text-lg  text-end px-4">
-                                            <div class="text-sm italic">
-                                                Subtotal
-                                            </div>
-                                            <div class="font-bold">P {{ detail.subtotal }}</div>
-                                            <!-- Price, assuming a currency filter -->
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-2 pt-2 justify-between mr-3">
-                                        <div class="flex items-center w-1/3 h-full ml-3">
-                                            <div class="flex-wrap">
-                                                <div class="text-sm mr-1 font-bold">
-                                                    Price:
-                                                </div>
-                                                <div class="text-base italic">
-                                                    P {{ detail.price }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div style="width: 55%;">
-                                            <InputGroup class="w-full" style="height: 30px">
-                                                <Button :severity="detail.quantity > 1 ? 'primary' : 'danger'"
-                                                    size="small" class="w-4/12 h-full"
-                                                    @click="detail.quantity > 1 ? decreaseQuantity(detail) : removeItem(detail)">
-                                                    <Icon :icon="detail.quantity > 1 ? 'ic:sharp-minus' : 'mi:delete'"
-                                                        width="15" height="15" />
-                                                </Button>
-                                                <InputText v-model="detail.quantity" @change="updateQuantity(detail)"
-                                                    placeholder="0" class="h-full" />
-                                                <Button severity="primary" size="small" class="w-4/12 h-full"
-                                                    @click="increaseQuantity(detail)">
-                                                    <Icon icon="ic:sharp-plus" width="15" height="15" />
-                                                </Button>
-                                            </InputGroup>
-
-
-
-                                        </div>
-                                    </div>
-
-                                    <Divider />
-
-                                </div>
-
-
-
-                            </div>
-                        </div>
+        <Drawer v-model:visible="detailsVisible" header="Item Details" position="bottom" class="opacity-90"
+            :style="{ width: '100%', height: '80vh' }">
+            <div v-if="selectedItem" class="h-full justify-between flex flex-col">
+                <div>
+                    <div class="w-full bg-white justify-center flex rounded-lg py-3 mb-2">
+                        <img :src="selectedItem.imageUrl" class="h-[20vh] w-auto " />
                     </div>
-                    <div class="w-full">
-                        <div class="flex-wrap mb-3 gap-2">
-                            <div class="flex mb-3">
-                                <div class="flex justify-start px-4 ">
-                                    <span class="font-bold text-xl self-center">Total Price</span>
-                                </div>
-                                <div class="flex-1 text-end gap-2 align-self-end ">
-                                    <span class="font-bold text-2xl pr-4">P {{ totalOrderPrice }}</span>
-                                </div>
-                            </div>
-                            <div class="flex justify-center">
-                                <div class="flex-1 text-end gap-2 justify-center flex ">
-                                    <Button :disabled="!orderDetails.length" severity="success" class="w-full xl:w-auto"
-                                        @click="setQRVisibility(true)">
-                                        <Icon icon="ic:baseline-payments" width="20" height="20" />
-                                        <div class="font-bold">Confirm Order</div>
-                                    </Button>
-
-                                </div>
-                            </div>
-                        </div>
+                    <div class="text-2xl font-bold">{{ selectedItem.name }}</div>
+                    <div class="text-yellow-500 flex gap-1">
+                        <Icon v-for="index in starsDisplay.fullStars" :key="'full-' + index" icon="ic:round-star"
+                            height="20" />
+                        <Icon v-if="starsDisplay.halfStar" icon="ic:round-star-half" height="20" />
+                        <Icon v-for="index in starsDisplay.emptyStars" :key="'empty-' + index"
+                            icon="ic:round-star-outline" height="20" />
+                    </div>
+                    <p>{{ selectedItem.description }}</p>
+                    <div>
+                        Price: ₱{{ selectedItem.price }}
                     </div>
                 </div>
-            </Drawer>
-
-
-            <Dialog v-model:visible="QRcodeVisible" modal :style="{ width: '90vw', height: '80%' }" position="center"
-                header="Order QR Code" @update:visible="setQRVisibility">
-                <div class="flex w-full text-center">
-                    <div class="text-2xl font-bold w-full">{{ text }}</div>
-                </div>
-                <div class="flex justify-center mt-4">
-                    <qrcode-vue :value="text" size='270' level='L' margin="3" class="rounded-xl" />
-                </div>
-                <div class="italic mt-2 text-light text-sm">
-                    <span class="italic mt-2 text-light text-sm">
-                        Let any staff from <span class="font-bold">Anahaw Island View Resort</span>
-                        scan your QR code or let them know about the code above the QR.
-                    </span>
-                </div>
-                <div v-if="QRcodeVisible" class="flex">
-                    <span class="font-bold">Time Remaining: </span>
-                    <p>&nbsp;{{ formattedTime }}</p>
-                </div>
-            </Dialog>
-
-
-            <Dialog v-model:visible="confirmedVisible" modal :style="{ width: '90vw', height: '40%' }" position="center"
-                class="p-0" style="margin: -50px;">
-                <div class="flex w-full text-green-400 justify-center">
-                    <Icon icon="line-md:confirm-circle-twotone" height="70" />
-                </div>
-                <div class="flex w-full text-green-400 justify-center text-xl font-bold">
-                    Order Confirmed Order #{{ myOrder }}
-                </div>
-                <div class="flex w-full italic justify-center">
-                    Kindly wait for your order as it is being prepared
-                </div>
-                <div class="flex w-full italic justify-center mt-2">
-                    <Button severity="info" class="w-full" @click="trackOrder">
-                        <div class="font-bold">
-                            Track My Order
-                        </div>
-
-                        <Icon icon="arcticons:whereyougo" width="20" height="20" />
+                <!-- Conditionally render buttons based on if item is added to order -->
+                <div class="flex justify-center mt-4 mb-4">
+                    <Button v-if="!isItemAdded(selectedItem.id)" @click="addToOrder(selectedItem)"
+                        class="w-full xl:w-auto" severity="success">
+                        <Icon icon="ic:baseline-add-shopping-cart" height="20" />
+                        <b>Add to Order</b>
+                    </Button>
+                    <Button v-else @click="showOrderDetails" class="w-full xl:w-auto" severity="info">
+                        <Icon icon="ic:outline-shopping-cart" height="20" />
+                        <b>My Orders</b>
                     </Button>
                 </div>
-            </Dialog>
+            </div>
+            <!-- Optional else case if no item is selected -->
+            <div v-else class="flex justify-center items-center h-full">
+                <p>Select an item to see details</p>
+            </div>
+        </Drawer>
 
-            <Drawer v-model:visible="detailsVisible" header="Item Details" position="bottom" class="opacity-90"
-                :style="{ width: '100%', minHeight: '65vh', height: 'auto' }">
-                <div v-if="selectedItem" class="h-full justify-between flex flex-col">
-                    <div>
-                        <div class="w-full bg-white justify-center flex rounded-lg py-3 mb-2">
-                            <img :src="selectedItem.imageUrl" class="h-[20vh] w-auto " />
-                        </div>
-                        <div class="text-2xl font-bold">{{ selectedItem.name }}</div>
-                        <!-- <div class="text-yellow-500 flex gap-1">
-                            <Icon v-for="index in starsDisplay.fullStars" :key="'full-' + index" icon="ic:round-star"
-                                height="20" />
-                            <Icon v-if="starsDisplay.halfStar" icon="ic:round-star-half" height="20" />
-                            <Icon v-for="index in starsDisplay.emptyStars" :key="'empty-' + index"
-                                icon="ic:round-star-outline" height="20" />
-                        </div> -->
-                        <p v-html="selectedItem.description"></p>
-                        <div>
-                            Price: ₱{{ selectedItem.price }}
-                        </div>
-                    </div>
-                    <!-- Conditionally render buttons based on if item is added to order -->
-                    <div class="flex justify-center mt-4 mb-4">
-                        <Button v-if="!isItemAdded(selectedItem.id)" @click="addToOrder(selectedItem)"
-                            class="w-full xl:w-auto" severity="success">
-                            <Icon icon="ic:baseline-add-shopping-cart" height="20" />
-                            <b>Add to Order</b>
-                        </Button>
-                        <Button v-else @click="showOrderDetails" class="w-full xl:w-auto" severity="info">
-                            <Icon icon="ic:outline-shopping-cart" height="20" />
-                            <b>My Orders</b>
-                        </Button>
-                    </div>
-                </div>
-                <!-- Optional else case if no item is selected -->
-                <div v-else class="flex justify-center items-center h-full">
-                    <p>Select an item to see details</p>
-                </div>
-            </Drawer>
 
-            <Dialog v-model:visible="simpleMenu" modal :style="{ width: '90vw', height: '95%' }" position="center"
-                header="Simplified Menu">
-                <div class="p-4">
-                    <div v-for="category in categories" :key="category.id" class="mb-4">
-                        <h3 class="text-primary text-lg font-bold mb-2">{{ category.name }}</h3>
-                        <ul>
-                            <li v-for="item in filteredMenuItems(category.id)" :key="item.id"
-                                class="flex justify-between items-center relative py-2 gap-2">
-                                <div class="flex gap-2 flex-1">
-                                    <div v-if="isItemAdded(item.id)">
-                                        <Badge :value="getItemQuantity(item.id)" severity="info" />
-                                    </div>
-                                    <span class=" flex-1 pr-4  underline" @click="showDetails(item)">{{
-                                        item.name }}</span>
-                                    <span>P{{ item.price }}</span>
-                                </div>
-                                <span>
-                                    <Button text @click="addToOrder(item)" class="h-[2rem] m-0"
-                                        :severity="isItemAdded(item.id) ? 'success' : 'primary'">
-                                        <Icon :icon="isItemAdded(item.id) ? 'typcn:tick' : 'typcn:plus'" />
-                                    </Button></span>
-                            </li>
-                            <Divider />
-
-                        </ul>
-                    </div>
-                </div>
-            </Dialog>
-
-            <Dialog v-model:visible="search" modal :style="{ width: '100vw', height: 'auto' }" position="top"
-                header="Search Menu">
-                <div class="p-4">
-                    <div class="w-full flex mb-2 gap-2">
-                        <InputText type="text" v-model="searchTerm" placeholder="Search Food or Drink"
-                            class="w-[80%]" />
-                        <Button class="w-[20%]">
-                            <Icon icon="mingcute:search-line" />
-                        </Button>
-                    </div>
-                </div>
-            </Dialog>
-        </div>
     </template>
 
 <style scoped>

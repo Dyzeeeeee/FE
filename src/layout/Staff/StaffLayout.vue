@@ -84,8 +84,8 @@ function isOutsideClicked(event) {
     <div class="layout-wrapper" :class="containerClass">
         <app-topbar></app-topbar>
         <staff-sidebar></staff-sidebar>
-        <div class="layout-main-container ">
-            <div class="layout-main">
+        <div class="layout-main-container mt-9">
+            <div class="layout-main mt-9">
                 <router-view></router-view>
             </div>
             <!-- <app-footer></app-footer> -->

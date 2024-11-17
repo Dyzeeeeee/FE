@@ -362,7 +362,7 @@ onUnmounted(() => {
     </Dialog>
     <div class="absolute inset-0 bg-opacity-100 flex items-center justify-center">
         <div class="text-center text-white text-xl font-semibold">
-            <img src="@/assets/pics/CSoon.png" class="h-80"/>
+            <img src="@/assets/pics/CSoon.png" class="h-80" />
         </div>
     </div>
 </template>

@@ -138,7 +138,13 @@ async function handleLogin() {
         } else if (response.data.user.role === 'waiter') {
             router.push('/waiter/home'); // Navigate to staff dashboard
         } else if (response.data.user.role === 'kitchen') {
-            router.push('/kitchen/home'); // Navigate to staff dashboard
+            router.push('/kitchen/home');
+        } else if (response.data.user.role === 'cashier') {
+            router.push('/cashier/home');
+        } else if (response.data.user.role === 'admin') {
+            router.push('/admin/home');
+        } else if (response.data.user.role === 'accountant') {
+            router.push('/accountant/home'); // Navigate to staff dashboard
         } else {
             throw new Error('Unknown role');
         }

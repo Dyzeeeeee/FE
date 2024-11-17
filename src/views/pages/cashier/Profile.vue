@@ -1,114 +1,79 @@
 <template>
-    <div class="flex gap-3">
-        <div class="flex-wrap w-9">
-            <div class="flex-1 mb-3">
-                <Card style="overflow: hidden; position: relative">
-                    <template #header>
-                        <div class="card-header-image">
-                            <img alt="user header" src="https://timelinecovers.pro/facebook-cover/download/tropical-relax-resort-facebook-cover.jpg" />
-                        </div>
-                        <div class="round-image">
-                            <img alt="round user avatar" src="https://thumbs.dreamstime.com/b/vector-illustration-smiling-shark-cartoon-minimalist-flat-style-isolated-white-background-315602043.jpg" />
-                        </div>
-                    </template>
-                    <template #title>
-                        <div class="flex">
-                            <div class="flex-wrap flex-1">
-                                <div class="flex text-4xl" style="margin-left: 170px; margin-top: -10px">
-                                    <div class="flex-1">Jan Dyze Malaluan</div>
+    <div class="mt-[5rem]">
+
+        <div class="grid grid-cols-12 xl:gap-1 gap-2">
+            <div class="col-span-12 lg:col-span-6 xl:col-span-8 -mx7 xl:m-0 gap-2">
+                <div class="card p-0 h-auto pb-5">
+                    <div class="flex relative">
+                        <img src="https://images.unsplash.com/photo-1554629947-334ff61d85dc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1024&h=1280&q=80"
+                            class="object-cover xl:h-[20vh] h-[18vh] w-full" />
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFICcql4ZvAAs3kWwFfW_7ZtPWblMi5zXdSQ&s"
+                            class="absolute bottom-0 left-0 transform xl:translate-y-1/2 translate-y-1/4 rounded-full border-4 border-blue-500 xl:ml-7 ml-3 h-[15vh] xl:[h-20]" />
+                    </div>
+                    <div class="flex mt-7 pt-2 ml-4 xl:ml-0 xl:pt-0 xl:mt-4">
+                        <div class="xl:w-2/12"></div>
+                        <div class="xl:w-70 flex-1 flex-wrap">
+                            <div class="flex justify-between">
+                                <div class="flex-wrap">
+                                    <div class="text-2xl font-bold xl:text-4xl">Jan Dyze Malaluan</div>
+                                    <div class="text-sm italic xl:text-lg">Cashier</div>
                                 </div>
-                                <div class="flex text-base font-italic" style="margin-left: 170px">
-                                    <div class="flex-1 font-italic font-light">Cashier</div>
+                                <div class="mr-3">
+                                    <Button severity="info" outlined rounded>
+                                        <Icon icon="tabler:edit" width="20" height="20" />
+                                        <div class="font-bold hidden sm:block">Edit profile</div>
+                                    </Button>
                                 </div>
                             </div>
-                            <div class="justify-end">
-                                <Button label="Edit my profile" icon="pi pi-pencil" severity="info" outlined rounded> </Button>
-                            </div></div
-                    ></template>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-0 h-auto pb-5 ">
+                    sasasssss
 
-                    <template #subtitle> </template>
-                </Card>
-            </div>
-            <div class="mb-3 max-h-20rem">
-                <Card style="overflow: hidden; position: relative">
-                    <template #title>
-                        <div class="flex text-2xl">
-                            <div class="flex-1">Contact Details</div>
-                        </div>
-                    </template>
+                </div>
 
-                    <template #content>
-                        <div class="flex-wrap mt-4 text-lg">
-                            <div class="flex mb-2">
-                                <div class="w-2 text-end mr-6 font-light">Email:</div>
-                                <div class="w-9 ml-4 font-bold">jdmalaluan2@gmail.com</div>
-                            </div>
-                            <div class="flex mb-2">
-                                <div class="w-2 text-end mr-6 font-light">Number:</div>
-                                <div class="w-9 ml-4 font-bold">0992 410 3295</div>
-                            </div>
-                            <div class="flex mb-2">
-                                <div class="w-2 text-end mr-6 font-light">Address:</div>
-                                <div class="w-9 ml-4 font-bold">Lumangbayan, Calapan City, Oriental Mindoro</div>
-                            </div>
-                        </div>
-                    </template>
-                </Card>
-            </div>
-            <div>
-                <Card style="overflow: hidden; position: relative; min-height: 20rem">
-                    <template #title>
-                        <div class="flex text-2xl">
-                            <div class="flex-1">About Me</div>
-                        </div>
-                    </template>
-
-                    <template #content>
-                        <div class="flex-wrap mt-4 text-lg">
-                            <div class="flex mb-2">
-                                <div class="w-2 text-end mr-6 font-light">Eme:</div>
-                                <div class="w-9 ml-4 font-bold">Whatever can be placed here</div>
-                            </div>
-                        </div>
-                    </template>
-                </Card>
             </div>
         </div>
-        <div class="flex-wrap w-3 h-full">
-            <div class="flex card mb-3" style="min-height: 25rem">
-                <div class="font-bold flex-1 text-2xl">Recent Activity</div>
-            </div>
-            <div class="card flex" style="min-height: 30rem">
-                <div class="font-bold flex-1 text-2xl">Awards Received</div>
-            </div>
-        </div>
+
+        <button type="button" @click="handleLogout">
+            <i class="pi pi-power-off"></i>
+            <span>Logout</span>
+        </button>
+
     </div>
+
 </template>
 
-<style scoped>
-.card-header-image img {
-    width: 100%;
-    height: 190px;
-    object-fit: cover;
-}
+<style scoped></style>
 
-.round-image {
-    position: absolute;
-    /* top: 50%; */
-    left: 20px; /* Adjust this value to position the image properly */
-    transform: translateY(-50%);
-    width: 150px; /* Adjust size as needed */
-    height: 150px; /* Adjust size as needed */
-    border-radius: 50%;
-    overflow: hidden;
-    /* border: 3px solid white;  */
-    border: 4px solid #4caf50;
-    /* padding: 2px; */
-}
+<script setup>
+import router from '@/router';
+import axios from 'axios';
+const handleLogout = async () => {
+    try {
+        // Call backend logout endpoint
+        await axios.post('/logout', {}, {
+            headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+        });
 
-.round-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-</style>
+        // Clear local storage or any state management holding user data
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('role');
+        sessionStorage.removeItem('userId');
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('orderId');
+
+        // Redirect to the login page
+        router.push('/auth/welcome').then(() => {
+            // Reload the page to ensure proper rerouting after logout
+            window.location.reload();
+        });
+    } catch (error) {
+        console.error('Logout failed:', error);
+    }
+};
+</script>

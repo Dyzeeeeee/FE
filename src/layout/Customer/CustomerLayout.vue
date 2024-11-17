@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import AppTopbar from '../AppTopbar.vue';
 import CustomerBottomBar from './CustomerBottomBar.vue';
-import CustomerTopBar from './CustomerTopBar.vue';
 
 const installPromptEvent = ref(null);
 const isInstallable = ref(false);
@@ -69,7 +68,7 @@ const handleInstallApp = async () => {
         <div class="hidden">
             <app-topbar></app-topbar>
         </div>
-        <CustomerTopBar />
+        <!-- <CustomerTopBar /> -->
 
         <!-- bottom-bar that has 5 menu that is by default home then when an different button is selected it will be the
         active one -->

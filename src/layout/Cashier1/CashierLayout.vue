@@ -2,8 +2,8 @@
 import { useLayout } from '@/layout/composables/layout';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import AppTopbar from './../AppTopbar.vue';
-import CashierBottomBar from './CashierBottomBar.vue';
-import CashierTopBar from './CashierTopBar.vue';
+import CashierSidebar from './CashierSidebar.vue';
+
 const currentTime = ref(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 const currentDate = ref(formatDate(new Date()));
 
@@ -82,27 +82,23 @@ function isOutsideClicked(event) {
 
 <template>
     <div class="layout-wrapper" :class="containerClass">
-        <CashierTopBar></CashierTopBar>
-        <div class="hidden">
-            <app-topbar></app-topbar>
-        </div>
+        <app-topbar></app-topbar>
+        <cashier-sidebar></cashier-sidebar>
         <div class="layout-main-container">
-            <div class="layout-main ">
+            <div class="layout-main">
                 <router-view></router-view>
             </div>
             <!-- <app-footer></app-footer> -->
         </div>
         <div class="layout-mask animate-fadein"></div>
     </div>
-    <div class="hidden xl:flex fixed bottom-0 right-0 m-2 text-center rounded-t-lg">
-        <div class="flex-1 font-bold p-1 rounded-tl-lg -mb-2 pt-2 px-2 bg-blue-400 text-black"
-            style="text-transform: lowercase">
+    <div class="flex fixed bottom-0 right-0 m-2 text-center rounded-t-lg" style="background-color: var(--bg-surface-900)">
+        <div class="flex-1 font-bold p-1 rounded-tl-lg px-2" style="background-color: var(--bg-surface-700); text-transform: lowercase">
             {{ currentTime }}
         </div>
-        <div class="-mb-2 pt-2 px-2 font-bold rounded-tr-lg bg-green-100 text-black">
+        <div class="p-1 px-2 font-bold rounded-t-lg" style="background-color: var(--bg-surface-900)">
             {{ currentDate }}
         </div>
     </div>
-    <CashierBottomBar></CashierBottomBar>
     <Toast />
 </template>

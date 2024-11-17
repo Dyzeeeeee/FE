@@ -154,37 +154,6 @@ onUnmounted(() => {
 });
 const orders = ref([]);
 
-
-const markAsServed = async (itemId) => {
-    selectedItem.value = { id: itemId }; // Optional: set the selected item with the ID for tracking
-    itemStatus.value = false;
-
-    // Make an API request to update the order detail status using axios
-    try {
-        const response = await axios.put(`/update-order-detail/${itemId}`, {
-            status: 'served'
-        });
-
-        if (response.status === 200) {
-            console.log('Order detail updated successfully:', response.data);
-
-            // If you have access to the item object locally, update its status:
-            if (selectedItem.value) {
-                selectedItem.value.status = 'served'; // Update status locally
-            }
-            getAllOrders();
-        } else {
-            console.error('Failed to update order detail:', response.data);
-        }
-    } catch (error) {
-        console.error('Error updating order detail:', error);
-        if (error.response) {
-            console.error('Server response:', error.response.data);
-        }
-    }
-};
-
-
 const getStatusIcon = (status) => {
     switch (status) {
         case 'standby':
@@ -452,24 +421,19 @@ const totalPrice = computed(() => {
 
 
         <div v-if="selectedItem" class="mt-2">
-            {{ getStatusIcon(selectedItem.status).description }} by {{ selectedOrder.customer_name }}
+            Order Taken/Made by {{ selectedOrder.customer_name }}
 
-            <div :class="getStatusIcon(selectedItem.status).colorClass" class="flex">
-                {{ selectedItem.status }}
-                <Icon :icon="getStatusIcon(selectedItem.status).icon" height="20" />
+            <div class="flex"> Status: &nbsp;
+                <div :class="getStatusIcon(selectedItem.status).colorClass" class="flex">
+                    {{ selectedItem.status }}
+                    <Icon :icon="getStatusIcon(selectedItem.status).icon" height="20" />
+                </div>
             </div>
+
         </div>
 
         <div class="flex justify-end gap-2 p-0 w-full mt-2">
-
-        </div>
-        <div class="flex justify-end gap-2 p-0 w-full mt-2">
-            <button v-if="selectedItem.status === 'serving'" @click="markAsServed(selectedItem.detail_id)"
-                class="flex w-full bg-transparent gap-1 rounded-lg text-green-700 p-2 justify-center font-bold border-[1px] border-green-700">
-                <div>Mark as Served</div>
-                <Icon icon="line-md:check-all" height="20" class="" />
-            </button>
-            <button v-else-if="selectedItem.status === 'served'" @click="itemStatus = false"
+            <button
                 class="flex w-full bg-transparent rounded-lg text-white  p-2 justify-center font-bold border-[1px] border-white ">
                 <div>Okay</div>
             </button>
