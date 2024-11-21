@@ -3,6 +3,7 @@ import { useLayout } from '@/layout/composables/layout';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import AppTopbar from './../AppTopbar.vue';
 import CashierBottomBar from './CashierBottomBar.vue';
+import CashierSidebar from './CashierSidebar.vue';
 import CashierTopBar from './CashierTopBar.vue';
 const currentTime = ref(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 const currentDate = ref(formatDate(new Date()));
@@ -86,6 +87,8 @@ function isOutsideClicked(event) {
         <div class="hidden">
             <app-topbar></app-topbar>
         </div>
+        <CashierSidebar></CashierSidebar>
+
         <div class="layout-main-container">
             <div class="layout-main ">
                 <router-view></router-view>

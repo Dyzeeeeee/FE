@@ -46,7 +46,8 @@
                         </div>
                     </div>
                     <div>
-                        <button class="">Filter</button>
+
+                        <!-- <button class="">Filter</button> -->
                     </div>
                 </div>
             </div>
@@ -64,7 +65,7 @@
                 <div class="w-full h-auto">
                     <div class="card border-[1px] h-full p-3">
 
-                        <div class="flex flex-wrap gap-2 overflow-auto max-h-[20vh]">
+                        <div class="flex flex-wrap gap-2 overflow-auto min-h-[35vh]">
                             <!-- Canvas with ref -->
                             <canvas ref="dailySalesCanvas"></canvas>
                         </div>
@@ -121,13 +122,17 @@
 
                 <div class="col-span-12 h-auto">
                     <div class="card border-[1px] h-full p-3">
-
-                        <DataTable :value="orders" stripedRows tableStyle="">
-                            <Column field="id" header="Order #"></Column>
-                            <Column field="total" header="Total"></Column>
-                            <Column field="tendered" header="Tendered"></Column>
-                            <Column field="change" header="Change"></Column>
+                        <DataTable :value="formattedOrders" stripedRows tableStyle="" headerClass="text-sm"
+                            :paginator="true" :rows="10" :rowsPerPageOptions="[5, 10, 20]">
+                            <Column field="id" header="Order#" headerClass="text-sm" bodyClass="text-sm"></Column>
+                            <Column field="total" header="Total" headerClass="text-sm" bodyClass="text-sm"></Column>
+                            <Column field="tendered" header="Tendered" headerClass="text-sm" bodyClass="text-sm">
+                            </Column>
+                            <Column field="change" header="Change" headerClass="text-sm" bodyClass="text-sm"></Column>
+                            <Column field="formattedDate" header="Date" headerClass="text-sm" bodyClass="text-sm">
+                            </Column>
                         </DataTable>
+
                     </div>
                 </div>
             </div>
@@ -142,17 +147,18 @@ const isRounded = ref(true); // State to manage if the topbar is rounded
 
 const selectedDate = '2024-11-20'; // Default selected date
 const orders = [
-    { id: 1, name: 'Dine', total: 150.00, tendered: 200.00, change: 50.00 },
-    { id: 2, name: 'Takeout', total: 200.00, tendered: 250.00, change: 50.00 },
-    { id: 3, name: 'Dine', total: 120.00, tendered: 150.00, change: 30.00 },
-    { id: 4, name: 'Takeout', total: 180.00, tendered: 200.00, change: 20.00 },
-    { id: 5, name: 'Dine', total: 220.00, tendered: 250.00, change: 30.00 },
-    { id: 6, name: 'Takeout', total: 150.00, tendered: 150.00, change: 0.00 },
-    { id: 7, name: 'Dine', total: 300.00, tendered: 350.00, change: 50.00 },
-    { id: 8, name: 'Takeout', total: 90.00, tendered: 100.00, change: 10.00 },
-    { id: 9, name: 'Dine', total: 250.00, tendered: 300.00, change: 50.00 },
-    { id: 10, name: 'Takeout', total: 170.00, tendered: 200.00, change: 30.00 }
+    { id: 1, total: 150.00, tendered: 200.00, change: 50.00, created_at: '2024-11-20 08:15:00' },
+    { id: 2, total: 200.00, tendered: 250.00, change: 50.00, created_at: '2024-11-20 09:30:00' },
+    { id: 3, total: 120.00, tendered: 150.00, change: 30.00, created_at: '2024-11-20 10:45:00' },
+    { id: 4, total: 180.00, tendered: 200.00, change: 20.00, created_at: '2024-11-20 11:20:00' },
+    { id: 5, total: 220.00, tendered: 250.00, change: 30.00, created_at: '2024-11-20 12:05:00' },
+    { id: 6, total: 150.00, tendered: 150.00, change: 0.00, created_at: '2024-11-20 13:40:00' },
+    { id: 7, total: 300.00, tendered: 350.00, change: 50.00, created_at: '2024-11-20 14:25:00' },
+    { id: 8, total: 90.00, tendered: 100.00, change: 10.00, created_at: '2024-11-20 15:10:00' },
+    { id: 9, total: 250.00, tendered: 300.00, change: 50.00, created_at: '2024-11-20 16:55:00' },
+    { id: 10, total: 170.00, tendered: 200.00, change: 30.00, created_at: '2024-11-20 17:40:00' }
 ];
+
 
 
 // Reactive property to track the selected mode
@@ -213,6 +219,22 @@ const day = dateObj.getDate(); // Get the day of the month
 // Format the date as 'Nov. 18'
 const formattedDate = computed(() => `${month}. ${day}`);
 const filteredData = filterSalesByDate(selectedDate);
+const formattedOrders = computed(() => {
+    return orders.map(order => {
+        const dateObj = new Date(order.created_at);
+        const month = months[dateObj.getMonth()];
+        const day = dateObj.getDate();
+        const hours = dateObj.getHours();
+        const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'pm' : 'am';
+        const formattedTime = `${hours % 12 || 12}:${minutes}${ampm}`;
+
+        return {
+            ...order,
+            formattedDate: `${month} ${day} (${formattedTime})`
+        };
+    });
+});
 
 
 // Function to render the chart
@@ -259,4 +281,11 @@ onMounted(() => {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.p-datatable-tbody tr td {
+    font-size: 0.875rem;
+    /* Tailwind's `text-sm` equivalent */
+    padding: 0.5rem 0.5rem;
+    /* Adjust padding for smaller rows */
+}
+</style>

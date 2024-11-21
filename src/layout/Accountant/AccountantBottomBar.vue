@@ -8,21 +8,6 @@
                     :class="{ 'text-yellow-500': $route.path === '/accountant/home' }" />
             </div>
         </div>
-        <!-- <div @click="$router.push('/waiter/menu')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/waiter/menu' }">Menu</div>
-            <div class="flex justify-center">
-                <Icon icon="ic:sharp-menu-book" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/waiter/menu' }" />
-            </div>
-        </div> -->
-        <!-- Menu -->
-        <div @click="$router.push('/accountant/orders')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/accountant/orders' }">Orders</div>
-            <div class="flex justify-center">
-                <Icon icon="fluent-mdl2:activate-orders" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/accountant/orders' }" />
-            </div>
-        </div>
         <div @click="$router.push('/accountant/sales')" class="flex-1 text-center p-2 cursor-pointer">
             <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/accountant/sales' }">Sales</div>
             <div class="flex justify-center">
@@ -31,31 +16,6 @@
             </div>
         </div>
 
-        <!-- Center Plus Button -->
-        <!-- <div @click="handleScanner"
-            class="absolute bottom-2 left-1/2 transform -translate-x-1/2 cursor-pointer  rounded-full text-emerald-500 justify-center flex items-center w-[60px] h-[60px] z-20 shadow-lg"
-            :class="{
-                'bg-emerald-500 w-[55px] h-[55px] rounded-xl border-[2px]': $route.path === '/waiter/takeorder',
-                'bg-white w-[60px] h-[60px] ': $route.path !== '/waiter/takeorder'
-            }">
-            <Icon :icon="$route.path === '/waiter/takeorder' ? 'gg:qr' : 'zondicons:add-solid'"
-                :height="$route.path === '/waiter/takeorder' ? '45' : '55'"
-                :class="{ 'text-white': $route.path === '/waiter/takeorder' }" />
-        </div> -->
-
-        <!-- Rooms -->
-        <!-- <div class="flex-1 text-center p-2 cursor-pointer">
-
-        </div> -->
-
-        <!-- Profile -->
-        <div @click="$router.push('/accountant/history')" class="flex-1 text-center p-2 cursor-pointer">
-            <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/accountant/history' }">History</div>
-            <div class="flex justify-center">
-                <Icon icon="nimbus:history" width="20" height="20"
-                    :class="{ 'text-yellow-500': $route.path === '/accountant/history' }" />
-            </div>
-        </div>
         <div @click="$router.push('/accountant/more')" class="flex-1 text-center p-2 cursor-pointer">
             <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/accountant/more' }">More</div>
             <div class="flex justify-center">
@@ -63,7 +23,7 @@
                     :class="{ 'text-yellow-500': $route.path === '/accountant/more' }" />
             </div>
         </div>
-    </div>
+    </div>  
 
 
     <Dialog v-model:visible="cameraVisible" modal class="xl:h-[80vh] xl:w-[40vw]" position="center"

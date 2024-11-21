@@ -1,6 +1,6 @@
 <template>
     <div v-if="minimized === true && showComponent"
-        :class="['z-50 xl:hidden block top-0 left-0 bg-emerald-500 fixed p-3 mt-10 rounded-tr-xl rounded-br-xl ', isHidden ? 'opacity-0' : 'opacity-90']"
+        :class="['z-50 xl:hidden block top-0 left-0 bg-gray-100 fixed p-3 mt-10 rounded-tr-xl rounded-br-xl ', isHidden ? 'opacity-0' : 'opacity-90']"
         @click="toggleTopBar" @mouseenter="resetInactivityTimer" @mouseleave="resetInactivityTimer"
         :style="{ transition: 'opacity 1s ease' }">
         <div>
@@ -8,7 +8,7 @@
         </div>
     </div>
     <div v-if="showComponent && minimized === false" class=" xl:hidden block "
-        :class="[' top-0 left-0 right-0 z-50 ', isRounded ? 'text-surface-800 border-[2px] border-surface-800 mt-3 rounded-3xl mx-2 bg-emerald-500 p-2 shadow-md transition-all duration-300 ease-in-out' : ' fixed bg-gray-800  p-2 transition-all duration-300 ease-in-out']">
+        :class="[' top-0 left-0 right-0 z-50 ', isRounded ? 'text-surface-800 border-[2px] border-surface-800 mt-3 rounded-3xl mx-2 bg-gray-100 p-2 shadow-md transition-all duration-300 ease-in-out' : ' fixed bg-gray-800  p-2 transition-all duration-300 ease-in-out']">
         <div class="flex justify-between px-2 self-center">
             <div class="flex gap-2 flex-1">
                 <div class="self-center" @click="toggleTopBar">
@@ -129,6 +129,6 @@ const minimized = ref(true);
 
 
 const showComponent = computed(() => {
-    return route.path !== '/accountant/orders' && route.path !== '/accountant/history' && route.path !== '/accountant/sales';
+    return route.path !== '/accountant/home' && route.path !== '/accountant/sales' && route.path !== '/accountant/more';
 });
 </script>
