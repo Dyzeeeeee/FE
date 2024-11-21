@@ -89,7 +89,7 @@ function isOutsideClicked(event) {
         </div>
         <CashierSidebar></CashierSidebar>
 
-        <div class="layout-main-container">
+        <div class="layout-main-container xl:mt-20">
             <div class="layout-main ">
                 <router-view></router-view>
             </div>

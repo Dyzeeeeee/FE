@@ -729,8 +729,9 @@ const confirmPayment = async () => {
         // Data to be sent in the update request
         const paymentData = {
             tendered: amountTendered.value,
-            // customer_tag: selectedCustomer.value,
+            customer_tag: selectedCustomer.value,
             total_price: totalOrderAmount.value,
+            service: selectedService.value,
             service: selectedService.value,
             payment_method: selectedPaymentMethod.value,
             change1: changeDue.value,
