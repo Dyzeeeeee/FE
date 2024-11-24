@@ -64,7 +64,7 @@
                                         &nbsp;</span>
                                     <span :class="{ [getStatusIcon(log.status).textColor]: true }">{{
                                         getStatusIcon(log.status).action
-                                    }}&nbsp;</span>
+                                        }}&nbsp;</span>
                                     <span class="font-bold px-1 bg-gray-600 text-white">{{ log.menu_name }}</span>
                                 </p>
                                 <p class="text-gray-500 text-sm">{{ formatRelativeTime(log.updated_at) }}</p>

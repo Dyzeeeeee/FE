@@ -40,13 +40,23 @@
                             <div class="text-xl font-bold">{{ formattedDate }}</div>
                         </div>
                         <div class="self-center ">
-                            <button class="flex items-center justify-center">
+                            <button class="flex items-center justify-center" @click=" calendarDialog = true">
                                 <Icon icon="material-symbols:edit-calendar" height="25" />
                             </button>
                         </div>
                     </div>
+                    <div class="flex justify-end flex-1 px-4">
+                        <button @click="rotateIcon" class="self-center" ref="refreshButton">
+                            <Icon icon="bx:refresh" height="30" :class="rotationClass" />
+                        </button>
+                    </div>
                     <div>
+                        <Dialog v-model:visible="calendarDialog" header="Select Date" :modal="true" :closable="true"
+                            showEffect="fade" hideEffect="fade">
 
+                            <DatePicker v-model="selectedDate" inline class="w-full sm:w-[30rem]"
+                                @click="closeCalendar" />
+                        </Dialog>
                         <!-- <button class="">Filter</button> -->
                     </div>
                 </div>
@@ -59,6 +69,7 @@
             </div>
         </div>
 
+
         <template v-if="selectedMode == 'Daily'">
             <div class="col-span-12 xl:col-span-12 flex flex-col gap-2" :class="showModes ? 'mt-28' : 'mt-12'">
 
@@ -66,8 +77,7 @@
                     <div class="card border-[1px] h-full p-3">
 
                         <div class="flex flex-wrap gap-2 overflow-auto min-h-[35vh]">
-                            <!-- Canvas with ref -->
-                            <canvas ref="dailySalesCanvas"></canvas>
+                            <canvas ref="salesChart" width="400" height="250"></canvas>
                         </div>
                     </div>
                 </div>
@@ -80,18 +90,20 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <div class="font-bold text-2xl">
-                                        P5000
+                                        {{ totalSales.toLocaleString('en-US', { style: 'currency', currency: 'PHP' }) }}
                                     </div>
+
                                     <div class="opacity-60 italic text-sm">
                                         Total Sales
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex gap-1 text-green-500 text-xs">
-                                <Icon icon="cuida:arrow-up-outline"
-                                    class="bg-transparent border-[1px] border-green-500 rounded-full self-center"
-                                    height="13" />
-                                <div>13% (from yesterday)</div>
+                            <div class="flex gap-1 text-xs" :class="textColor">
+                                <Icon :icon="arrowIcon" class="bg-transparent border-[1px]  rounded-full self-center"
+                                    :class="textColor" height="13" />
+                                <div>
+                                    {{ percentageChange || 'No data available' }} (from yesterday)
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -103,18 +115,20 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <div class="font-bold text-2xl">
-                                        100
+                                        {{ totalOrders }}
                                     </div>
                                     <div class="opacity-60 italic text-sm">
                                         Total Orders
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex gap-1 text-red-500 text-xs">
-                                <Icon icon="cuida:arrow-down-outline"
-                                    class="bg-transparent border-[1px] border-red-500 rounded-full self-center"
-                                    height="13" />
-                                <div>13% (from yesterday)</div>
+                            <div class="flex gap-1 text-xs" :class="orderTextColor">
+                                <Icon :icon="orderArrowIcon"
+                                    class="bg-transparent border-[1px]  rounded-full self-center"
+                                    :class="orderTextColor" height="13" />
+                                <div>
+                                    {{ percentageOrderChange || 'No data available' }} (from yesterday)
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -125,11 +139,15 @@
                         <DataTable :value="orders" stripedRows tableStyle="" headerClass="text-sm" :paginator="true"
                             :rows="10" :rowsPerPageOptions="[5, 10, 20]">
                             <Column field="id" header="Order#" headerClass="text-sm" bodyClass="text-sm"></Column>
-                            <Column field="total" header="Total" headerClass="text-sm" bodyClass="text-sm"></Column>
+                            <Column field="total_price" header="Total" headerClass="text-sm" bodyClass="text-sm">
+                            </Column>
                             <Column field="tendered" header="Tendered" headerClass="text-sm" bodyClass="text-sm">
                             </Column>
-                            <Column field="change" header="Change" headerClass="text-sm" bodyClass="text-sm"></Column>
-                            <Column field="created_at" header="Date" headerClass="text-sm" bodyClass="text-sm">
+                            <Column field="change1" header="Change" headerClass="text-sm" bodyClass="text-sm"></Column>
+                            <Column field="updated_at" header="Date" headerClass="text-sm" bodyClass="text-sm">
+                                <template #body="slotProps">
+                                    {{ formatDate(slotProps.data.updated_at) }}
+                                </template>
                             </Column>
                         </DataTable>
 
@@ -142,42 +160,519 @@
 
 <script setup>
 import axios from 'axios';
-import Chart from 'chart.js/auto';
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { LineController } from 'chart.js'; // Import the line controller
+
+import { CategoryScale, Chart, Filler, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+
+const totalSales = computed(() => {
+    // Sum up all total_price values in orders
+    return orders.value.reduce((sum, order) => {
+        const price = parseFloat(order.total_price.replace(/[^\d.-]/g, '')) || 0; // Handle formatting
+        return sum + price;
+    }, 0);
+});
+
+const totalOrders = computed(() => {
+    return orders.value.length;
+});
+const loading = ref(false); // Track if the process is in progress
+
+const rotationClass = ref(''); // This will hold the rotation class
+
+
+const rotateIcon = async () => {
+    if (loading.value) return; // Prevent action if already loading
+    loading.value = true; // Set loading state to true
+
+    rotationClass.value = "rotate"; // Apply rotation class
+    setTimeout(() => {
+        rotationClass.value = ""; // Remove the rotation class after animation ends
+    }, 1000);
+
+    try {
+        if (selectedDate.value) {
+            const date = new Date(selectedDate.value);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+            const day = String(date.getDate()).padStart(2, "0"); // Get local day of the month
+            const formattedDate = `${year}-${month}-${day}`;
+            console.log(formattedDate);
+        } else {
+            console.log("No date selected");
+        }
+
+        await getAllOrders();
+        await calculateOrdersPercentageChange();
+        await calculatePercentageChange();
+
+        await nextTick(() => {
+            renderChart();
+        });
+    } catch (error) {
+        console.error("Error during process:", error);
+    } finally {
+        loading.value = false; // Reset loading state when done
+    }
+};
+
+const percentageChange = ref(''); // Reactive state to store the percentage change
+
+const calculatePercentageChange = async () => {
+    if (totalOrders.value === 0) {
+        console.log("No orders available."); // Debug log for no orders
+        percentageChange.value = 'No data available'; // Handle case when no data is available
+        return;
+    }
+
+    // Helper function to format a Date object to 'YYYY-MM-DD'
+    const formatToDateString = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure 2-digit month
+        const day = String(date.getDate()).padStart(2, '0'); // Ensure 2-digit day
+        return `${year}-${month}-${day}`;
+    };
+
+    // Define "today" and "yesterday" dates
+    const today = new Date(selectedDate.value);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const todayFormatted = formatToDateString(today);
+    const yesterdayFormatted = formatToDateString(yesterday);
+
+    console.log("Today:", todayFormatted);
+    console.log("Yesterday:", yesterdayFormatted);
+
+    // Fetch orders from the API
+    let todayOrders = [];
+    let yesterdayOrders = [];
+
+    try {
+        const response = await axios.get('/get-orders'); // Your API endpoint here
+        if (response.data) {
+            // Filter orders for today and yesterday
+            todayOrders = response.data.filter((order) => {
+                const orderDate = new Date(order.updated_at);
+                const orderDateString = orderDate.toISOString().split('T')[0]; // Format order date as 'YYYY-MM-DD'
+                return orderDateString === todayFormatted && order.status === 'paid';
+            });
+
+            yesterdayOrders = response.data.filter((order) => {
+                const orderDate = new Date(order.updated_at);
+                const orderDateString = orderDate.toISOString().split('T')[0]; // Format order date as 'YYYY-MM-DD'
+                return orderDateString === yesterdayFormatted && order.status === 'paid';
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+    }
+
+    console.log("Today's Orders:", todayOrders);
+    console.log("Yesterday's Orders:", yesterdayOrders);
+
+    // Calculate total sales for today and yesterday
+    const totalTodaySales = todayOrders.reduce(
+        (sum, order) => sum + parseFloat(order.total_price.replace(/[^\d.-]/g, '')) || 0,
+        0
+    );
+    const totalYesterdaySales = yesterdayOrders.reduce(
+        (sum, order) => sum + parseFloat(order.total_price.replace(/[^\d.-]/g, '')) || 0,
+        0
+    );
+
+    console.log("Total Sales Today:", totalTodaySales);
+    console.log("Total Sales Yesterday:", totalYesterdaySales);
+
+    // Avoid division by zero
+    if (totalYesterdaySales === 0) {
+        console.log("Yesterday's sales are zero. Percentage change cannot be calculated.");
+        percentageChange.value = 'N/A';
+        return;
+    }
+
+    // Calculate percentage change
+    const change = ((totalTodaySales - totalYesterdaySales) / totalYesterdaySales) * 100;
+
+    // Log the final percentage change
+    console.log("Percentage Change:", change.toFixed(2));
+
+    // Set the calculated percentage change
+    percentageChange.value = `${change > 0 ? '+' : ''}${change.toFixed(2)}%`;
+};
+
+const percentageOrderChange = ref(''); // Reactive state to store the percentage change
+
+
+const calculateOrdersPercentageChange = async () => {
+    if (totalOrders.value === 0) {
+        console.log("No orders available."); // Debug log for no orders
+        percentageOrderChange.value = 'No data available'; // Handle case when no data is available
+        return;
+    }
+
+    // Helper function to format a Date object to 'YYYY-MM-DD'
+    const formatToDateString = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure 2-digit month
+        const day = String(date.getDate()).padStart(2, '0'); // Ensure 2-digit day
+        return `${year}-${month}-${day}`;
+    };
+
+    // Define "today" and "yesterday" dates
+    const today = new Date(selectedDate.value);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const todayFormatted = formatToDateString(today);
+    const yesterdayFormatted = formatToDateString(yesterday);
+
+    console.log("Today:", todayFormatted);
+    console.log("Yesterday:", yesterdayFormatted);
+
+    // Fetch orders from the API
+    let todayOrders = [];
+    let yesterdayOrders = [];
+
+    try {
+        const response = await axios.get('/get-orders'); // Your API endpoint here
+        if (response.data) {
+            // Filter orders for today and yesterday
+            todayOrders = response.data.filter((order) => {
+                const orderDate = new Date(order.updated_at);
+                const orderDateString = orderDate.toISOString().split('T')[0]; // Format order date as 'YYYY-MM-DD'
+                return orderDateString === todayFormatted && order.status === 'paid';
+            });
+
+            yesterdayOrders = response.data.filter((order) => {
+                const orderDate = new Date(order.updated_at);
+                const orderDateString = orderDate.toISOString().split('T')[0]; // Format order date as 'YYYY-MM-DD'
+                return orderDateString === yesterdayFormatted && order.status === 'paid';
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+    }
+
+    console.log("Today's Orders:", todayOrders);
+    console.log("Yesterday's Orders:", yesterdayOrders);
+
+    // Calculate the number of orders for today and yesterday
+    const totalTodayOrders = todayOrders.length;
+    const totalYesterdayOrders = yesterdayOrders.length;
+
+    console.log("Total Orders Today:", totalTodayOrders);
+    console.log("Total Orders Yesterday:", totalYesterdayOrders);
+
+    // Avoid division by zero
+    if (totalYesterdayOrders === 0) {
+        console.log("Yesterday's orders are zero. Percentage change cannot be calculated.");
+        percentageOrderChange.value = 'N/A';
+        return;
+    }
+
+    // Calculate percentage change
+    const change = ((totalTodayOrders - totalYesterdayOrders) / totalYesterdayOrders) * 100;
+
+    // Log the final percentage change
+    console.log("Percentage Change:", change.toFixed(2));
+
+    // Set the calculated percentage change
+    percentageOrderChange.value = `${change > 0 ? '+' : ''}${change.toFixed(2)}%`;
+};
+
+
+const arrowIcon = computed(() => {
+    if (percentageChange.value.startsWith('+')) {
+        return 'cuida:arrow-up-outline';
+    } else if (percentageChange.value.startsWith('-')) {
+        return 'cuida:arrow-down-outline';
+    }
+    return null; // No arrow for default case
+});
+
+const textColor = computed(() => {
+    if (percentageOrderChange.value.startsWith('+')) {
+        return 'text-green-500 border-green-500';
+    } else if (percentageOrderChange.value.startsWith('-')) {
+        return 'text-red-500 border-red-500';
+    }
+    return 'text-gray-500'; // Default color for 'No data available' or 'N/A'
+});
+
+const orderArrowIcon = computed(() => {
+    if (percentageChange.value.startsWith('+')) {
+        return 'cuida:arrow-up-outline';
+    } else if (percentageChange.value.startsWith('-')) {
+        return 'cuida:arrow-down-outline';
+    }
+    return null; // No arrow for default case
+});
+
+const orderTextColor = computed(() => {
+    if (percentageOrderChange.value.startsWith('+')) {
+        return 'text-green-500 border-green-500';
+    } else if (percentageOrderChange.value.startsWith('-')) {
+        return 'text-red-500 border-red-500';
+    }
+    return 'text-gray-500'; // Default color for 'No data available' or 'N/A'
+});
+
+
+import { onUnmounted } from 'vue';
+
+// Optional: Clean up the chart instance when the component is unmounted
+onUnmounted(() => {
+    if (chartInstance.value) {
+        chartInstance.value.destroy(); // Destroy the chart instance
+        chartInstance.value = null; // Set the chart instance reference to null
+    }
+});
+
+const calendarDialog = ref(false);
+const closeCalendar = async () => {
+    if (selectedDate.value) {
+        const date = new Date(selectedDate.value);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const day = String(date.getDate()).padStart(2, '0'); // Get local day of the month
+        const formattedDate = `${year}-${month}-${day}`;
+        console.log(formattedDate);
+    } else {
+        console.log('No date selected');
+    }
+    await getAllOrders();
+    await calculateOrdersPercentageChange();
+    await calculatePercentageChange();
+    await nextTick(() => {
+        renderChart();
+    });
+    calendarDialog.value = false;
+};
+
+
+Chart.register(
+    LineController, // Register the LineController
+    LinearScale,
+    CategoryScale,
+    Title,
+    Tooltip,
+    Legend,
+    LineElement,
+    PointElement,
+    Filler
+);
 const isRounded = ref(true); // State to manage if the topbar is rounded
-const selectedDate = '2024-11-21'; // Default selected date
+const selectedDate = ref(new Date()); // Default selected date
 
 const orders = ref([])
+const salesChart = ref(null); // Reference to the canvas element
 
+// Function to fetch all orders
+// Function to fetch all orders
 const getAllOrders = async () => {
     try {
-        const response = await axios.get('/get-orders'); // Update with your API endpoint
+        const response = await axios.get('/get-orders'); // Your API endpoint here
         if (response.data) {
-            orders.value = response.data;
-            console.log('Orders fetched:', orders.value);
-        } else {
-            console.error('No orders found');
+            // Ensure selectedDate is in 'YYYY-MM-DD' format
+            const formattedSelectedDate = (() => {
+                const date = new Date(selectedDate.value);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                const day = String(date.getDate()).padStart(2, '0'); // Ensure 2-digit day
+                return `${year}-${month}-${day}`;
+            })();
+
+            // Filter orders for the selected date and status 'paid'
+            orders.value = response.data.filter(order => {
+                const orderDate = new Date(order.updated_at);
+                const orderDateString = orderDate.toISOString().split('T')[0]; // Format order date as 'YYYY-MM-DD'
+                return orderDateString === formattedSelectedDate && order.status === 'paid';
+            });
+            // calculatePercentageChange();
+            console.log('Orders for selected date with status "paid":', orders.value); // Log the filtered orders
+
         }
     } catch (error) {
         console.error('Error fetching orders:', error);
     }
 };
+
+
+
+// Function to render the chart
+const chartInstance = ref(null); // Keep track of the Chart.js instance
+
+const renderChart = () => {
+
+    const salesData = new Array(15).fill(0); // Initialize an array for each hour (8 AM - 10 PM)
+
+    // Loop through the orders and calculate the total price per hour
+    orders.value.forEach(order => {
+        const orderDate = new Date(order.updated_at);
+        const orderHour = orderDate.getHours();
+
+        if (orderHour >= 8 && orderHour <= 22) {
+            const hourIndex = orderHour - 8; // Adjust hour to match the 8 AM to 10 PM range
+
+            // Ensure total_price is a valid number
+            const totalPrice = parseFloat(order.total_price.replace(/[^\d.-]/g, '')) || 0;
+
+            salesData[hourIndex] += totalPrice; // Add the total price to the corresponding hour
+        }
+    });
+
+    // Function to format the 24-hour time to 12-hour format with AM/PM
+    const formatTime = (hour) => {
+        const period = hour >= 12 ? 'pm' : 'am';
+        const formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Convert hour to 12-hour format
+        return `${formattedHour}${period}`;
+    };
+
+    console.log('Sales data for chart (hourly):', salesData); // Log the sales data calculated for each hour
+
+    // Destroy the previous chart instance if it exists
+    if (chartInstance.value) {
+        chartInstance.value.destroy();
+    }
+
+    // Check if the canvas is rendered and available
+    if (salesChart.value) {
+        const ctx = salesChart.value.getContext('2d');
+        chartInstance.value = new Chart(ctx, {
+            type: 'line', // You can use 'bar' or 'line' for the chart
+            data: {
+                labels: Array.from({ length: 15 }, (_, index) => formatTime(index + 8)), // Labels for hours (8 AM to 10 PM)
+                datasets: [
+                    {
+                        label: 'Total Sales',
+                        data: salesData, // Sales data for each hour
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true, // Fill the area under the line
+                        tension: 0.1,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 500, // Adjust the y-axis step size
+                        },
+                    },
+                },
+            },
+        });
+    } else {
+        console.error('Canvas element not found!');
+    }
+};
+
+// Optional: Clean up the chart instance when the component is unmounted
+onBeforeUnmount(() => {
+    if (chartInstance.value) {
+        chartInstance.value.destroy();
+        chartInstance.value = null;
+    }
+});
+
+
+// Function to set the selected mode
+
+// OnMounted lifecycle hook
+onMounted(async () => {
+    if (loading.value) return; // Prevent execution if already loading
+    loading.value = true; // Set loading state to true
+
+    try {
+        if (selectedDate.value) {
+            const date = new Date(selectedDate.value);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+            const day = String(date.getDate()).padStart(2, "0"); // Get local day of the month
+            const formattedDate = `${year}-${month}-${day}`;
+            console.log(formattedDate);
+        } else {
+            console.log("No date selected");
+        }
+
+        await getAllOrders();
+        await calculateOrdersPercentageChange();
+        await calculatePercentageChange();
+
+        await nextTick(() => {
+            renderChart();
+        });
+    } catch (error) {
+        console.error("Error during mounted process:", error);
+    } finally {
+        loading.value = false; // Reset loading state when done
+    }
+});
+
+
+
+const formatDate = (dateString) => {
+    const dateObj = new Date(dateString);
+    const options = { month: 'short', day: 'numeric' };
+    const formattedDate = dateObj.toLocaleDateString('en-US', options); // e.g., "Nov. 21"
+
+    const hours = dateObj.getHours();
+    const minutes = dateObj.getMinutes();
+    const period = hours >= 12 ? 'pm' : 'am';
+    const formattedTime = `${hours % 12 || 12}:${minutes.toString().padStart(2, '0')}${period}`; // e.g., "10:44am"
+
+    return `${formattedDate} (${formattedTime})`;
+};
+
+
 // Reactive property to track the selected mode
 const selectedMode = ref('Daily');
 
 // Function to set the selected mode
-const selectMode = (mode) => {
+const selectMode = async (mode) => {
     selectedMode.value = mode;
-    if (mode === 'Daily') {
-        nextTick(() => {
-            console.log("chart: ", dailySalesCanvas.value); // Ensure the canvas is now available
-            renderChart(); // Re-render the chart
+    // if (mode === 'Daily') {
+    //     nextTick(() => {
+    //         console.log("chart: ", salesChart.value); // Ensure the canvas is now available
+    //         renderChart(); // Re-render the chart
+    //     });
+    // }
+    if (loading.value) return; // Prevent execution if already loading
+    loading.value = true; // Set loading state to true
+
+    try {
+        if (selectedDate.value) {
+            const date = new Date(selectedDate.value);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+            const day = String(date.getDate()).padStart(2, "0"); // Get local day of the month
+            const formattedDate = `${year}-${month}-${day}`;
+            console.log(formattedDate);
+        } else {
+            console.log("No date selected");
+        }
+
+        await getAllOrders();
+        await calculateOrdersPercentageChange();
+        await calculatePercentageChange();
+
+        await nextTick(() => {
+            renderChart();
         });
+    } catch (error) {
+        console.error("Error during mounted process:", error);
+    } finally {
+        loading.value = false; // Reset loading state when done
     }
 };
+
+
 const showModes = ref(true);
 
-const dailySalesCanvas = ref(null);
 
 // Array for month names
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -186,87 +681,42 @@ const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // Get the day of the week and format the date
-const dateObj = new Date(selectedDate);
-const dayOfWeek = computed(() => days[dateObj.getDay()]); // Get the day of the week
+const dateObj = new Date(selectedDate.value);
 const month = months[dateObj.getMonth()]; // Get the month
 const day = dateObj.getDate(); // Get the day of the month
 
 // Format the date as 'Nov. 18'
-const formattedDate = computed(() => `${month}. ${day}`);
 
-// Function to dynamically generate sales data based on orders
-const filterSalesByDate = (date) => {
-    const filteredOrders = orders.value.filter(order => {
-        const orderDate = new Date(order.created_at);
-        const orderDateString = `${orderDate.getFullYear()}-${(orderDate.getMonth() + 1).toString().padStart(2, '0')}-${orderDate.getDate().toString().padStart(2, '0')}`;
-        return orderDateString === date;
-    });
-
-    // Prepare the sales data for each hour of the day
-    const hourlySales = new Array(24).fill(0); // Array to store sales for each hour (24 hours)
-    filteredOrders.forEach(order => {
-        const orderHour = new Date(order.created_at).getHours(); // Get the hour of the order
-        hourlySales[orderHour] += order.total; // Accumulate the total sales for that hour
-    });
-
-    return {
-        labels: Array.from({ length: 24 }, (_, index) => `${index}:00`), // Labels for each hour
-        data: hourlySales // Sales data per hour
-    };
-};
-
-const filteredData = computed(() => filterSalesByDate(selectedDate));
-
-// Function to render the chart
-const renderChart = () => {
-    if (dailySalesCanvas.value) {
-        const ctx = dailySalesCanvas.value.getContext('2d');
-        new Chart(ctx, {
-            type: 'line', // Using line chart for sales visualization
-            data: {
-                labels: filteredData.value.labels,
-                datasets: [
-                    {
-                        label: 'Daily Sales (in Php)',
-                        data: filteredData.value.data,
-                        backgroundColor: 'yellow',
-                        borderColor: 'green',
-                        borderWidth: 1,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                    },
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true, // Ensure y-axis starts at 0
-                    },
-                },
-            },
-        });
-    }
-};
-
-// Initialize the chart on component mount
-onMounted(() => {
-    getAllOrders();
-    renderChart();
+const dayOfWeek = computed(() => {
+    const date = new Date(selectedDate.value);
+    return date.toLocaleString('en-US', { weekday: 'long' }); // Get the full weekday name
 });
 
-</script>
+const formattedDate = computed(() => {
+    const date = new Date(selectedDate.value);
+    const options = { month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options); // Format as e.g. "Nov. 18"
+});
 
+// Function to dynamically generate sales data based on orders
+
+</script>
 <style scoped>
-.p-datatable-tbody tr td {
-    font-size: 0.875rem;
-    /* Tailwind's `text-sm` equivalent */
-    padding: 0.5rem 0.5rem;
-    /* Adjust padding for smaller rows */
+/* Add some hover effect for better interaction */
+
+.rotate {
+    animation: rotateAnimation 1s ease-in-out;
 }
+
+@keyframes rotateAnimation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+/* Example additional styles if needed */
 </style>
