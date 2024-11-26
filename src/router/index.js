@@ -1,4 +1,5 @@
 import AccountantLayout from '@/layout/Accountant/AccountantLayout.vue';
+import AdminLayout from '@/layout/Admin/AdminLayout.vue';
 import AppLayout from '@/layout/AppLayout.vue';
 import CashierLayout from '@/layout/Cashier/CashierLayout.vue';
 import CustomerLayout from '@/layout/Customer/CustomerLayout.vue';
@@ -275,6 +276,39 @@ const router = createRouter({
             ]
         },
         {
+            path: '/admin',
+            component: AdminLayout,
+            meta: { role: 'admin' },
+
+            children: [
+                {
+                    path: '/admin/home',
+                    name: 'admin-home',
+                    component: () => import('@/views/pages/admin/Home.vue')
+                },
+                {
+                    path: '/admin/orders',
+                    name: 'admin-orders',
+                    component: () => import('@/views/pages/admin/Orders.vue')
+                },
+                {
+                    path: '/admin/history',
+                    name: 'admin-history',
+                    component: () => import('@/views/pages/admin/History.vue')
+                },
+                {
+                    path: '/admin/more',
+                    name: 'admin-more',
+                    component: () => import('@/views/pages/admin/More.vue')
+                },
+                {
+                    path: '/admin/sales',
+                    name: 'admin-Sales',
+                    component: () => import('@/views/pages/admin/Sales.vue')
+                }
+            ]
+        },
+        {
             path: '/kitchen',
             component: KitchenLayout,
             meta: { role: 'kitchen' },
@@ -399,19 +433,34 @@ const router = createRouter({
     ]
 });
 router.beforeEach((to, from, next) => {
-    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer'];
+    const publicPages = ['/auth/login', '/auth/signup', '/auth/welcome', '/customer', '/customer/menu'];
 
     const authRequired = !publicPages.includes(to.path);
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     const role = sessionStorage.getItem('role') || localStorage.getItem('role');
 
     if (token && publicPages.includes(to.path)) {
-        if (to.path === '/customer') {
+        if ((to.path === '/customer', '/customer/menu')) {
             // Allow public access to the customer home without redirection
             return next();
         } else {
             // Redirect to a default secure page based on role or to the dashboard
-            const redirectTo = role === 'customer' ? '/customer' : role === 'staff' ? '/staff' : role === 'waiter' ? '/waiter' : role === 'kitchen' ? '/accountant' : role === 'accountant' ? '/accountant' : role === 'cashier' ? '/cashier' : '/';
+            const redirectTo =
+                role === 'customer'
+                    ? '/customer'
+                    : role === 'staff'
+                      ? '/staff'
+                      : role === 'waiter'
+                        ? '/waiter'
+                        : role === 'kitchen'
+                          ? '/accountant'
+                          : role === 'accountant'
+                            ? '/accountant'
+                            : role === 'cashier'
+                              ? '/cashier'
+                              : role === 'admin'
+                                ? '/admin'
+                                : '/';
             return next(redirectTo);
         }
     }

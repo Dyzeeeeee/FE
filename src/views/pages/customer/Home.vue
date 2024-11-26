@@ -213,6 +213,8 @@
             </div>
         </div>
     </div>
+    <Chatbot />
+
 </template>
 
 <style scoped>
@@ -234,6 +236,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import Chatbot from '@/components/Chatbot.vue'
 
 const slides = ref([
     {
