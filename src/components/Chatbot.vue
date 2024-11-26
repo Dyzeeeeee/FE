@@ -49,26 +49,39 @@ const chatContainer = ref(null); // Ref for the chat container
 
 // Predefined replies
 const predefinedReplies = {
-    reservation: "Would you like to make a reservation? Please provide the date, time, and the number of guests.",
-    menu: "Here's our menu: We offer a variety of cuisines including seafood, vegetarian dishes, and desserts. Let me know what you're interested in!",
-    hours: "We are open from 8 AM to 10 PM every day. Do you need more details about our timings?",
-    location: "We are located by the beachside at Anahaw Resort. Would you like directions?",
-    activities: "We have live music every evening and a beach barbecue on weekends. Let me know if you'd like more information!",
-    feedback: "We appreciate your feedback! Please share your experience or any suggestions.",
+    reservation:
+        "Would you like to make a reservation? Please provide the date, time, and the number of guests.",
+    menu:
+        "Here's our menu: We offer a variety of cuisines, including seafood, vegetarian dishes, and desserts. Let me know if you’d like more details.",
+    hours:
+        "We are open from 8 AM to 10 PM every day. Let me know if you need help planning your visit.",
+    location:
+        "We are located by the beachside at Anahaw Resort. Would you like directions or a map?",
+    activities:
+        "We have live music every evening and a beach barbecue on weekends. Would you like to know about our upcoming events?",
+    feedback:
+        "We value your feedback! Please share your experience or suggestions so we can serve you better.",
     goodbye: "Goodbye! We look forward to seeing you soon at Anahaw Resort.",
+    greeting:
+        "Hello there! Welcome to Anahaw Resort Chatbot. How can I assist you today?",
+    gratitude: "You're welcome! Feel free to ask if you need anything else.",
+    help:
+        "I'm here to help! You can ask about reservations, menu, activities, location, or anything else related to Anahaw Resort.",
     default: "I'm here to assist you. Please ask about reservations, menu, hours, location, or activities!"
 };
-
-// Keywords mapping to replies
 const keywords = {
-    reservation: ["reservation", "book", "table"],
-    menu: ["menu", "food", "dish"],
-    hours: ["hours", "time", "open"],
-    location: ["location", "address", "where"],
-    activities: ["activities", "events", "music", "barbecue"],
-    feedback: ["feedback", "review", "suggestion"],
-    goodbye: ["bye", "goodbye", "see you"]
+    reservation: ["reservation", "book", "table", "schedule", "reserve"],
+    menu: ["menu", "food", "dish", "specialty", "offerings"],
+    hours: ["hours", "time", "open", "closing", "schedule"],
+    location: ["location", "address", "where", "directions", "map"],
+    activities: ["activities", "events", "entertainment", "music", "barbecue"],
+    feedback: ["feedback", "review", "suggestion", "complain", "improve"],
+    goodbye: ["bye", "goodbye", "see you", "later", "take care"],
+    greeting: ["hello", "hi", "hey", "good morning", "good afternoon"],
+    gratitude: ["thanks", "thank you", "appreciate", "grateful"],
+    help: ["help", "assist", "support", "problem", "question"]
 };
+
 
 // Toggle chat visibility
 const toggleChat = () => {
@@ -77,14 +90,31 @@ const toggleChat = () => {
 
 // Analyze message and generate reply
 const analyzeMessage = (message) => {
-    message = message.toLowerCase();
+    const lowerMessage = message.toLowerCase();
+
+    // Fuzzy keyword matching
     for (const [key, triggers] of Object.entries(keywords)) {
-        if (triggers.some((word) => message.includes(word))) {
+        if (triggers.some((word) => lowerMessage.includes(word))) {
             return predefinedReplies[key];
         }
     }
+
+    // Sentiment Analysis (basic example)
+    if (lowerMessage.includes("not good") || lowerMessage.includes("bad")) {
+        return "I'm sorry to hear that. Can you share more details so we can improve?";
+    }
+    if (lowerMessage.includes("amazing") || lowerMessage.includes("love")) {
+        return "Thank you for your kind words! We're thrilled to hear you enjoyed it.";
+    }
+
+    // Prediction for incomplete messages
+    if (lowerMessage.endsWith("can I")) {
+        return "Could you clarify what you'd like to know or do?";
+    }
+
     return predefinedReplies.default;
 };
+
 
 // Handle user message
 const sendMessage = async () => {
