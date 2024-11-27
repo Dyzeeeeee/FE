@@ -35,7 +35,7 @@ import router from './router';
 
 // Dynamically set the base URL using the current host
 const currentHost = window.location.hostname;
-// const baseURL = `https://resort.anahaw.shop/`;
+const baseURL = `https://resort.anahaw.shop/`;
 // const baseURL = `http://anahawbackend.test/index.php/`;
 // const baseURL = `http://192.168.131.1/anahawbackend/public/index.php/`;
 
