@@ -54,8 +54,14 @@
                         <Dialog v-model:visible="calendarDialog" header="Select Date" :modal="true" :closable="true"
                             showEffect="fade" hideEffect="fade">
 
-                            <DatePicker v-model="selectedDate" inline class="w-full sm:w-[30rem]"
-                                @click="closeCalendar" />
+                            <DatePicker v-model="selectedDate" inline class="w-full sm:w-[30rem]" />
+                            <div class="w-full flex justify-end">
+                                <button @click="closeCalendar"
+                                    class="p-2 m-2 rounded-lg bg-yellow-500 text-black flex gap-2">
+                                    <Icon icon="tdesign:check" />
+                                    <div>Select Date</div>
+                                </button>
+                            </div>
                         </Dialog>
                         <!-- <button class="">Filter</button> -->
                     </div>
