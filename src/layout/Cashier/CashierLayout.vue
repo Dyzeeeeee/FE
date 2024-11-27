@@ -84,12 +84,12 @@ function isOutsideClicked(event) {
 <template>
     <div class="layout-wrapper" :class="containerClass">
         <CashierTopBar></CashierTopBar>
-        <div class="hidden">
+        <div class="xl:block hidden">
             <app-topbar></app-topbar>
+            <CashierSidebar></CashierSidebar>
         </div>
-        <CashierSidebar></CashierSidebar>
 
-        <div class="layout-main-container xl:mt-20">
+        <div class="layout-main-container">
             <div class="layout-main ">
                 <router-view></router-view>
             </div>
@@ -106,6 +106,8 @@ function isOutsideClicked(event) {
             {{ currentDate }}
         </div>
     </div>
-    <CashierBottomBar></CashierBottomBar>
-    <Toast />
+    <div class="xl:hidden block">
+        <CashierBottomBar></CashierBottomBar>
+        <Toast />
+    </div>
 </template>

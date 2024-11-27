@@ -39,16 +39,12 @@ onMounted(() => {
     getUserById();
 });
 
-// Menu model for the staff dashboard
+// Menu model for the kitchen dashboard
 const model = computed(() => [
-    { label: 'Home', icon: 'mdi:home', to: '/staff/home', color: 'text-yellow-500' },
-    { label: 'POS', icon: 'mdi:cash-register', to: '/staff/pos', color: 'text-blue-500' },
-    { label: 'Tasks', icon: 'mdi:clipboard-text', to: '/staff/tasks', color: 'text-green-500' },
-    { label: 'Reservations', icon: 'fluent-mdl2:reservation-orders', to: '/staff/reservations', color: 'text-red-500' },
-    { label: 'Kitchen', icon: 'hugeicons:chef', to: '/staff/kitchen', color: 'text-orange-500' },
-    { label: 'Customers', icon: 'gravity-ui:persons', to: '/staff/customers', color: 'text-white' },
-    { label: 'Inventory', icon: 'ic:baseline-inventory', to: '/staff/inventory', color: 'text-indigo-500' },
-    { label: 'Settings', icon: 'basil:settings-alt-outline', to: '/staff/settings', color: 'text-gray-500' },
+    { label: 'Home', icon: 'mdi:home', to: '/kitchen/home', color: 'text-yellow-500' },
+    { label: 'History', icon: 'mdi:cash-register', to: '/kitchen/history', color: 'text-blue-500' },
+    { label: 'Orders', icon: 'mdi:clipboard-text', to: '/kitchen/orders', color: 'text-green-500' },
+    { label: 'Reservations', icon: 'fluent-mdl2:reservation-orders', to: '/kitchen/more', color: 'text-red-500' },
 ]);
 
 // Function to check if the current route matches or is a sub-route of the item path
@@ -62,7 +58,7 @@ const isRouteActive = (itemPath) => {
         <!-- Profile Card -->
         <div class="col-span-12 mb-3">
             <div class="card bg-surface-800 p-4 cursor-pointer"
-                :class="{ 'active-card': isRouteActive('/staff/profile') }" @click="goTo('/staff/profile')">
+                :class="{ 'active-card': isRouteActive('/kitchen/profile') }" @click="goTo('/kitchen/profile')">
                 <div class="flex">
                     <div>
                         <img src="https://res.cloudinary.com/teepublic/image/private/s--70s5l004--/c_crop,x_10,y_10/c_fit,w_1109/c_crop,g_north_west,h_1008,w_1260,x_-76,y_-64/co_rgb:c8e0ec,e_colorize,u_Misc:One%20Pixel%20Gray/c_scale,g_north_west,h_1008,w_1260/fl_layer_apply,g_north_west,x_-76,y_-64/bo_157px_solid_white/e_overlay,fl_layer_apply,h_1008,l_Misc:Art%20Print%20Bumpmap,w_1260/e_shadow,x_6,y_6/c_limit,h_1254,w_1254/c_lpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_auto,h_630,q_auto:good:420,w_630/v1661243507/production/designs/34363529_0.jpg"

@@ -4,7 +4,7 @@ import { baseImageUrl } from '@/config'; // Make sure the path is correct based 
 import axios from "axios";
 
 import { formatDistanceToNow } from "date-fns";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, onBeforeUnmount } from "vue";
 const selectedItem = ref(null);  // Stores selected item details
 const selectedOrder = ref(null); // Store the entire order context
 const imageUrl = ref(""); // Declare the image URL
@@ -21,6 +21,12 @@ const openItemDialog = (order, item) => {
     // Set the image URL dynamically or fallback if the menu_image is not available
     imageUrl.value = item.menu_image ? `${baseImageUrl}${encodeURIComponent(item.menu_image)}` : fallbackImage;
 };
+
+
+const firstColumn = computed(() => filteredOrders.value.filter((_, i) => i % 3 === 0));
+const secondColumn = computed(() => filteredOrders.value.filter((_, i) => i % 3 === 1));
+const thirdColumn = computed(() => filteredOrders.value.filter((_, i) => i % 3 === 2));
+
 
 const getLeftIcon = computed(() => {
     const category = uniqueCategories.value.find(cat => cat.name === selectedCategory.value);
@@ -64,7 +70,24 @@ const startPreparing = async (itemId) => {
         }
     }
 };
+onMounted(() => {
+    // Check if the screen size is 'xl'
+    const isXL = window.matchMedia('(min-width: 1280px)').matches
 
+    if (isXL) {
+        // Prevent scrolling by adding 'overflow-hidden' to the body
+        document.body.style.overflow = 'hidden'
+    }
+})
+
+onBeforeUnmount(() => {
+    // Re-enable scrolling by removing 'overflow-hidden' from the body when the component is unmounted
+    const isXL = window.matchMedia('(min-width: 1280px)').matches
+
+    if (isXL) {
+        document.body.style.overflow = ''
+    }
+})
 
 const readyToServe = async (itemId) => {
     selectedItem.value = { id: itemId }; // Optional: set the selected item with the ID for tracking
@@ -95,6 +118,53 @@ const readyToServe = async (itemId) => {
     }
 };
 
+const itemsByCategory = computed(() => {
+    const categoryItems = new Map();
+
+    orders.value.forEach(order => {
+        order.details.forEach(detail => {
+            if (!categoryItems.has(detail.category_name)) {
+                categoryItems.set(detail.category_name, new Map());
+            }
+            const menuCount = categoryItems.get(detail.category_name);
+            menuCount.set(
+                detail.menu_name,
+                (menuCount.get(detail.menu_name) || 0) + 1
+            );
+        });
+    });
+
+    // Ensure 'All' category is always included
+    const allItems = Array.from(categoryItems.values()).reduce((all, categoryMap) => {
+        categoryMap.forEach((count, menuName) => {
+            all.set(menuName, (all.get(menuName) || 0) + count);
+        });
+        return all;
+    }, new Map());
+
+    categoryItems.set('All', allItems); // Make sure 'All' is always available
+
+    return categoryItems;
+});
+
+
+
+const itemsPerCategory = computed(() => {
+    const categoryCounts = new Map();
+
+    orders.value.forEach(order => {
+        order.details.forEach(detail => {
+            const count = categoryCounts.get(detail.category_name) || 0;
+            categoryCounts.set(detail.category_name, count + detail.quantity);
+        });
+    });
+
+    // Include "All" as a total count for all items
+    const totalItems = Array.from(categoryCounts.values()).reduce((sum, count) => sum + count, 0);
+    categoryCounts.set('All', totalItems);
+
+    return categoryCounts;
+});
 
 
 const uniqueCategories = computed(() => {
@@ -122,8 +192,10 @@ const uniqueCategories = computed(() => {
 
 // Method to handle category selection
 const selectCategory = (category) => {
-    selectedCategory.value = category.name;
+    // Set selected category, if category name is undefined or doesn't exist, fall back to 'All'
+    selectedCategory.value = category.name || 'All';
 };
+
 
 // Filtered orders based on the selected category
 const filteredOrders = computed(() => {
@@ -172,6 +244,15 @@ const getStatusIcon = (status) => {
             };
     }
 };
+const getTotalCountForCategory = (categoryName) => {
+    return orders.value.reduce((total, order) => {
+        const categoryCount = order.details
+            .filter(detail => categoryName === "All" || detail.category_name === categoryName)  // Check if it's "All"
+            .reduce((sum, detail) => sum + parseInt(detail.quantity, 10), 0);  // Ensure quantity is a number
+        return total + categoryCount;
+    }, 0);
+};
+
 
 const isRounded = ref(true); // State to manage if the topbar is rounded
 
@@ -279,6 +360,13 @@ function isLessThanOneDayOld(orderDate) {
     return diffInMilliseconds < oneDayInMilliseconds;
 }
 
+const showCategoryDetails = ref({});
+
+// Method to toggle visibility of category details
+const toggleCategoryDetails = (categoryName) => {
+    showCategoryDetails.value[categoryName] = !showCategoryDetails.value[categoryName];
+};
+
 const getAllOrders = async () => {
     try {
         const response = await axios.get('/get-orders'); // Replace with your API endpoint
@@ -305,9 +393,9 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10">
-        <div class="col-span-12 xl:col-span-12 items-center bg-gray-900  "
-            :class="['fixed top-0 left-0 right-0 z-[1]', isRounded ? ' p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-0 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
+    <div class="grid grid-cols-12 xl:gap-3 gap-2 -mx-5 xl:-mx-3 mb-10 xl:mb-0 xl:mt-16">
+        <div class="col-span-12 xl:col-span-12 items-center bg-gray-900  xl:hidden"
+            :class="['fixed xl:static top-0 left-0 right-0 z-[1]', isRounded ? ' p-2 shadow-md transition-all duration-300 ease-in-out' : ' top-0 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
             <div class="flex gap-2 overflow-x-auto transition-all duration-300 ease-in-out transform"
                 :class="showCustomers ? 'flex gap-2 overflow-x-auto' : 'hidden'"
                 style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
@@ -320,8 +408,8 @@ onMounted(() => {
 
                     <!-- Container for the category name with truncation -->
                     <div class="text-center text-xs overflow-hidden whitespace-nowrap text-ellipsis w-[3rem]">
-    {{ category.name }}
-</div>
+                        {{ category.name }}
+                    </div>
 
                 </div>
 
@@ -355,49 +443,227 @@ onMounted(() => {
 
         </div>
 
-        <div class="col-span-12 flex flex-col gap-3 " :class="showCustomers ? 'mt-32' : 'mt-20'">
-            <div v-for="order in filteredOrders" :key="order.id" class="col-span-12 flex flex-col gap-3 card p-0 m-0">
-                <div class="flex w-full">
-                    <div :class="['rounded-tl-lg rounded-bl-lg min-w-[4%]', statusColor(order.status)]"></div>
-                    <div class="w-[96%] p-3">
-                        <div class="flex-wrap text-2xl font-bold mb-2">
-                            <div class="flex justify-between">
-                                <div>Order #{{ order.id }}</div>
-                                <div :class="['rounded-full border-[1px] px-2 self-center text-base w-auto flex', statusColor(order.status),]"
-                                    style="background-color: #203444;">
-                                    <Icon icon="material-symbols:payments-outline-rounded" height="20" class="mr-1" />
-                                    {{ order.status }}
+        <div class="col-span-3 flex flex-col gap-3 xl:h-[87vh] xl:block hidden"
+            :class="showCustomers ? 'mt-32 xl:mt-0' : 'mt-20 xl:mt-0'">
+            <div class="col-span-12 flex flex-col gap-3 card p-0 m-0 h-full">
+                <div class="flex text-3xl font-bold p-3 pb-1"> Orders Summary</div>
+                <div class="flex flex-col w-full h-full xl:max-h-[87vh] overflow-y-auto">
+                    <div v-for="(category, index) in uniqueCategories" :key="index">
+                        <div class="bg-gray-800 w-full text-xl font-bold p-2 flex justify-between"
+                            @click="toggleCategoryDetails(category.name)">
+                            <div class="flex gap-2">
+                                <div
+                                    class="self-center text-base rounded-lg bg-gray-500 p-1 h-[2rem] w-[2rem] justify-center items-center flex">
+                                    {{
+                                        getTotalCountForCategory(category.name)
+                                    }}</div>
+                                <div class=" font-bold flex justify-center items-center flex-col">
+                                    <Icon :icon="category.icon" height="20" class="self-center" />
+                                </div>
+                                <div class="text-xl self-center">{{ category.name }}</div>
+                            </div>
+                            <div class="flex">
+                                <!-- Toggle specific category details -->
+                                <div>
+                                    <Icon
+                                        :icon="showCategoryDetails[category.name] ? 'icon-park-twotone:up-one' : 'icon-park-twotone:down-one'"
+                                        height="25" />
+                                </div>
+                                <div @click="selectCategory(category)"
+                                    :class="{ 'text-yellow-500': selectedCategory == category.name }">
+                                    <Icon icon="mdi:select-search" height="25" />
                                 </div>
                             </div>
-                            <div class="italic flex text-xs font-normal">{{ formatRelativeTime(order.updated_at) }}
-                            </div>
                         </div>
-
-                        <div class="border-[1px] border-dashed w-full p-2">
-                            <div v-for="item in order.details" :key="item.id" class="flex justify-between"
-                                @click="openItemDialog(order, item)">
-                                <div class="flex gap-1">
-                                    <div class="flex gap-1">
-                                        <div>{{ item.quantity }}x</div>
-                                        <div class="underline">{{ item.menu_name }}</div>
-                                        <div v-if="item.note" class="flex self-center text-blue-300">
-                                            <Icon icon="fluent:note-24-filled" height="20" class="" />
+                        <template v-if="showCategoryDetails[category.name]">
+                            <div class="flex justify-between px-3 gap-2">
+                                <div class="flex-1 self-center gap-1 flex flex-col">
+                                    <div v-for="[menuName, count] in itemsByCategory.get(category.name) || []"
+                                        :key="menuName" class="self-start pl-3">
+                                        {{ menuName }}
+                                    </div>
+                                </div>
+                                <div class="flex-1 self-center gap-1 flex flex-col ">
+                                    <div v-for="[menuName, count] in itemsByCategory.get(category.name) || []"
+                                        :key="menuName" class="self-center">
+                                        <div
+                                            class="rounded-lg bg-gray-500 h-[1.5rem] w-[1.5rem] flex flex-col justify-center items-center">
+                                            {{ count }}
                                         </div>
                                     </div>
                                 </div>
-                                <div :class="getStatusIcon(item.status).colorClass" v-tooltip.left="item.status">
-                                    <Icon :icon="getStatusIcon(item.status).icon" height="20" />
-                                </div>
                             </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
             </div>
         </div>
 
+
+        <!-- <div class="flex flex-wrap gap-2 p-2">
+            <div v-for="menuName in itemsByCategory.get(category.name) || []" :key="menuName"
+                class="bg-gray-200 px-2 py-1 rounded">
+                {{ menuName }}
+            </div>
+        </div> -->
+
+        <div class="col-span-12 xl:col-span-9 flex flex-col gap-3 xl:max-h-[87vh] overflow-y-auto"
+            :class="showCustomers ? 'mt-32 xl:mt-0' : 'mt-20 xl:mt-0'">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                <!-- First Column -->
+                <div class="flex flex-col gap-3">
+                    <div v-for="order in firstColumn" :key="order.id" class="flex flex-col gap-3 card p-0 m-0">
+                        <div class="flex w-full">
+                            <div :class="['rounded-tl-lg rounded-bl-lg min-w-[4%]', statusColor(order.status)]">
+                            </div>
+                            <div class="w-[96%] p-3 flex-1">
+                                <div class="flex-wrap text-2xl font-bold mb-2">
+                                    <div class="flex justify-between">
+                                        <div>Order #{{ order.id }}</div>
+                                        <div :class="['rounded-full border-[1px] px-2 self-center text-base w-auto flex', statusColor(order.status)]"
+                                            style="background-color: #203444;">
+                                            <Icon icon="material-symbols:payments-outline-rounded" height="20"
+                                                class="mr-1" />
+                                            {{ order.status }}
+                                        </div>
+                                    </div>
+                                    <div class="italic flex text-xs font-normal">{{
+                                        formatRelativeTime(order.updated_at)
+                                    }}</div>
+                                </div>
+
+                                <div class="border-[1px] border-dashed w-full p-2 flex-1 min-h-[5rem]">
+                                    <div v-for="item in order.details" :key="item.id" class="flex justify-between"
+                                        @click="openItemDialog(order, item)">
+                                        <div class="flex gap-1">
+                                            <div class="flex gap-1">
+                                                <div>{{ item.quantity }}x</div>
+                                                <div class="underline" :class="{
+                                                    'text-yellow-500 font-bold': selectedCategory === item.category_name
+                                                }">
+                                                    {{ item.menu_name }}
+                                                </div>
+                                                <div v-if="item.note" class="flex self-center text-blue-300">
+                                                    <Icon icon="fluent:note-24-filled" height="20" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div :class="getStatusIcon(item.status).colorClass"
+                                            v-tooltip.left="item.status">
+                                            <Icon :icon="getStatusIcon(item.status).icon" height="20" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Column -->
+                <div class="flex flex-col gap-3">
+                    <div v-for="order in secondColumn" :key="order.id" class="flex flex-col gap-3 card p-0 m-0 ">
+                        <div class="flex w-full">
+                            <div :class="['rounded-tl-lg rounded-bl-lg min-w-[4%]', statusColor(order.status)]">
+                            </div>
+                            <div class="w-[96%] p-3 flex-1">
+                                <div class="flex-wrap text-2xl font-bold mb-2">
+                                    <div class="flex justify-between">
+                                        <div>Order #{{ order.id }}</div>
+                                        <div :class="['rounded-full border-[1px] px-2 self-center text-base w-auto flex', statusColor(order.status)]"
+                                            style="background-color: #203444;">
+                                            <Icon icon="material-symbols:payments-outline-rounded" height="20"
+                                                class="mr-1" />
+                                            {{ order.status }}
+                                        </div>
+                                    </div>
+                                    <div class="italic flex text-xs font-normal">{{
+                                        formatRelativeTime(order.updated_at)
+                                    }}</div>
+                                </div>
+
+                                <div class="border-[1px] border-dashed w-full p-2 flex-1 min-h-[5rem]">
+                                    <div v-for="item in order.details" :key="item.id" class="flex justify-between"
+                                        @click="openItemDialog(order, item)">
+                                        <div class="flex gap-1">
+                                            <div class="flex gap-1">
+                                                <div>{{ item.quantity }}x</div>
+                                                <div class="underline" :class="{
+                                                    'text-yellow-500 font-bold': selectedCategory === item.category_name
+                                                }">
+                                                    {{ item.menu_name }}
+                                                </div>
+                                                <div v-if="item.note" class="flex self-center text-blue-300">
+                                                    <Icon icon="fluent:note-24-filled" height="20" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div :class="getStatusIcon(item.status).colorClass"
+                                            v-tooltip.left="item.status">
+                                            <Icon :icon="getStatusIcon(item.status).icon" height="20" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Third Column -->
+                <div class="flex flex-col gap-3">
+                    <div v-for="order in thirdColumn" :key="order.id" class="flex flex-col gap-3 card p-0 m-0 ">
+                        <div class="flex w-full">
+                            <div :class="['rounded-tl-lg rounded-bl-lg min-w-[4%]', statusColor(order.status)]">
+                            </div>
+                            <div class="w-[96%] p-3 flex-1">
+                                <div class="flex-wrap text-2xl font-bold mb-2">
+                                    <div class="flex justify-between">
+                                        <div>Order #{{ order.id }}</div>
+                                        <div :class="['rounded-full border-[1px] px-2 self-center text-base w-auto flex', statusColor(order.status)]"
+                                            style="background-color: #203444;">
+                                            <Icon icon="material-symbols:payments-outline-rounded" height="20"
+                                                class="mr-1" />
+                                            {{ order.status }}
+                                        </div>
+                                    </div>
+                                    <div class="italic flex text-xs font-normal">{{
+                                        formatRelativeTime(order.updated_at)
+                                    }}</div>
+                                </div>
+
+                                <div class="border-[1px] border-dashed w-full p-2 flex-1 min-h-[5rem]">
+                                    <div v-for="item in order.details" :key="item.id" class="flex justify-between"
+                                        @click="openItemDialog(order, item)">
+                                        <div class="flex gap-1">
+                                            <div class="flex gap-1">
+                                                <div>{{ item.quantity }}x</div>
+                                                <div class="underline" :class="{
+                                                    'text-yellow-500 font-bold': selectedCategory === item.category_name
+                                                }">
+                                                    {{ item.menu_name }}
+                                                </div>
+                                                <div v-if="item.note" class="flex self-center text-blue-300">
+                                                    <Icon icon="fluent:note-24-filled" height="20" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div :class="getStatusIcon(item.status).colorClass"
+                                            v-tooltip.left="item.status">
+                                            <Icon :icon="getStatusIcon(item.status).icon" height="20" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
-    <Dialog v-model:visible="itemStatus" modal :style="{ width: '80vw', minHeight: '25%', padding: '0px' }"
-        position="center" :header="selectedItem ? selectedItem.menu_name : 'Name of the menu item'">
+    <Dialog v-model:visible="itemStatus" modal :style="{ minHeight: '25%', padding: '0px' }"
+        class="w-full sm:w-3/4 md:w-1/2 xl:w-1/3" position="center"
+        :header="selectedItem ? selectedItem.menu_name : 'Name of the menu item'">
         <div v-if="selectedItem" class="bg-blue-100 border-[1px] border-dashed p-2 text-sm text-black overflow-auto">
             <span class="font-bold">Note:&nbsp;</span>{{ selectedItem.note || 'No note available' }}
         </div>
@@ -405,7 +671,7 @@ onMounted(() => {
         <!-- Display the image of the selected menu item -->
         <div v-if="selectedItem && selectedItem.menu_image" class="mt-4">
             <img :src="imageUrl" alt="Menu Item" @error="handleImageError"
-                class="self-center w-[20rem] h-[8rem] rounded-lg border-[1px] border-yellow-500 p-[1px] object-cover">
+                class="self-center w-[20rem] h-[8rem] xl:w-full xl:h-[15rem] rounded-lg border-[1px] border-yellow-500 p-[1px] object-cover">
         </div>
 
 

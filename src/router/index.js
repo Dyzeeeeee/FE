@@ -383,6 +383,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/customer/More.vue')
                 },
                 {
+                    path: '/customer/order',
+                    name: 'customer-order',
+                    component: () => import('@/views/pages/customer/Order.vue')
+                },
+                {
                     path: '/customer/track-order/:id',
                     name: 'customer-track-order',
                     component: () => import('@/views/pages/customer/TrackOrder.vue')

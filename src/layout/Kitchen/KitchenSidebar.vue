@@ -4,7 +4,7 @@ import KitchenMenu from './KitchenMenu.vue';
 
 <template>
     <div class="layout-sidebar -m-3">
-        <waiter-menu></waiter-menu>
+        <kitchen-menu></kitchen-menu>
     </div>
 </template>
 

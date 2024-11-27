@@ -1,7 +1,7 @@
 <script setup>
 import axios from "axios";
 import { formatDistanceToNow, isToday } from 'date-fns';
-import { onMounted, onUnmounted, ref, computed } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 const isRounded = ref(true);
 
@@ -29,6 +29,7 @@ const fetchOrders = async () => {
 };
 
 onMounted(() => {
+    window.addEventListener("scroll", handleScroll);
     getUserById();
     fetchOrders(); // Fetch orders initially
     // Set an interval to fetch orders every 1 minute (60,000ms)
@@ -36,6 +37,7 @@ onMounted(() => {
     // Clear the interval when the component is unmounted
     onUnmounted(() => {
         clearInterval(interval);
+        window.removeEventListener("scroll", handleScroll);
     });
 });
 
@@ -43,37 +45,46 @@ onMounted(() => {
 
 
 const currentIndex = ref(0);
-const itemsToShow = ref(window.innerWidth < 640 ? 1 : 3); // 1 for small, 2 for large
 
-// Update `itemsToShow` when the window resizes
-const updateItemsToShow = () => {
-    itemsToShow.value = window.innerWidth < 640 ? 1 : 3;
+// Reference to the scroll container
+const scrollContainer = ref(null);
+
+// Function to update the currentIndex when scrolling
+const handleScroll = () => {
+    const container = scrollContainer.value;
+    const scrollLeft = container.scrollLeft;
+    const cardWidth = container.children[currentIndex.value]?.offsetWidth || 0;
+
+    // Calculate the index based on scroll position
+    currentIndex.value = Math.round(scrollLeft / cardWidth);
+
+    // Ensure currentIndex is within bounds
+    currentIndex.value = Math.max(0, Math.min(currentIndex.value, orderList.value.length - 1));
 };
 
-window.addEventListener('resize', updateItemsToShow);
-
-// Dynamically computes orders to display
-const currentOrders = computed(() => {
-    if (orderList.value.length === 0) {
-        return [];
-    }
-    return orderList.value.slice(currentIndex.value, currentIndex.value + itemsToShow.value);
-});
-
-// Scroll functions
+// Scroll functions for buttons
 const scrollRight = () => {
-    if (currentIndex.value + itemsToShow.value < orderList.value.length) {
-        currentIndex.value += itemsToShow.value; // Move forward by the number of items shown
+    if (currentIndex.value < orderList.value.length - 1) {
+        currentIndex.value++;
+        updateScrollPosition();
     }
 };
 
 const scrollLeft = () => {
-    if (currentIndex.value - itemsToShow.value >= 0) {
-        currentIndex.value -= itemsToShow.value; // Move backward by the number of items shown
+    if (currentIndex.value > 0) {
+        currentIndex.value--;
+        updateScrollPosition();
     }
 };
 
-
+// Scroll the container to the current index
+const updateScrollPosition = () => {
+    const orderWidth = scrollContainer.value.children[currentIndex.value].offsetWidth;
+    scrollContainer.value.scrollTo({
+        left: orderWidth * currentIndex.value,
+        behavior: 'smooth',
+    });
+};
 
 const userData = ref([]);
 const getUserById = async () => {
@@ -122,7 +133,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-12 xl:gap-3 gap-2 -m-5 xl:-m-3 mb-10 xl:mb-0 xl:m-0 mt-1  xl:mt-16">
+    <div class="grid grid-cols-12 xl:gap-3 gap-2 -m-5 xl:-m-3 mb-10 mt-1">
         <div class="col-span-12 xl:col-span-12 flex items-center">
             <div class="xl:ml-4 mr-2">
                 <Avatar
@@ -163,33 +174,32 @@ onUnmounted(() => {
 
 
 
-        <div
-            class="col-span-12 xl:col-span-12 min-h-[25vh] xl:min-h-[35vh] max-h-[40vh] xl:max-h-[50vh] mb-2 px-8 relative border-dashed  rounded-lg pb-4 ">
+        <div class="col-span-12 min-h-[25vh] max-h-[40vh] mb-2 px-8 relative">
             <template v-if="orderList.length > 0">
-                <button v-if="currentIndex > 0" class="absolute -left-2 top-1/2 transform -translate-y-1/2 text-white"
-                    @click="scrollLeft">
-                    <Icon icon="fe:arrow-left" width="40" height="40" />
+                <button class="absolute -right-2 top-1/2 transform -translate-y-1/2 text-white" @click="scrollRight">
+                    <Icon icon="fe:arrow-right" width="40" height="40" class="cursor-pointer pb-2" />
                 </button>
-                <button v-if="currentIndex < orderList.length - 1"
-                    class="absolute -right-2 top-1/2 transform -translate-y-1/2 text-white" @click="scrollRight">
-                    <Icon icon="fe:arrow-right" width="40" height="40" />
+                <button class="absolute -left-2 top-1/2 transform -translate-y-1/2 text-white" @click="scrollLeft">
+                    <Icon icon="fe:arrow-left" width="40" height="40" class="cursor-pointer pb-2" />
                 </button>
 
+                <!-- Index / Length -->
                 <div class="flex justify-center">
                     {{ currentIndex + 1 }} / {{ orderList.length }}
                 </div>
             </template>
 
-            <div class="flex gap-4 pb-0 mt-1 text-sm  xl:text-xl font-bold p-0 xl:px-4 whitespace-nowrap">
-                <template v-if="currentOrders.length > 0">
-                    <div v-for="(order, index) in currentOrders" :key="order.id"
-                        class="card border-[2px] rounded-xl h-auto xl:min-w-[33%] min-w-[80vw] m-0 border-white p-0">
+            <div class="flex gap-4 pb-0 mt-1 text-sm xl:text-9xl font-bold p-0 overflow-x-auto whitespace-nowrap"
+                ref="scrollContainer" style="scrollbar-width: none; -ms-overflow-style: none;" @scroll="handleScroll">
+                <template v-if="orderList.length > 0">
+                    <div v-for="(order, index) in orderList" :key="order.id"
+                        class="card border-[2px] rounded-xl h-auto min-w-[80vw] m-0 border-white p-0">
                         <div class="w-full">
                             <div
                                 class="border-b-[0px] text-surface-900 border-[2px] font-bold text-xl flex justify-between bg-gray-200 rounded-t-lg p-2 border-white">
                                 <div class="flex flex-col">
                                     <div>Customer {{ order.customer_tag }}</div>
-                                    <div class="text-xs">{{ formatRelativeTime(order.updated_at) }}</div>
+                                    <div class=" text-xs">{{ formatRelativeTime(order.updated_at) }}</div>
                                 </div>
                                 <div class="flex gap-2">
                                     <button
@@ -211,7 +221,7 @@ onUnmounted(() => {
                                     <div>{{ order.service }}</div>
                                     <div>P {{ order.total_price }}</div>
                                 </div>
-                                <div class="overflow-auto max-h-[15vh] min-h-[10vh] xl:min-h-[15vh]">
+                                <div class="overflow-auto max-h-[15vh] min-h-[10vh]">
                                     <div class="flex justify-between">
                                         <div class="flex flex-col">
                                             <div class="text-lg">Iced Coffee Latte</div>
@@ -225,33 +235,12 @@ onUnmounted(() => {
                             </div>
                         </div>
                     </div>
-                    <div v-show="currentOrders.length === 1"
-                        class="xl:block hidden card border-[2px] border-dashed rounded-xl h-[25vh] xl:min-w-[33%] min-w-[80vw] h-auto m-0 bg-transparent opacity-50 border-white p-0">
-                        <div class="w-full h-full flex items-center justify-center gap-2">
-                            <div class="text-center text-white font-semibold  xl:text-xl">
-                            </div>
-                            <div>
-                                <Icon icon="game-icons:sad-crab" height="20" />
-                            </div>
-                        </div>
-                    </div>
-                    <div v-show="currentOrders.length === 1 || currentOrders.length === 2"
-                        class="xl:block hidden card border-[2px] border-dashed rounded-xl h-[25vh] xl:min-w-[33%] min-w-[80vw] h-auto m-0 bg-transparent opacity-50 border-white p-0">
-                        <div class="w-full h-full flex items-center justify-center gap-2">
-                            <div class="text-center text-white font-semibold  xl:text-xl">
-                            </div>
-                            <div>
-                                <Icon icon="game-icons:sad-crab" height="20" />
-                            </div>
-                        </div>
-                    </div>
                 </template>
                 <template v-else>
                     <div
-                        class="card border-[2px] border-dashed rounded-xl h-[25vh] xl:min-w-[100%] min-w-[80vw] xl:h-[35vh] m-0 bg-transparent opacity-50 border-white p-0">
+                        class="card border-[2px] border-dashed rounded-xl h-[25vh] min-w-[80vw] m-0 bg-transparent opacity-50 border-white p-0">
                         <div class="w-full h-full flex items-center justify-center gap-2">
-                            <div class="text-center text-white font-semibold  xl:text-xl">No requests at the moment
-                            </div>
+                            <div class="text-center text-white font-semibold">No requests at the moment</div>
                             <div>
                                 <Icon icon="game-icons:sad-crab" height="20" />
                             </div>
@@ -263,10 +252,10 @@ onUnmounted(() => {
 
 
 
-        <div class="col-span-12 xl:col-span-4 h-auto mb-2 ">
-            <div class="flex gap-3 justify-center xl:flex-col items-center self-center h-full">
+        <div class="col-span-12 h-auto mb-2">
+            <div class="flex gap-3 justify-center ">
                 <button
-                    class="flex flex-col justify-center items-center bg-white  text-black border-black border-[2px]  h-[5rem] w-[30%] xl:w-[90%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="fluent-mdl2:activate-orders" height="20" class="" />
                     </div>
@@ -275,7 +264,7 @@ onUnmounted(() => {
                     </div>
                 </button>
                 <button
-                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] xl:w-[90%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="hugeicons:menu-restaurant" height="20" class="" />
                     </div>
@@ -284,7 +273,7 @@ onUnmounted(() => {
                     </div>
                 </button>
                 <button
-                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] xl:w-[90%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="gg:qr" height="30" class="" />
                     </div>
@@ -295,7 +284,7 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <div class="col-span-12 xl:col-span-8 h-[30vh]">
+        <div class="col-span-12 h-[30vh]">
             <div class="card border-[1px] h-full p-3">
                 <div class="flex text-2xl font-bold mb-2">
                     Active Customers

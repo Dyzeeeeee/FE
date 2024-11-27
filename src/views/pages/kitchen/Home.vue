@@ -1,52 +1,41 @@
 <script setup>
 import axios from "axios";
-import { formatDistanceToNow } from 'date-fns';
-import { onMounted, onUnmounted, ref } from "vue";
+import { formatDistanceToNow, isToday } from 'date-fns';
+import { onMounted, onUnmounted, ref, computed } from "vue";
 
 const isRounded = ref(true);
 
 const formatRelativeTime = (dateString) => {
     return formatDistanceToNow(new Date(dateString), { addSuffix: true });
 };
-const currentDate = new Date();
 
-function isLessThanOneDayOld(orderDate) {
-    const orderDateObj = new Date(orderDate);
-    const diffInMilliseconds = currentDate - orderDateObj;
-    const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // 24 hours * 60 minutes * 60 seconds * 1000 ms
-    return diffInMilliseconds < oneDayInMilliseconds;
-}
 const orderList = ref([]);
-const getAllOrders = async () => {
+const fetchOrders = async () => {
     try {
-        const response = await axios.get('/get-orders'); // Replace with your API endpoint
+        const response = await axios.get("/get-all-online-orders");
         if (response.data) {
-            // Filter orders based on your conditions
-            orderList.value = response.data.filter(order => {
-                const hasDetails = Array.isArray(order.details) && order.details.length > 0;
-                const isCompletedZero = order.completed == 0;
-                return isLessThanOneDayOld(order.created_at) && hasDetails && isCompletedZero;
-            });
-            console.log('Filtered Orders:', orderList.value);
+            // Filter orders to include only those that were created today, have a total_price greater than 0, and confirmed is 'sent'
+            orderList.value = response.data.filter(order =>
+                isToday(new Date(order.updated_at)) &&
+                order.total_price > 0 &&
+                order.confirmed === 'sent'
+            );
         } else {
-            console.error('No orders found');
+            console.error("No orders found");
         }
     } catch (error) {
-        console.error('Error fetching orders:', error);
+        console.error("Error fetching orders:", error);
     }
 };
 
-
 onMounted(() => {
-    window.addEventListener("scroll", handleScroll);
     getUserById();
-    getAllOrders(); // Fetch orders initially
+    fetchOrders(); // Fetch orders initially
     // Set an interval to fetch orders every 1 minute (60,000ms)
-    const interval = setInterval(getAllOrders, 60000);
+    const interval = setInterval(fetchOrders, 60000);
     // Clear the interval when the component is unmounted
     onUnmounted(() => {
         clearInterval(interval);
-        window.removeEventListener("scroll", handleScroll);
     });
 });
 
@@ -54,46 +43,37 @@ onMounted(() => {
 
 
 const currentIndex = ref(0);
+const itemsToShow = ref(window.innerWidth < 640 ? 1 : 3); // 1 for small, 2 for large
 
-// Reference to the scroll container
-const scrollContainer = ref(null);
-
-// Function to update the currentIndex when scrolling
-const handleScroll = () => {
-    const container = scrollContainer.value;
-    const scrollLeft = container.scrollLeft;
-    const cardWidth = container.children[currentIndex.value]?.offsetWidth || 0;
-
-    // Calculate the index based on scroll position
-    currentIndex.value = Math.round(scrollLeft / cardWidth);
-
-    // Ensure currentIndex is within bounds
-    currentIndex.value = Math.max(0, Math.min(currentIndex.value, orderList.value.length - 1));
+// Update `itemsToShow` when the window resizes
+const updateItemsToShow = () => {
+    itemsToShow.value = window.innerWidth < 640 ? 1 : 3;
 };
 
-// Scroll functions for buttons
+window.addEventListener('resize', updateItemsToShow);
+
+// Dynamically computes orders to display
+const currentOrders = computed(() => {
+    if (orderList.value.length === 0) {
+        return [];
+    }
+    return orderList.value.slice(currentIndex.value, currentIndex.value + itemsToShow.value);
+});
+
+// Scroll functions
 const scrollRight = () => {
-    if (currentIndex.value < orderList.value.length - 1) {
-        currentIndex.value++;
-        updateScrollPosition();
+    if (currentIndex.value + itemsToShow.value < orderList.value.length) {
+        currentIndex.value += itemsToShow.value; // Move forward by the number of items shown
     }
 };
 
 const scrollLeft = () => {
-    if (currentIndex.value > 0) {
-        currentIndex.value--;
-        updateScrollPosition();
+    if (currentIndex.value - itemsToShow.value >= 0) {
+        currentIndex.value -= itemsToShow.value; // Move backward by the number of items shown
     }
 };
 
-// Scroll the container to the current index
-const updateScrollPosition = () => {
-    const orderWidth = scrollContainer.value.children[currentIndex.value].offsetWidth;
-    scrollContainer.value.scrollTo({
-        left: orderWidth * currentIndex.value,
-        behavior: 'smooth',
-    });
-};
+
 
 const userData = ref([]);
 const getUserById = async () => {
@@ -142,7 +122,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-12 xl:gap-3 gap-2 -m-5 xl:-m-3 mb-10 mt-1">
+    <div class="grid grid-cols-12 xl:gap-3 gap-2 -m-5 xl:-m-3 mb-10 xl:mb-0 xl:m-0 mt-1  xl:mt-16">
         <div class="col-span-12 xl:col-span-12 flex items-center">
             <div class="xl:ml-4 mr-2">
                 <Avatar
@@ -183,92 +163,95 @@ onUnmounted(() => {
 
 
 
-        <div class="col-span-12 min-h-[25vh] max-h-[40vh] mb-2 px-8 relative">
+        <div
+            class="col-span-12 xl:col-span-12 min-h-[25vh] xl:min-h-[35vh] max-h-[40vh] xl:max-h-[50vh] mb-2 px-8 relative border-dashed  rounded-lg pb-4 ">
             <template v-if="orderList.length > 0">
-                <button class="absolute -right-2 top-1/2 transform -translate-y-1/2 text-white" @click="scrollRight">
-                    <Icon icon="fe:arrow-right" width="40" height="40" class="cursor-pointer pb-2" />
+                <button v-if="currentIndex > 0" class="absolute -left-2 top-1/2 transform -translate-y-1/2 text-white"
+                    @click="scrollLeft">
+                    <Icon icon="fe:arrow-left" width="40" height="40" />
                 </button>
-                <button class="absolute -left-2 top-1/2 transform -translate-y-1/2 text-white" @click="scrollLeft">
-                    <Icon icon="fe:arrow-left" width="40" height="40" class="cursor-pointer pb-2" />
+                <button v-if="currentIndex < orderList.length - 1"
+                    class="absolute -right-2 top-1/2 transform -translate-y-1/2 text-white" @click="scrollRight">
+                    <Icon icon="fe:arrow-right" width="40" height="40" />
                 </button>
 
-                <!-- Index / Length -->
                 <div class="flex justify-center">
                     {{ currentIndex + 1 }} / {{ orderList.length }}
                 </div>
             </template>
 
-            <div class="flex gap-4 pb-0 mt-1 text-sm xl:text-9xl font-bold p-0 overflow-x-auto whitespace-nowrap"
-                ref="scrollContainer" style="scrollbar-width: none; -ms-overflow-style: none;" @scroll="handleScroll">
-                <template v-if="orderList.length > 0">
-                    <div v-for="(order, index) in orderList" :key="order.id"
-                        class="card border-[2px] rounded-xl h-auto min-w-[80vw] m-0 border-white p-0">
+            <div class="flex gap-4 pb-0 mt-1 text-sm  xl:text-xl font-bold p-0 xl:px-4 whitespace-nowrap">
+                <template v-if="currentOrders.length > 0">
+                    <div v-for="(order, index) in currentOrders" :key="order.id"
+                        class="card border-[2px] rounded-xl h-auto xl:min-w-[33%] min-w-[80vw] m-0 border-white p-0">
                         <div class="w-full">
                             <div
                                 class="border-b-[0px] text-surface-900 border-[2px] font-bold text-xl flex justify-between bg-gray-200 rounded-t-lg p-2 border-white">
                                 <div class="flex flex-col">
-                                    <div>On Standby</div>
-                                    <div class=" text-xs">9 minutes ago</div>
+                                    <div>Customer {{ order.customer_tag }}</div>
+                                    <div class="text-xs">{{ formatRelativeTime(order.updated_at) }}</div>
                                 </div>
                                 <div class="flex gap-2">
                                     <button
-                                        class="flex justify-center gap-2 px-2 rounded-full border-[1px] border-orange-500 text-orange-500 ">
+                                        class="flex justify-center gap-2 h-[2rem] w-[2rem] rounded-full border-[1px] border-gray-500 text-gray-500 hover:border-red-500 hover:text-red-500 hover:bg-red-300">
                                         <div class="self-center">
-                                            Prepare
+                                            <Icon icon="maki:cross" height="20" />
                                         </div>
+                                    </button>
+                                    <button
+                                        class="flex justify-center gap-2 h-[2rem] w-[2rem] rounded-full border-[1px] border-gray-500 text-gray-500 hover:border-green-500 hover:text-green-500 hover:bg-green-200">
                                         <div class="self-center">
-                                            <Icon icon="cuida:fire-outline" height="20" />
+                                            <Icon icon="entypo:check" height="20" />
                                         </div>
                                     </button>
                                 </div>
                             </div>
-                            <div class="p-4">
-                                <div class="font-bold text-xl flex ">
-                                    Customer AB
+                            <div class="px-2 py-2">
+                                <div class="p-2 bg-gray-900 mb-2 font-bold text-xl flex justify-between">
+                                    <div>{{ order.service }}</div>
+                                    <div>P {{ order.total_price }}</div>
                                 </div>
-                                <div class="overflow-auto max-h-[10vh] min-h-[10vh]">
+                                <div class="overflow-auto max-h-[15vh] min-h-[10vh] xl:min-h-[15vh]">
                                     <div class="flex justify-between">
-                                        <div>
-                                            Iced Coffee Latte
+                                        <div class="flex flex-col">
+                                            <div class="text-lg">Iced Coffee Latte</div>
+                                            <div class="italic">
+                                                <span>2x</span><span>200.00</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            X1
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <div>
-                                            Iced Coffee Latte
-                                        </div>
-                                        <div>
-                                            X1
-                                        </div>
+                                        <div class="text-lg self-center">P400.00</div>
                                     </div>
                                 </div>
-                                <div
-                                    class="flex bg-orange-300 rounded-full mt-4 p-2 border-dashed border-[1px] border-black  overflow-auto  text-black">
-                                    <div class="font-bold">Note:&nbsp; </div>
-                                    <div class="font-normal truncate">
-                                        No ice for the Iced Coffee Latte
-                                        No ice for the Iced Coffee Latte
-                                        No ice for the Iced Coffee Latte
-                                        No ice for the Iced Coffee Latte
-                                        No ice for the Iced Coffee Latte
-                                        No ice for the Iced Coffee Latte
-                                        No ice for the Iced Coffee Latte
-                                        No ice for the Iced Coffee Latte
-                                    </div>
-
-
-                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="currentOrders.length === 1"
+                        class="xl:block hidden card border-[2px] border-dashed rounded-xl h-[25vh] xl:min-w-[33%] min-w-[80vw] h-auto m-0 bg-transparent opacity-50 border-white p-0">
+                        <div class="w-full h-full flex items-center justify-center gap-2">
+                            <div class="text-center text-white font-semibold  xl:text-xl">
+                            </div>
+                            <div>
+                                <Icon icon="game-icons:sad-crab" height="20" />
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="currentOrders.length === 1 || currentOrders.length === 2"
+                        class="xl:block hidden card border-[2px] border-dashed rounded-xl h-[25vh] xl:min-w-[33%] min-w-[80vw] h-auto m-0 bg-transparent opacity-50 border-white p-0">
+                        <div class="w-full h-full flex items-center justify-center gap-2">
+                            <div class="text-center text-white font-semibold  xl:text-xl">
+                            </div>
+                            <div>
+                                <Icon icon="game-icons:sad-crab" height="20" />
                             </div>
                         </div>
                     </div>
                 </template>
                 <template v-else>
                     <div
-                        class="card border-[2px] border-dashed rounded-xl h-[25vh] min-w-[80vw] m-0 bg-transparent opacity-50 border-white p-0">
+                        class="card border-[2px] border-dashed rounded-xl h-[25vh] xl:min-w-[100%] min-w-[80vw] xl:h-[35vh] m-0 bg-transparent opacity-50 border-white p-0">
                         <div class="w-full h-full flex items-center justify-center gap-2">
-                            <div class="text-center text-white font-semibold">No requests at the moment</div>
+                            <div class="text-center text-white font-semibold  xl:text-xl">No requests at the moment
+                            </div>
                             <div>
                                 <Icon icon="game-icons:sad-crab" height="20" />
                             </div>
@@ -280,10 +263,10 @@ onUnmounted(() => {
 
 
 
-        <div class="col-span-12 h-auto mb-2">
-            <div class="flex gap-3 justify-center ">
+        <div class="col-span-12 xl:col-span-4 h-auto mb-2 ">
+            <div class="flex gap-3 justify-center xl:flex-col items-center self-center h-full">
                 <button
-                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white  text-black border-black border-[2px]  h-[5rem] w-[30%] xl:w-[90%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="fluent-mdl2:activate-orders" height="20" class="" />
                     </div>
@@ -292,7 +275,7 @@ onUnmounted(() => {
                     </div>
                 </button>
                 <button
-                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] xl:w-[90%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="hugeicons:menu-restaurant" height="20" class="" />
                     </div>
@@ -301,7 +284,7 @@ onUnmounted(() => {
                     </div>
                 </button>
                 <button
-                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
+                    class="flex flex-col justify-center items-center bg-white text-black border-black border-[2px]  h-[5rem] w-[30%] xl:w-[90%] rounded-xl font-bold hover:bg-yellow-200 hover:text-black hover:border-yellow-500">
                     <div>
                         <Icon icon="gg:qr" height="30" class="" />
                     </div>
@@ -312,10 +295,10 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <div class="col-span-12 h-[30vh]">
+        <div class="col-span-12 xl:col-span-8 h-[30vh]">
             <div class="card border-[1px] h-full p-3">
                 <div class="flex text-2xl font-bold mb-2">
-                    Orders Summary
+                    Active Customers
                 </div>
                 <div class="flex flex-wrap gap-2 overflow-auto max-h-[20vh]">
 
@@ -335,3 +318,4 @@ onUnmounted(() => {
         </div>
     </div>
 </template>
+    

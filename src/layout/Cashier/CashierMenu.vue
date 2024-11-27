@@ -41,14 +41,12 @@ onMounted(() => {
 
 // Menu model for the staff dashboard
 const model = computed(() => [
-    { label: 'Home', icon: 'mdi:home', to: '/staff/home', color: 'text-yellow-500' },
-    { label: 'POS', icon: 'mdi:cash-register', to: '/staff/pos', color: 'text-blue-500' },
-    { label: 'Tasks', icon: 'mdi:clipboard-text', to: '/staff/tasks', color: 'text-green-500' },
-    { label: 'Reservations', icon: 'fluent-mdl2:reservation-orders', to: '/staff/reservations', color: 'text-red-500' },
-    { label: 'Kitchen', icon: 'hugeicons:chef', to: '/staff/kitchen', color: 'text-orange-500' },
-    { label: 'Customers', icon: 'gravity-ui:persons', to: '/staff/customers', color: 'text-white' },
-    { label: 'Inventory', icon: 'ic:baseline-inventory', to: '/staff/inventory', color: 'text-indigo-500' },
-    { label: 'Settings', icon: 'basil:settings-alt-outline', to: '/staff/settings', color: 'text-gray-500' },
+    { label: 'Home', icon: 'mdi:home', to: '/cashier/home', color: 'text-yellow-500' },
+    { label: 'POS', icon: 'mdi:cash-register', to: '/cashier/takeorder', color: 'text-blue-500' },
+    { label: 'Kitchen', icon: 'hugeicons:chef', to: '/cashier/orders', color: 'text-orange-500' },
+    { label: 'Customers', icon: 'gravity-ui:persons', to: '/cashier/requests', color: 'text-white' },
+    { label: 'Inventory', icon: 'ic:baseline-inventory', to: '/cashier/more', color: 'text-indigo-500' },
+    // { label: 'Settings', icon: 'basil:settings-alt-outline', to: '/cashier/settings', color: 'text-gray-500' },
 ]);
 
 // Function to check if the current route matches or is a sub-route of the item path

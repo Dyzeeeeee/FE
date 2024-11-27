@@ -173,7 +173,7 @@ function goToSignup() {
                     <b>or</b>
                 </Divider>
             </div>
-            <div class="text-center text-sm font-light px-4 mt-7">
+            <!-- <div class="text-center text-sm font-light px-4 mt-7">
                 <Button text>
                     <Icon icon="ri:facebook-fill" width="45" height="45" class="text-blue-500" />
                 </Button>
@@ -183,7 +183,7 @@ function goToSignup() {
                 <Button text>
                     <Icon icon="hugeicons:new-twitter" width="45" height="45" class="text-white" />
                 </Button>
-            </div>
+            </div> -->
             <div class="text-center text-base mt-8 font-bold underline " @click="continueAsGuest">
                 <div>Continue as guest</div>
             </div>
