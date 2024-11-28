@@ -10,13 +10,13 @@
         </div>
 
         <!-- Menu -->
-        <!-- <div @click="$router.push('/customer/menu')" class="flex-1 text-center p-2 cursor-pointer">
+        <div @click="$router.push('/customer/menu')" class="flex-1 text-center p-2 cursor-pointer">
             <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/customer/menu' }">Menu</div>
             <div class="flex justify-center">
                 <Icon icon="map:food" width="20" height="20"
                     :class="{ 'text-yellow-500': $route.path === '/customer/menu' }" />
             </div>
-        </div> -->
+        </div>
         <div @click="$router.push('/customer/order')" class="flex-1 text-center p-2 cursor-pointer">
             <div :class="{ 'text-yellow-500 font-bold text-sm': $route.path === '/customer/order' }">Menu</div>
             <div class="flex justify-center">
