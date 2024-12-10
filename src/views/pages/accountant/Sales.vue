@@ -15,15 +15,15 @@ const totalSales = computed(() => {
 
 const printTable = () => {
     const originalContents = document.body.innerHTML;
-    const table = document.querySelector('.datatable').outerHTML;
+    // const table = document.querySelector('.datatable').outerHTML;
 
     // Set the document body to only include the table
-    document.body.innerHTML = `
-        <div class="print-container">
-            <h1 class="text-center mb-4">Sales Report</h1>
-            ${table}
-        </div>
-    `;
+    // document.body.innerHTML = `
+    //     <div class="print-container">
+    //         <h1 class="text-center mb-4">Sales Report</h1>
+    //         ${table}
+    //     </div>
+    // `;
     window.print();
 
     // Restore the original content after printing
