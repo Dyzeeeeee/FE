@@ -1,169 +1,3 @@
-<template>
-    <div class="grid grid-cols-12  -mx-5  mb-10 mt-1">
-        <div class="col-span-12 xl:col-span-12 items-center bg-gray-900  "
-            :class="['fixed top-0 left-0 right-0 z-[1]', isRounded ? 'shadow-md transition-all duration-300 ease-in-out' : ' top-0 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
-            <div class="flex gap-2 overflow-x-auto transition-all duration-300 ease-in-out transform bg-whsite"
-                :class="showModes ? 'flex gap-2 overflow-x-auto' : 'hidden'"
-                style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
-
-                <div class="flex bg-surface-900 m-3 mt-2 rounded-lg w-full">
-                    <!-- Daily -->
-                    <div :class="[
-                        'col-span-3 flex gap-3 font-bold flex-1 border-[1px] h-full relative p-2 justify-center',
-                        'rounded-tl-lg rounded-bl-lg',
-                        selectedMode === 'Daily' ? 'bg-white text-surface-900' : 'bg-surface-900 text-white'
-                    ]" @click="selectMode('Daily')">
-                        Daily
-                    </div>
-                    <!-- Weekly -->
-                    <div :class="[
-                        'col-span-3 flex gap-3 font-bold flex-1 border-[1px] h-full relative p-2 justify-center',
-                        selectedMode === 'Weekly' ? 'bg-white text-surface-900' : 'bg-surface-900 text-white'
-                    ]" @click="selectMode('Weekly')">
-                        Weekly
-                    </div>
-                    <!-- Monthly -->
-                    <div :class="[
-                        'col-span-3 flex gap-3 font-bold flex-1 border-[1px] h-full relative p-2 justify-center',
-                        'rounded-tr-lg rounded-br-lg',
-                        selectedMode === 'Monthly' ? 'bg-white text-surface-900' : 'bg-surface-900 text-white'
-                    ]" @click="selectMode('Monthly')">
-                        Monthly
-                    </div>
-                </div>
-            </div>
-            <div class="flex justify-between w-full p-0 font-bold rounded-full">
-                <div class=" flex px-4 py-2 justify-between w-full">
-                    <div class="flex gap-2 mx-3">
-                        <div class="flex flex-col">
-                            <div class="text-sm italic opacity-80 -mb-2">{{ dayOfWeek }}</div>
-                            <div class="text-xl font-bold">{{ formattedDate }}</div>
-                        </div>
-                        <div class="self-center ">
-                            <button class="flex items-center justify-center" @click=" calendarDialog = true">
-                                <Icon icon="material-symbols:edit-calendar" height="25" />
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flex justify-end flex-1 px-4">
-                        <button @click="rotateIcon" class="self-center" ref="refreshButton">
-                            <Icon icon="bx:refresh" height="30" :class="rotationClass" />
-                        </button>
-                    </div>
-                    <div>
-                        <Dialog v-model:visible="calendarDialog" header="Select Date" :modal="true" :closable="true"
-                            showEffect="fade" hideEffect="fade">
-
-                            <DatePicker v-model="selectedDate" inline class="w-full sm:w-[30rem]" />
-                            <div class="w-full flex justify-end">
-                                <button @click="closeCalendar"
-                                    class="p-2 m-2 rounded-lg bg-yellow-500 text-black flex gap-2">
-                                    <Icon icon="tdesign:check" />
-                                    <div>Select Date</div>
-                                </button>
-                            </div>
-                        </Dialog>
-                        <!-- <button class="">Filter</button> -->
-                    </div>
-                </div>
-            </div>
-            <div @click="showModes = !showModes"
-                class="absolute left-1/2 bottom-[-20px] w-16 h-16 bg-gray-900 rounded-full z-[-1] transform -translate-x-1/2 shadow-lg flex flex-col justify-end items-center">
-                <div class="flex items-center justify-center">
-                    <Icon :icon="showModes ? 'ri:arrow-up-s-line' : 'ri:arrow-down-s-line'" height="30" />
-                </div>
-            </div>
-        </div>
-
-
-        <template v-if="selectedMode == 'Daily'">
-            <div class="col-span-12 xl:col-span-12 flex flex-col gap-2" :class="showModes ? 'mt-28' : 'mt-12'">
-
-                <div class="w-full h-auto">
-                    <div class="card border-[1px] h-full p-3">
-
-                        <div class="flex flex-wrap gap-2 overflow-auto min-h-[35vh]">
-                            <canvas ref="salesChart" width="400" height="250"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <div class="flex-1 h-[15vh] ">
-                        <div class="card border-[1px] h-full p-3 flex flex-col justify-center">
-                            <div class="flex gap-2 items-center">
-                                <div class="">
-                                    <Icon icon="tdesign:money" height="40" />
-                                </div>
-                                <div class="flex flex-col">
-                                    <div class="font-bold text-2xl">
-                                        {{ totalSales.toLocaleString('en-US', { style: 'currency', currency: 'PHP' }) }}
-                                    </div>
-
-                                    <div class="opacity-60 italic text-sm">
-                                        Total Sales
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex gap-1 text-xs" :class="textColor">
-                                <Icon :icon="arrowIcon" class="bg-transparent border-[1px]  rounded-full self-center"
-                                    :class="textColor" height="13" />
-                                <div>
-                                    {{ percentageChange || 'No data available' }} (from yesterday)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex-1 h-[15vh] ">
-                        <div class="card border-[1px] h-full p-3 flex flex-col justify-center">
-                            <div class="flex gap-2 items-center">
-                                <div class="">
-                                    <Icon icon="material-symbols-light:fastfood-sharp" height="40" />
-                                </div>
-                                <div class="flex flex-col">
-                                    <div class="font-bold text-2xl">
-                                        {{ totalOrders }}
-                                    </div>
-                                    <div class="opacity-60 italic text-sm">
-                                        Total Orders
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex gap-1 text-xs" :class="orderTextColor">
-                                <Icon :icon="orderArrowIcon"
-                                    class="bg-transparent border-[1px]  rounded-full self-center"
-                                    :class="orderTextColor" height="13" />
-                                <div>
-                                    {{ percentageOrderChange || 'No data available' }} (from yesterday)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-12 h-auto">
-                    <div class="card border-[1px] h-full p-3">
-                        <DataTable :value="orders" stripedRows tableStyle="" headerClass="text-sm" :paginator="true"
-                            :rows="10" :rowsPerPageOptions="[5, 10, 20]">
-                            <Column field="id" header="Order#" headerClass="text-sm" bodyClass="text-sm"></Column>
-                            <Column field="total_price" header="Total" headerClass="text-sm" bodyClass="text-sm">
-                            </Column>
-                            <Column field="tendered" header="Tendered" headerClass="text-sm" bodyClass="text-sm">
-                            </Column>
-                            <Column field="change1" header="Change" headerClass="text-sm" bodyClass="text-sm"></Column>
-                            <Column field="updated_at" header="Date" headerClass="text-sm" bodyClass="text-sm">
-                                <template #body="slotProps">
-                                    {{ formatDate(slotProps.data.updated_at) }}
-                                </template>
-                            </Column>
-                        </DataTable>
-
-                    </div>
-                </div>
-            </div>
-        </template>
-    </div>
-</template>
-
 <script setup>
 import axios from 'axios';
 import { LineController } from 'chart.js'; // Import the line controller
@@ -179,6 +13,24 @@ const totalSales = computed(() => {
     }, 0);
 });
 
+const printTable = () => {
+    const originalContents = document.body.innerHTML;
+    const table = document.querySelector('.datatable').outerHTML;
+
+    // Set the document body to only include the table
+    document.body.innerHTML = `
+        <div class="print-container">
+            <h1 class="text-center mb-4">Sales Report</h1>
+            ${table}
+        </div>
+    `;
+    window.print();
+
+    // Restore the original content after printing
+    document.body.innerHTML = originalContents;
+    window.location.reload(); // Reload to ensure scripts reinitialize
+};
+
 const totalOrders = computed(() => {
     return orders.value.length;
 });
@@ -186,26 +38,25 @@ const loading = ref(false); // Track if the process is in progress
 
 const rotationClass = ref(''); // This will hold the rotation class
 
-
 const rotateIcon = async () => {
     if (loading.value) return; // Prevent action if already loading
     loading.value = true; // Set loading state to true
 
-    rotationClass.value = "rotate"; // Apply rotation class
+    rotationClass.value = 'rotate'; // Apply rotation class
     setTimeout(() => {
-        rotationClass.value = ""; // Remove the rotation class after animation ends
+        rotationClass.value = ''; // Remove the rotation class after animation ends
     }, 1000);
 
     try {
         if (selectedDate.value) {
             const date = new Date(selectedDate.value);
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-            const day = String(date.getDate()).padStart(2, "0"); // Get local day of the month
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const day = String(date.getDate()).padStart(2, '0'); // Get local day of the month
             const formattedDate = `${year}-${month}-${day}`;
             console.log(formattedDate);
         } else {
-            console.log("No date selected");
+            console.log('No date selected');
         }
 
         await getAllOrders();
@@ -216,7 +67,7 @@ const rotateIcon = async () => {
             renderChart();
         });
     } catch (error) {
-        console.error("Error during process:", error);
+        console.error('Error during process:', error);
     } finally {
         loading.value = false; // Reset loading state when done
     }
@@ -226,7 +77,7 @@ const percentageChange = ref(''); // Reactive state to store the percentage chan
 
 const calculatePercentageChange = async () => {
     if (totalOrders.value === 0) {
-        console.log("No orders available."); // Debug log for no orders
+        console.log('No orders available.'); // Debug log for no orders
         percentageChange.value = 'No data available'; // Handle case when no data is available
         return;
     }
@@ -247,8 +98,8 @@ const calculatePercentageChange = async () => {
     const todayFormatted = formatToDateString(today);
     const yesterdayFormatted = formatToDateString(yesterday);
 
-    console.log("Today:", todayFormatted);
-    console.log("Yesterday:", yesterdayFormatted);
+    console.log('Today:', todayFormatted);
+    console.log('Yesterday:', yesterdayFormatted);
 
     // Fetch orders from the API
     let todayOrders = [];
@@ -271,24 +122,18 @@ const calculatePercentageChange = async () => {
             });
         }
     } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error('Error fetching orders:', error);
     }
 
     console.log("Today's Orders:", todayOrders);
     console.log("Yesterday's Orders:", yesterdayOrders);
 
     // Calculate total sales for today and yesterday
-    const totalTodaySales = todayOrders.reduce(
-        (sum, order) => sum + parseFloat(order.total_price.replace(/[^\d.-]/g, '')) || 0,
-        0
-    );
-    const totalYesterdaySales = yesterdayOrders.reduce(
-        (sum, order) => sum + parseFloat(order.total_price.replace(/[^\d.-]/g, '')) || 0,
-        0
-    );
+    const totalTodaySales = todayOrders.reduce((sum, order) => sum + parseFloat(order.total_price.replace(/[^\d.-]/g, '')) || 0, 0);
+    const totalYesterdaySales = yesterdayOrders.reduce((sum, order) => sum + parseFloat(order.total_price.replace(/[^\d.-]/g, '')) || 0, 0);
 
-    console.log("Total Sales Today:", totalTodaySales);
-    console.log("Total Sales Yesterday:", totalYesterdaySales);
+    console.log('Total Sales Today:', totalTodaySales);
+    console.log('Total Sales Yesterday:', totalYesterdaySales);
 
     // Avoid division by zero
     if (totalYesterdaySales === 0) {
@@ -301,7 +146,7 @@ const calculatePercentageChange = async () => {
     const change = ((totalTodaySales - totalYesterdaySales) / totalYesterdaySales) * 100;
 
     // Log the final percentage change
-    console.log("Percentage Change:", change.toFixed(2));
+    console.log('Percentage Change:', change.toFixed(2));
 
     // Set the calculated percentage change
     percentageChange.value = `${change > 0 ? '+' : ''}${change.toFixed(2)}%`;
@@ -309,10 +154,9 @@ const calculatePercentageChange = async () => {
 
 const percentageOrderChange = ref(''); // Reactive state to store the percentage change
 
-
 const calculateOrdersPercentageChange = async () => {
     if (totalOrders.value === 0) {
-        console.log("No orders available."); // Debug log for no orders
+        console.log('No orders available.'); // Debug log for no orders
         percentageOrderChange.value = 'No data available'; // Handle case when no data is available
         return;
     }
@@ -333,8 +177,8 @@ const calculateOrdersPercentageChange = async () => {
     const todayFormatted = formatToDateString(today);
     const yesterdayFormatted = formatToDateString(yesterday);
 
-    console.log("Today:", todayFormatted);
-    console.log("Yesterday:", yesterdayFormatted);
+    console.log('Today:', todayFormatted);
+    console.log('Yesterday:', yesterdayFormatted);
 
     // Fetch orders from the API
     let todayOrders = [];
@@ -357,7 +201,7 @@ const calculateOrdersPercentageChange = async () => {
             });
         }
     } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error('Error fetching orders:', error);
     }
 
     console.log("Today's Orders:", todayOrders);
@@ -367,8 +211,8 @@ const calculateOrdersPercentageChange = async () => {
     const totalTodayOrders = todayOrders.length;
     const totalYesterdayOrders = yesterdayOrders.length;
 
-    console.log("Total Orders Today:", totalTodayOrders);
-    console.log("Total Orders Yesterday:", totalYesterdayOrders);
+    console.log('Total Orders Today:', totalTodayOrders);
+    console.log('Total Orders Yesterday:', totalYesterdayOrders);
 
     // Avoid division by zero
     if (totalYesterdayOrders === 0) {
@@ -381,12 +225,11 @@ const calculateOrdersPercentageChange = async () => {
     const change = ((totalTodayOrders - totalYesterdayOrders) / totalYesterdayOrders) * 100;
 
     // Log the final percentage change
-    console.log("Percentage Change:", change.toFixed(2));
+    console.log('Percentage Change:', change.toFixed(2));
 
     // Set the calculated percentage change
     percentageOrderChange.value = `${change > 0 ? '+' : ''}${change.toFixed(2)}%`;
 };
-
 
 const arrowIcon = computed(() => {
     if (percentageChange.value.startsWith('+')) {
@@ -424,7 +267,6 @@ const orderTextColor = computed(() => {
     return 'text-gray-500'; // Default color for 'No data available' or 'N/A'
 });
 
-
 import { onUnmounted } from 'vue';
 
 // Optional: Clean up the chart instance when the component is unmounted
@@ -456,7 +298,6 @@ const closeCalendar = async () => {
     calendarDialog.value = false;
 };
 
-
 Chart.register(
     LineController, // Register the LineController
     LinearScale,
@@ -471,7 +312,7 @@ Chart.register(
 const isRounded = ref(true); // State to manage if the topbar is rounded
 const selectedDate = ref(new Date()); // Default selected date
 
-const orders = ref([])
+const orders = ref([]);
 const salesChart = ref(null); // Reference to the canvas element
 
 // Function to fetch all orders
@@ -490,31 +331,27 @@ const getAllOrders = async () => {
             })();
 
             // Filter orders for the selected date and status 'paid'
-            orders.value = response.data.filter(order => {
+            orders.value = response.data.filter((order) => {
                 const orderDate = new Date(order.updated_at);
                 const orderDateString = orderDate.toISOString().split('T')[0]; // Format order date as 'YYYY-MM-DD'
                 return orderDateString === formattedSelectedDate && order.status === 'paid';
             });
             // calculatePercentageChange();
             console.log('Orders for selected date with status "paid":', orders.value); // Log the filtered orders
-
         }
     } catch (error) {
         console.error('Error fetching orders:', error);
     }
 };
 
-
-
 // Function to render the chart
 const chartInstance = ref(null); // Keep track of the Chart.js instance
 
 const renderChart = () => {
-
     const salesData = new Array(15).fill(0); // Initialize an array for each hour (8 AM - 10 PM)
 
     // Loop through the orders and calculate the total price per hour
-    orders.value.forEach(order => {
+    orders.value.forEach((order) => {
         const orderDate = new Date(order.updated_at);
         const orderHour = orderDate.getHours();
 
@@ -556,9 +393,9 @@ const renderChart = () => {
                         borderColor: 'rgba(75, 192, 192, 1)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         fill: true, // Fill the area under the line
-                        tension: 0.1,
-                    },
-                ],
+                        tension: 0.1
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -566,11 +403,11 @@ const renderChart = () => {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            stepSize: 500, // Adjust the y-axis step size
-                        },
-                    },
-                },
-            },
+                            stepSize: 500 // Adjust the y-axis step size
+                        }
+                    }
+                }
+            }
         });
     } else {
         console.error('Canvas element not found!');
@@ -585,7 +422,6 @@ onBeforeUnmount(() => {
     }
 });
 
-
 // Function to set the selected mode
 
 // OnMounted lifecycle hook
@@ -597,12 +433,12 @@ onMounted(async () => {
         if (selectedDate.value) {
             const date = new Date(selectedDate.value);
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-            const day = String(date.getDate()).padStart(2, "0"); // Get local day of the month
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const day = String(date.getDate()).padStart(2, '0'); // Get local day of the month
             const formattedDate = `${year}-${month}-${day}`;
             console.log(formattedDate);
         } else {
-            console.log("No date selected");
+            console.log('No date selected');
         }
 
         await getAllOrders();
@@ -613,13 +449,11 @@ onMounted(async () => {
             renderChart();
         });
     } catch (error) {
-        console.error("Error during mounted process:", error);
+        console.error('Error during mounted process:', error);
     } finally {
         loading.value = false; // Reset loading state when done
     }
 });
-
-
 
 const formatDate = (dateString) => {
     const dateObj = new Date(dateString);
@@ -633,7 +467,6 @@ const formatDate = (dateString) => {
 
     return `${formattedDate} (${formattedTime})`;
 };
-
 
 // Reactive property to track the selected mode
 const selectedMode = ref('Daily');
@@ -654,12 +487,12 @@ const selectMode = async (mode) => {
         if (selectedDate.value) {
             const date = new Date(selectedDate.value);
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-            const day = String(date.getDate()).padStart(2, "0"); // Get local day of the month
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const day = String(date.getDate()).padStart(2, '0'); // Get local day of the month
             const formattedDate = `${year}-${month}-${day}`;
             console.log(formattedDate);
         } else {
-            console.log("No date selected");
+            console.log('No date selected');
         }
 
         await getAllOrders();
@@ -670,15 +503,13 @@ const selectMode = async (mode) => {
             renderChart();
         });
     } catch (error) {
-        console.error("Error during mounted process:", error);
+        console.error('Error during mounted process:', error);
     } finally {
         loading.value = false; // Reset loading state when done
     }
 };
 
-
 const showModes = ref(true);
-
 
 // Array for month names
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -705,8 +536,154 @@ const formattedDate = computed(() => {
 });
 
 // Function to dynamically generate sales data based on orders
-
 </script>
+
+<template>
+    <div class="grid grid-cols-12 -mx-5 mb-10 mt-1">
+        <div class="col-span-12 xl:col-span-12 items-center bg-gray-900"
+            :class="['fixed top-0 left-0 right-0 z-[1]', isRounded ? 'shadow-md transition-all duration-300 ease-in-out' : ' top-0 bg-gray-800  p-2 transition-all duration-300 ease-in-out shadow-lg ']">
+            <div class="flex gap-2 overflow-x-auto transition-all duration-300 ease-in-out transform bg-whsite"
+                :class="showModes ? 'flex gap-2 overflow-x-auto' : 'hidden'"
+                style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none">
+                <div class="flex bg-surface-900 m-3 mt-2 rounded-lg w-full">
+                    <!-- Daily -->
+                    <div :class="['col-span-3 flex gap-3 font-bold flex-1 border-[1px] h-full relative p-2 justify-center', 'rounded-tl-lg rounded-bl-lg', selectedMode === 'Daily' ? 'bg-white text-surface-900' : 'bg-surface-900 text-white']"
+                        @click="selectMode('Daily')">
+                        Daily
+                    </div>
+                    <!-- Weekly -->
+                    <div :class="['col-span-3 flex gap-3 font-bold flex-1 border-[1px] h-full relative p-2 justify-center', selectedMode === 'Weekly' ? 'bg-white text-surface-900' : 'bg-surface-900 text-white']"
+                        @click="selectMode('Weekly')">
+                        Weekly
+                    </div>
+                    <!-- Monthly -->
+                    <div :class="['col-span-3 flex gap-3 font-bold flex-1 border-[1px] h-full relative p-2 justify-center', 'rounded-tr-lg rounded-br-lg', selectedMode === 'Monthly' ? 'bg-white text-surface-900' : 'bg-surface-900 text-white']"
+                        @click="selectMode('Monthly')">
+                        Monthly
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-between w-full p-0 font-bold rounded-full">
+                <div class="flex px-4 py-2 justify-between w-full">
+                    <div class="flex gap-2 mx-3">
+                        <div class="flex flex-col">
+                            <div class="text-sm italic opacity-80 -mb-2">{{ dayOfWeek }}</div>
+                            <div class="text-xl font-bold">{{ formattedDate }}</div>
+                        </div>
+                        <div class="self-center">
+                            <button class="flex items-center justify-center" @click="calendarDialog = true">
+                                <Icon icon="material-symbols:edit-calendar" height="25" />
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-end flex-1 px-4 gap-2">
+                        <button @click="printTable" class="self-center">
+                            <Icon icon="material-symbols:print" height="30" />
+                        </button>
+                        <button @click="rotateIcon" class="self-center" ref="refreshButton">
+                            <Icon icon="bx:refresh" height="30" :class="rotationClass" />
+                        </button>
+                    </div>
+                    <div>
+                        <Dialog v-model:visible="calendarDialog" header="Select Date" :modal="true" :closable="true"
+                            showEffect="fade" hideEffect="fade">
+                            <DatePicker v-model="selectedDate" inline class="w-full sm:w-[30rem]" />
+                            <div class="w-full flex justify-end">
+                                <button @click="closeCalendar"
+                                    class="p-2 m-2 rounded-lg bg-yellow-500 text-black flex gap-2">
+                                    <Icon icon="tdesign:check" />
+                                    <div>Select Date</div>
+                                </button>
+                            </div>
+                        </Dialog>
+                        <!-- <button class="">Filter</button> -->
+                    </div>
+                </div>
+            </div>
+            <div @click="showModes = !showModes"
+                class="absolute left-1/2 bottom-[-20px] w-16 h-16 bg-gray-900 rounded-full z-[-1] transform -translate-x-1/2 shadow-lg flex flex-col justify-end items-center">
+                <div class="flex items-center justify-center">
+                    <Icon :icon="showModes ? 'ri:arrow-up-s-line' : 'ri:arrow-down-s-line'" height="30" />
+                </div>
+            </div>
+        </div>
+
+        <template v-if="selectedMode == 'Daily'">
+            <div class="col-span-12 xl:col-span-12 flex flex-col gap-2" :class="showModes ? 'mt-28' : 'mt-12'">
+                <div class="w-full h-auto">
+                    <div class="card border-[1px] h-full p-3">
+                        <div class="flex flex-wrap gap-2 overflow-auto min-h-[35vh]">
+                            <canvas ref="salesChart" width="400" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="flex-1 h-[15vh]">
+                        <div class="card border-[1px] h-full p-3 flex flex-col justify-center">
+                            <div class="flex gap-2 items-center">
+                                <div class="">
+                                    <Icon icon="tdesign:money" height="40" />
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="font-bold text-2xl">
+                                        {{ totalSales.toLocaleString('en-US', { style: 'currency', currency: 'PHP' }) }}
+                                    </div>
+
+                                    <div class="opacity-60 italic text-sm">Total Sales</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-1 text-xs" :class="textColor">
+                                <Icon :icon="arrowIcon" class="bg-transparent border-[1px] rounded-full self-center"
+                                    :class="textColor" height="13" />
+                                <div>{{ percentageChange || 'No data available' }} (from yesterday)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 h-[15vh]">
+                        <div class="card border-[1px] h-full p-3 flex flex-col justify-center">
+                            <div class="flex gap-2 items-center">
+                                <div class="">
+                                    <Icon icon="material-symbols-light:fastfood-sharp" height="40" />
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="font-bold text-2xl">
+                                        {{ totalOrders }}
+                                    </div>
+                                    <div class="opacity-60 italic text-sm">Total Orders</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-1 text-xs" :class="orderTextColor">
+                                <Icon :icon="orderArrowIcon"
+                                    class="bg-transparent border-[1px] rounded-full self-center" :class="orderTextColor"
+                                    height="13" />
+                                <div>{{ percentageOrderChange || 'No data available' }} (from yesterday)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-12 h-auto">
+                    <div class="card border-[1px] h-full p-3">
+                        <DataTable class="datatable" :value="orders" stripedRows tableStyle="" headerClass="text-sm"
+                            :paginator="true" :rows="10" :rowsPerPageOptions="[5, 10, 20]">
+                            <Column field="id" header="Order#" headerClass="text-sm" bodyClass="text-sm"></Column>
+                            <Column field="total_price" header="Total" headerClass="text-sm" bodyClass="text-sm">
+                            </Column>
+                            <Column field="tendered" header="Tendered" headerClass="text-sm" bodyClass="text-sm">
+                            </Column>
+                            <Column field="change1" header="Change" headerClass="text-sm" bodyClass="text-sm"></Column>
+                            <Column field="updated_at" header="Date" headerClass="text-sm" bodyClass="text-sm">
+                                <template #body="slotProps">
+                                    {{ formatDate(slotProps.data.updated_at) }}
+                                </template>
+                            </Column>
+                        </DataTable>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>
 <style scoped>
 /* Add some hover effect for better interaction */
 
@@ -721,6 +698,45 @@ const formattedDate = computed(() => {
 
     100% {
         transform: rotate(-360deg);
+    }
+}
+
+@media print {
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: black;
+    }
+
+    .print-container {
+        margin: 20px;
+    }
+
+    .print-container h1 {
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .paginator,
+    .self-center {
+        display: none;
     }
 }
 
