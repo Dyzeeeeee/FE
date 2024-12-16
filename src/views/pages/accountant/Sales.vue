@@ -39,7 +39,7 @@ const totalOrders = computed(() => {
 const loading = ref(false); // Track if the process is in progress
 
 const rotationClass = ref(''); // This will hold the rotation class
-const rows = ref(10); // Default rows per page
+const rows = ref(100); // Default rows per page
 
 // Method to show all rows
 const showAll = () => {
