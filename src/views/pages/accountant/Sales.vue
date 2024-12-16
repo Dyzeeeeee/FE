@@ -3,7 +3,7 @@ import axios from 'axios';
 import { LineController } from 'chart.js'; // Import the line controller
 
 import { CategoryScale, Chart, Filler, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const totalSales = computed(() => {
     // Sum up all total_price values in orders
@@ -12,6 +12,8 @@ const totalSales = computed(() => {
         return sum + price;
     }, 0);
 });
+
+// Watch for changes to selectedDate and store it in localStorage
 
 const printTable = () => {
     const originalContents = document.body.innerHTML;
@@ -37,7 +39,12 @@ const totalOrders = computed(() => {
 const loading = ref(false); // Track if the process is in progress
 
 const rotationClass = ref(''); // This will hold the rotation class
+const rows = ref(10); // Default rows per page
 
+// Method to show all rows
+const showAll = () => {
+    rows.value = orders.value.length; // Set the rows to show all orders
+};
 const rotateIcon = async () => {
     if (loading.value) return; // Prevent action if already loading
     loading.value = true; // Set loading state to true
@@ -422,13 +429,19 @@ onBeforeUnmount(() => {
     }
 });
 
+watch(selectedDate, (newDate) => {
+    localStorage.setItem('selectedDate', newDate.toISOString());
+});
 // Function to set the selected mode
 
 // OnMounted lifecycle hook
 onMounted(async () => {
     if (loading.value) return; // Prevent execution if already loading
     loading.value = true; // Set loading state to true
-
+    const storedDate = localStorage.getItem('selectedDate');
+    if (storedDate) {
+        selectedDate.value = new Date(storedDate);
+    }
     try {
         if (selectedDate.value) {
             const date = new Date(selectedDate.value);
@@ -665,7 +678,7 @@ const formattedDate = computed(() => {
                 <div class="col-span-12 h-auto">
                     <div class="card border-[1px] h-full p-3">
                         <DataTable class="datatable" :value="orders" stripedRows tableStyle="" headerClass="text-sm"
-                            :paginator="true" :rows="10" :rowsPerPageOptions="[5, 10, 20]">
+                            :paginator="true" :rows="rows" :rowsPerPageOptions="[5, 10, 20, orders.length]">
                             <Column field="id" header="Order#" headerClass="text-sm" bodyClass="text-sm"></Column>
                             <Column field="total_price" header="Total" headerClass="text-sm" bodyClass="text-sm">
                             </Column>
@@ -678,6 +691,8 @@ const formattedDate = computed(() => {
                                 </template>
                             </Column>
                         </DataTable>
+                        <!-- Show All Button -->
+                        <button @click="showAll" class="btn btn-primary mt-3">Show All</button>
                     </div>
                 </div>
             </div>
